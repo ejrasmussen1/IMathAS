@@ -1,0 +1,5 @@
+# .gitignore
+config.php
+infoheader.php
+loginpage.php
+newinstructor.php
