@@ -257,8 +257,11 @@ class Sanitize
 	 */
 
 	 public static function randomQueryStringParam(){
+		 	
 			$bytes = mt_rand(10,100);
-			$r =  openssl_random_pseudo_bytes($bytes,true);
+			$rndmBytes =  openssl_random_pseudo_bytes($bytes);
+			$hex   = bin2hex($rndmBytes);
+			$r =  strval($hex);
 			return $r;
 	 }
 
