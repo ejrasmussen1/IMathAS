@@ -100,7 +100,9 @@
 
 		 $sessiondata['secsalt'] = generaterandstring();
 		 if (isset($_POST['savesettings'])) {
-			 setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000);
+			# Turn on HTTPOnly parameter on in setcookie()
+			# setcookie('mathgraphprefs',$_POST['mathdisp'].'-'.$_POST['graphdisp'],2000000000);
+			setcookie('mathgraphprefs', $_POST['mathdisp'] . '-' . $_POST['graphdisp'], 2000000000, null, null, null, true); 
 		 }
 		 $enc = base64_encode(serialize($sessiondata));
 		 //DB $query = "UPDATE imas_sessions SET sessiondata='$enc' WHERE sessionid='$sessionid'";
