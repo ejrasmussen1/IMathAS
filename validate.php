@@ -73,7 +73,7 @@
  	 		$tzname = $line['tzname'];
  	 	}
  	 }
- 	 $enc = $line['sessiondata'];
+	 $enc = $line['sessiondata'];
 	 if ($enc!='0') {
 		 $sessiondata = unserialize(base64_decode($enc));
 		 //delete own session if old and not posting
@@ -115,7 +115,7 @@
 		$stm->execute(array(':now'=>$now, ':log'=>"$userid login from IP:{$_SERVER['REMOTE_ADDR']}"));
 
 
-		 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . $querys);
+		 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . $querys . '&r=' . Sanitize::generateQueryStringParam());
 		 exit;
 	 }
 
@@ -286,7 +286,7 @@
 		 //DB //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
 		 //DB //mysql_query($query) or die("Query failed : " . mysql_error());
 
-		 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . $querys);
+		 header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . $querys . '&r=' . Sanitize::fullQueryStringParam());
 	 } else {
 		 if (empty($_SESSION['challenge'])) {
 			 $badsession = true;
@@ -360,7 +360,7 @@
 	}
 	
 	if (!empty($line['forcepwreset']) && (empty($_GET['action']) || $_GET['action']!='forcechgpwd') && (!isset($sessiondata['ltiitemtype']) || $sessiondata['ltirole']!='learner')) {
-		 header('Location: ' . $GLOBALS['basesiteurl'] . '/forms.php?action=forcechgpwd');
+		 header('Location: ' . $GLOBALS['basesiteurl'] . '/forms.php?action=forcechgpwd' . '&r=' . Sanitize::randomQueryStringParam());
 		 exit;
 	}
 
@@ -399,7 +399,7 @@
 		writesessiondata();
 	}
 	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php".'?r='.Sanitize::randomQueryStringParam());
 	}
 
 	if (isset($sessiondata['ltiitemtype'])) {
@@ -421,7 +421,7 @@
 				$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
 				$stm->execute(array(':id'=>$sessiondata['ltiitemid']));
 				$cid = Sanitize::courseId($stm->fetchColumn(0));
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}" . "&r=" . Sanitize::randomQueryStringParam());
 				exit;
 			}
 		} else if ($sessiondata['ltirole']=='instructor') {
