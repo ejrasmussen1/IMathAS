@@ -248,9 +248,9 @@ if (isset($_POST['createcourse'])) {
 			$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
 			$stm->execute(array(':id'=>$typeid));
 			$atitle = $stm->fetchColumn(0);
-			$r = openssl_random_pseudo_bytes(10,true);
-			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_place_aid=$typeid&r=$r";
-			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle).'&text='.Sanitize::encodeUrlParam($atitle));
+			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_place_aid=$typeid&r=" .Sanitize::randomQueryStringParam();
+			
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($atitle).'&text='.Sanitize::encodeUrlParam($atitle). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
 
 		} else {
@@ -260,9 +260,8 @@ if (isset($_POST['createcourse'])) {
 			$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
 			$stm->execute(array(':id'=>$typeid));
 			$cname = $stm->fetchColumn(0);
-			$r = openssl_random_pseudo_bytes(10,true);
-			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_open_folder=$typeid-0&r=$r";
-			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname).'&text='.Sanitize::encodeUrlParam($cname));
+			$url = $GLOBALS['basesiteurl'] . "/bltilaunch.php?custom_open_folder=$typeid-0&r" .Sanitize::randomQueryStringParam();
+			header('Location: '.$sessiondata['lti_selection_return'].'?embed_type=basic_lti&url='.Sanitize::encodeUrlParam($url).'&title='.Sanitize::encodeUrlParam($cname).'&text='.Sanitize::encodeUrlParam($cname). '&r=' .Sanitize::randomQueryStringParam());
 			exit;
 		}
 	}
@@ -287,8 +286,7 @@ if (isset($_POST['createcourse'])) {
 
 if ($hasplacement && $placementtype=='course') {
 	if (!isset($_GET['showhome']) && !isset($_GET['chgplacement'])) {
-		$r = openssl_random_pseudo_bytes(10,true);
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($cid) . "&r=" . $r);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($cid) . "&r=" .Sanitize::randomQueryStringParam());
 		exit;
 	}
 }
