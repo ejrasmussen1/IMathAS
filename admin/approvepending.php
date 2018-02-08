@@ -66,7 +66,7 @@ if (isset($_GET['go'])) {
 			mail($row[2],$installname . ' Account Approval',$message,$headers);
 		}
 	}
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/approvepending.php?skipn=$offset");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/approvepending.php?skipn=$offset&r=".Sanitize::randomQueryStringParam());
 	exit;
 }
 
