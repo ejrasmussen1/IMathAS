@@ -39,15 +39,15 @@ if (isset($CFG['CPS']['theme'])) {
 $coursetheme = $defaultcoursetheme; //will be overwritten later if set
 if (!isset($CFG['CPS']['miniicons'])) {
 	$CFG['CPS']['miniicons'] = array(
-			'assess'=>'assess_tiny.png',
-			'drill'=>'drill_tiny.png',
-			'inline'=>'inline_tiny.png',
-			'linked'=>'html_tiny.png',
-			'forum'=>'forum_tiny.png',
-			'wiki'=>'wiki_tiny.png',
-			'folder'=>'folder_tiny.png',
-			'tree'=>'folder_tree_tiny.png',
-			'calendar'=>'1day.png');
+		'assess'=>'assess_tiny.png',
+		'drill'=>'drill_tiny.png',
+		'inline'=>'inline_tiny.png',
+		'linked'=>'html_tiny.png',
+		'forum'=>'forum_tiny.png',
+		'wiki'=>'wiki_tiny.png',
+		'folder'=>'folder_tiny.png',
+		'tree'=>'folder_tree_tiny.png',
+		'calendar'=>'1day.png');
 }
 
 //check for bad sessionids.
