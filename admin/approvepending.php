@@ -101,7 +101,7 @@ if ($stm->rowCount()==0) {
 	echo '<input type="hidden" name="email" value="' . Sanitize::encodeStringForDisplay($row[4]) . '"/>';
 	echo '<input type="hidden" name="id" value="' . Sanitize::encodeStringForDisplay($row[0]) . '"/>';
 	echo '<p>Username: ' . Sanitize::encodeStringForDisplay($row[1]) . '<br/>Name: ' . Sanitize::encodeStringForDisplay($row[2]) . ', ' . Sanitize::encodeStringForDisplay($row[3]) . ' (' . Sanitize::encodeStringForDisplay($row[4]) . ')</p>';
-	echo '<p>Request made: '.$reqdate.'</p>';
+	echo '<p>Request made: '.Sanitize::encodeStringForDisplay($reqdate).'</p>';
 	$school = '';
 	if ($details != '') {
 		$cleanDetails = sanitizeNewInstructorRequestLog($details);
