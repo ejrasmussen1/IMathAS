@@ -291,7 +291,8 @@ require_once("includes/sanitize.php");
 				require("footer.php");
 				exit;
 			} else {
-				echo "Invalid Username.  <a href=\"index.php$gb\">Try again</a>";
+                                                                        $rqs = '&r='.Sanitize::randomQueryStringParam();
+				echo "Invalid Username.  <a href=\"index.php$gb$rqs\">Try again</a>";
 				exit;
 			}
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
@@ -334,7 +335,7 @@ require_once("includes/sanitize.php");
 			exit;
 		} else if (isset($_GET['code'])) {
 			//moved to forms.php - keep redirect for to keep old links working for now.
-			header('Location: ' . $GLOBALS['basesiteurl'] . '/action=resetpw&id='.Sanitize::onlyInt($_GET['id']).'&code='.Sanitize::encodeUrlParam($code));
+			header('Location: ' . $GLOBALS['basesiteurl'] . '/action=resetpw&id='.Sanitize::onlyInt($_GET['id']).'&code='.Sanitize::encodeUrlParam($code).'&r='.Sanitize::randomQueryStringParam());
 		}
 	} else if ($_GET['action']=="lookupusername") {
 		require_once("init_without_validate.php");
@@ -411,7 +412,7 @@ require_once("includes/sanitize.php");
 		$stm->execute(array($sessionid));
 		$_SESSION = array();
 		if (isset($_COOKIE[session_name()])) {
-			setcookie(session_name(), '', time()-42000, '/');
+			setcookie(session_name(), '', time()-42000, '/', '','',true);
 		}
 		session_destroy();
 	} else if ($_GET['action']=="chgpwd" || $_GET['action']=="forcechgpwd") {
@@ -790,7 +791,7 @@ require_once("includes/sanitize.php");
 	if ($isgb) {
 		echo '<html><body>Changes Recorded.  <input type="button" onclick="parent.GB_hide()" value="Done" /></body></html>';
 	} else {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php?r=".Sanitize::randomQueryStringParam());
 	}
 
 

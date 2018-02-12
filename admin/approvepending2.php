@@ -34,8 +34,9 @@ if (isset($_POST['newstatus'])) {
 		if ($_POST['group']>-1) {
 			$group = intval($_POST['group']);
 		} else if (trim($_POST['newgroup'])!='') {
+			$newGroupName = Sanitize::encodeStringForDisplay($_POST['newgroup']);
 			$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
-			$stm->execute(array(':name'=>$_POST['newgroup']));
+			$stm->execute(array(':name'=>$newGroupName));
 			$group = $DBH->lastInsertId();
 		} else {
 			$group = 0;

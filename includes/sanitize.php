@@ -261,8 +261,8 @@ class Sanitize
 			$bytes = mt_rand(10,100);
 			$rndmBytes =  openssl_random_pseudo_bytes($bytes);
 			$hex   = bin2hex($rndmBytes);
-			$r =  strval($hex);
-			return $r;
+			$randomString = strval($hex);
+			return $randomString;
 	 }
 
 	/**

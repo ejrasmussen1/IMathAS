@@ -695,8 +695,8 @@ if (!(isset($teacherid))) {
 		$stm->execute(array(':id'=>$cid));
 
 		list($blockcnt,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
-		$ciditemorder = unserialize($itemorder);
-		$items = unserialize($itemlist);
+		$ciditemorder = json_decode($itemorder);
+		$items = json_decode($itemlist);
 		$newitems = array();
 		$missingfiles = array();
 
@@ -724,7 +724,8 @@ if (!(isset($teacherid))) {
 			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
 		} else if ($myrights==100) {
 			echo "<p>$updateqcnt questions updated, $newqcnt questions added.</p>";
-			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
+			$randomString = Sanitize::randomQueryStringParam();
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid&r=$randomString\" >Done</a></p>";
 		} else {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
 		}
@@ -746,7 +747,7 @@ if (!(isset($teacherid))) {
 			$page_fileErrorMsg .=  "a question or library export.\n";
 		}
 
-		$items = unserialize($itemlist);
+		$items = json_decode($itemlist);
 		$ids = array();
 		$types = array();
 		$names = array();
