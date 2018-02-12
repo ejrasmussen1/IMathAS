@@ -97,10 +97,10 @@
 	   $stm->execute(array(':sessionid'=>$sessionid));
 	   $sessiondata = array();
 	   if (isset($_COOKIE[session_name()])) {
-		   setcookie(session_name(), '', time()-42000, '/');
+		   setcookie(session_name(), '', time()-42000, '/', '', '', true);
 	   }
 	   session_destroy();
-	   header('Location: ' . $GLOBALS['basesiteurl'] . "/diag/index.php?id=" . Sanitize::onlyInt($diagid));
+	   header('Location: ' . $GLOBALS['basesiteurl'] . "/diag/index.php?id=" . Sanitize::onlyInt($diagid) . "&r=" . Sanitize::randomQueryStringParam());
 	   exit;
 	}
 
@@ -108,7 +108,7 @@ if (isset($_POST['SID'])) {
 	$_POST['SID'] = trim(str_replace('-','',$_POST['SID']));
 	if (trim($_POST['SID'])=='' || trim($_POST['firstname'])=='' || trim($_POST['lastname'])=='') {
 		echo "<html><body>", _('Please enter your ID, first name, and lastname.'), "  <a href=\"index.php?id=" . Sanitize::onlyInt($diagid) . "\">", _('Try Again'), "</a>\n";
-			exit;
+		exit;
 	}
 
 	$entrytype = substr($entryformat,0,1); //$entryformat{0};
@@ -299,8 +299,8 @@ if (isset($_POST['SID'])) {
 			$stm = $DBH->prepare("UPDATE imas_users SET lastaccess=:lastaccess WHERE id=:id");
 			$stm->execute(array(':lastaccess'=>$now, ':id'=>$userid));
 
-		    header(sprintf('Location: %s/assessment/showtest.php?cid=%s&id=%d', $GLOBALS['basesiteurl'],
-                Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid)));
+		    header(sprintf('Location: %s/assessment/showtest.php?cid=%s&id=%d&r=%s', $GLOBALS['basesiteurl'],
+                Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid), Sanitize::randomQueryStringParam()));
 			exit;
 
 		//} else {
@@ -348,8 +348,8 @@ if (isset($_POST['SID'])) {
 	$aids = explode(',',$line['aidlist']);
 	$paid = $aids[$_POST['course']];
 
-	header(sprintf('Location: %s/assessment/showtest.php?cid=%s&id=%d', $GLOBALS['basesiteurl'],
-        Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid)));
+	header(sprintf('Location: %s/assessment/showtest.php?cid=%s&id=%d&r=%s', $GLOBALS['basesiteurl'],
+        Sanitize::onlyInt($pcid), Sanitize::onlyInt($paid), Sanitize::randomQueryStringParam()));
 	exit;
 }
 
