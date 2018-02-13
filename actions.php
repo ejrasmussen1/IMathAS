@@ -444,7 +444,7 @@ require_once("includes/sanitize.php");
 
 	} else if ($_GET['action']=="enroll") {
 		if ($myrights < 6) {
-			echo "<html><body>\nError: Guests can't enroll in courses</body></html";
+			echo "<html><body>\nError: Guests can't enroll in courses</body></html>";
 			exit;
 		}
 		if (isset($_POST['courseselect']) && $_POST['courseselect']>0) {
@@ -456,7 +456,7 @@ require_once("includes/sanitize.php");
 			$pagetopper .= "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Enroll in a Course</div>\n";
 		}
 		$pagetopper .= '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
-		if ($_POST['cid']=="" || !is_numeric($_POST['cid'])) {
+		if (empty($courseId)) {
 			require("header.php");
 			echo $pagetopper;
 			echo "Please include Course ID.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
@@ -471,6 +471,8 @@ require_once("includes/sanitize.php");
 		$stm->execute(array(':cid'=>$_POST['cid']));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 
+
+
 		if ($line === false) {
 			require("header.php");
 			echo $pagetopper;
@@ -483,7 +485,7 @@ require_once("includes/sanitize.php");
 			echo "Course is closed for self enrollment.  Contact your instructor for access.  <a href=\"index.php\">Return to home page.</a>\n";
 			require("footer.php");
 			exit;
-		} else if ($eKey=="" && $line['enrollkey'] != '') {
+		} else if ($eKey == "" && $line['enrollkey'] != '') {
 			require("header.php");
 			echo $pagetopper;
 			echo "Please include Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
@@ -577,7 +579,7 @@ require_once("includes/sanitize.php");
 		}
 	} else if ($_POST['action']=="unenroll") {
 		if ($myrights < 6) {
-			echo "<html><body>\nError: Guests can't unenroll from courses</body></html";
+			echo "<html><body>\nError: Guests can't unenroll from courses</body></html>";
 			exit;
 		}
 		if (!isset($_GET['cid'])) {
