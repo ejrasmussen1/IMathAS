@@ -149,31 +149,37 @@ require_once("includes/sanitize.php");
 			echo '<div id="headerforms" class="pagetitle"><h2>New User Signup</h2></div>';
 			echo "<p>Your account with username <b>" . Sanitize::encodeStringForDisplay($_POST['SID']) . "</b> has been created.  If you forget your password, you can ask your ";
 			echo "instructor to reset your password or use the forgotten password link on the login page.</p>\n";
-			if (trim($_POST['courseid'])!='') {
-				$error = '';
+			$courseId = Sanitize::courseId($_POST['courseid']);
+			$eKey = (string) trim($_POST['ekey']);
+			$uidp = (int) $_POST['id']; //user id $_POST
+			$uidg = (int) $_GET['id']; //user id $_GET
 
-				if (!is_numeric($_POST['courseid'])) {
-					$error = 'Invalid course id';
-				} else {
+
+			if (!empty($courseId)) {
+			//if (trim($_POST['courseid'])!='') {
+			//	$error = '';
+				//if (!is_numeric($_POST['courseid'])) {
+				//	$error = 'Invalid course id';
+				//} else {
 					//DB $query = "SELECT enrollkey,allowunenroll,deflatepass FROM imas_courses WHERE id = '{$_POST['courseid']}' AND (available=0 OR available=2)";
 					//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 					//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 
 					$query = "SELECT enrollkey,allowunenroll,deflatepass,msgset FROM imas_courses WHERE id=:cid AND (available=0 OR available=2)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':cid'=>$_POST['courseid']));
+					$stm->execute(array(':cid'=> $_POST['courseid']));
 					$line = $stm->fetch(PDO::FETCH_ASSOC);
 
 					if ($line==null) {
 						$error = 'Course not found';
 					} else if (($line['allowunenroll']&2)==2) {
 						$error = 'Course is closed for self enrollment';
-					} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
+					} else if ($eKey=="" && $line['enrollkey'] != '') {
 						$error = 'No enrollment key provided';
 					} else {
 						$keylist = array_map('strtolower',array_map('trim',explode(';',$line['enrollkey'])));
-						$_POST['ekey'] = trim($_POST['ekey']);
-						if (!in_array(strtolower($_POST['ekey']), $keylist)) {
+						//$_POST['ekey'] = trim($_POST['ekey']);
+						if (!in_array(strtolower($eKey), $keylist)) {
 							$error = 'Incorrect enrollment key';
 						} else {
 							if (count($keylist)>1) {
@@ -181,27 +187,27 @@ require_once("includes/sanitize.php");
 								$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:uid,:cid,:section,:latepass);";
 								$array = array(
 									':uid'=>$newuserid,
-									':cid'=>$_POST['courseid'],
-									':section'=>$_POST['ekey'],
+									':cid'=>$courseId,
+									':section'=>$eKey,
 									':latepass'=>$line['deflatepass']
 								);
 							} else {
 								//DB $query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$newuserid','{$_POST['courseid']}','{$line['deflatepass']}');";
 								$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES (:uid,:cid,:latepass);";
-								$array = array(':uid'=>$newuserid, ':cid'=>$_POST['courseid'], ':latepass'=>$line['deflatepass']);
+								$array = array(':uid'=>$newuserid, ':cid'=>$courseId, ':latepass'=>$line['deflatepass']);
 							}
 							$stm = $DBH->prepare($query);
 							$stm->execute($array);
 							//DB mysql_query($query) or die("Query failed : " . mysql_error());
-							echo '<p>You have been enrolled in course ID '.Sanitize::encodeStringForDisplay($_POST['courseid']).'</p>';
+							echo '<p>You have been enrolled in course ID '.$courseId.'</p>';
 
 							$msgOnEnroll = ((floor($line['msgset']/5)&2) > 0);
 							if ($msgOnEnroll) {
 								$stm_nmsg = $DBH->prepare("INSERT INTO imas_msgs (courseid,title,message,msgto,msgfrom,senddate,isread) VALUES (:cid,:title,:message,:msgto,:msgfrom,:senddate,4)");
 								$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=:cid");
-								$stm->execute(array(':cid'=>$_POST['courseid']));
+								$stm->execute(array(':cid'=>$courseId));
 								while ($tuid = $stm->fetchColumn(0)) {
-									$stm_nmsg->execute(array(':cid'=>$_POST['courseid'],':title'=>_('Automated new enrollment notice'),
+									$stm_nmsg->execute(array(':cid'=>$courseId,':title'=>_('Automated new enrollment notice'),
 										':message'=>_('This is an automated system message letting you know this student just enrolled in your course'),
 										':msgto'=>$tuid, ':msgfrom'=>$newuserid, ':senddate'=>time()));
 								}
@@ -218,9 +224,9 @@ require_once("includes/sanitize.php");
 
 			echo "<p>You can now <a href=\"" . $GLOBALS['basesiteurl'] . "/index.php\">return to the login page</a> and login with your new username and password</p>";
 			require("footer.php");
-		}
+	//	}
 		//header('Location: ' . $urlmode  . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/\\') . "/index.php");
-		exit;
+	//	exit;
 	} else if ($_GET['action']=="confirm") {
 		require_once("init_without_validate.php");
 		//DB $query = "UPDATE imas_users SET rights=10 WHERE id='{$_GET['id']}' AND rights=0";
@@ -229,7 +235,7 @@ require_once("includes/sanitize.php");
 
 		$query = "UPDATE imas_users SET rights=10 WHERE id=:id AND rights=0";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':id'=>$_GET['id']));
+		$stm->execute(array(':id'=>$uidg));
 
 		if ($stm->rowCount()>0) {
 			require("header.php");
@@ -291,15 +297,15 @@ require_once("includes/sanitize.php");
 				require("footer.php");
 				exit;
 			} else {
-                                                                        $rqs = '&r='.Sanitize::randomQueryStringParam();
+				$rqs = '&r='.Sanitize::randomQueryStringParam();
 				echo "Invalid Username.  <a href=\"index.php$gb$rqs\">Try again</a>";
 				exit;
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/index.php".$rqs);
 		} else if (isset($_POST['pw1'])) {
 			if ($_POST['pw1']!=$_POST['pw2']) {
 				echo 'Passwords do not match.  <a href="forms.php?action=resetpw&code='.Sanitize::encodeUrlParam($_POST['code'])
-					.'&id='.Sanitize::encodeUrlParam($_POST['id']).'">Try again</a>';
+					.'&id='.Sanitize::encodeUrlParam($uidp).'">Try again</a>';
 				exit;
 			}
 			//DB $query = "SELECT remoteaccess FROM imas_users WHERE id='{$_POST['id']}'";
@@ -309,7 +315,7 @@ require_once("includes/sanitize.php");
 
 			$query = "SELECT remoteaccess FROM imas_users WHERE id=:id";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':id'=>$_POST['id']));
+			$stm->execute(array(':id'=>$uidp));
 			if ($stm->rowCount() > 0) {
 				$row = $stm->fetch(PDO::FETCH_ASSOC);
 				if ($row['remoteaccess']!='' && $row['remoteaccess']===$_POST['code']) {
@@ -323,7 +329,7 @@ require_once("includes/sanitize.php");
 
 					$query = "UPDATE imas_users SET password=:newpw,remoteaccess='' WHERE id=:id LIMIT 1";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':id'=>$_POST['id'], ':newpw'=>$newpw));
+					$stm->execute(array(':id'=>$uidp, ':newpw'=>$newpw));
 					echo "Password Reset.  ";
 					echo "<a href=\"index.php\">Login with your new password</a>";
 				} else {
@@ -438,19 +444,19 @@ require_once("includes/sanitize.php");
 
 	} else if ($_GET['action']=="enroll") {
 		if ($myrights < 6) {
-			echo "<html><body>\nError: Guests can't enroll in courses</body></html";
+			echo "<html><body>\nError: Guests can't enroll in courses</body></html>";
 			exit;
 		}
 		if (isset($_POST['courseselect']) && $_POST['courseselect']>0) {
 			$_POST['cid'] = $_POST['courseselect'];
-			$_POST['ekey'] = '';
+			$eKey = '';
 		}
 		$pagetopper = '';
 		if ($gb == '') {
 			$pagetopper .= "<div class=breadcrumb><a href=\"index.php\">Home</a> &gt; Enroll in a Course</div>\n";
 		}
 		$pagetopper .= '<div id="headerforms" class="pagetitle"><h2>Enroll in a Course</h2></div>';
-		if ($_POST['cid']=="" || !is_numeric($_POST['cid'])) {
+		if (empty($courseId)) {
 			require("header.php");
 			echo $pagetopper;
 			echo "Please include Course ID.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
@@ -465,6 +471,8 @@ require_once("includes/sanitize.php");
 		$stm->execute(array(':cid'=>$_POST['cid']));
 		$line = $stm->fetch(PDO::FETCH_ASSOC);
 
+
+
 		if ($line === false) {
 			require("header.php");
 			echo $pagetopper;
@@ -477,7 +485,7 @@ require_once("includes/sanitize.php");
 			echo "Course is closed for self enrollment.  Contact your instructor for access.  <a href=\"index.php\">Return to home page.</a>\n";
 			require("footer.php");
 			exit;
-		} else if ($_POST['ekey']=="" && $line['enrollkey'] != '') {
+		} else if ($eKey == "" && $line['enrollkey'] != '') {
 			require("header.php");
 			echo $pagetopper;
 			echo "Please include Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
@@ -524,7 +532,7 @@ require_once("includes/sanitize.php");
 				exit;
 			} else {
 				$keylist = array_map('strtolower',array_map('trim',explode(';',$line['enrollkey'])));
-				if (!in_array(strtolower(trim($_POST['ekey'])), $keylist)) {
+				if (!in_array(strtolower(trim($eKey)), $keylist)) {
 					require("header.php");
 					echo $pagetopper;
 					echo "Incorrect Enrollment Key.  <a href=\"forms.php?action=enroll$gb\">Try Again</a>\n";
@@ -534,7 +542,7 @@ require_once("includes/sanitize.php");
 					if (count($keylist)>1) {
 						//DB $query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES ('$userid','{$_POST['cid']}','{$_POST['ekey']}','{$line['deflatepass']}');";
 						$query = "INSERT INTO imas_students (userid,courseid,section,latepass) VALUES (:uid,:cid,:section,:latepass);";
-						$array = array(':uid'=>$userid, ':cid'=>$_POST['cid'], ':section'=>$_POST['ekey'],':latepass'=>$line['deflatepass']);
+						$array = array(':uid'=>$userid, ':cid'=>$_POST['cid'], ':section'=>$eKey,':latepass'=>$line['deflatepass']);
 					} else {
 						//DB $query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES ('$userid','{$_POST['cid']}','{$line['deflatepass']}');";
 						$query = "INSERT INTO imas_students (userid,courseid,latepass) VALUES (:uid,:cid,:latepass);";
@@ -571,7 +579,7 @@ require_once("includes/sanitize.php");
 		}
 	} else if ($_POST['action']=="unenroll") {
 		if ($myrights < 6) {
-			echo "<html><body>\nError: Guests can't unenroll from courses</body></html";
+			echo "<html><body>\nError: Guests can't unenroll from courses</body></html>";
 			exit;
 		}
 		if (!isset($_GET['cid'])) {
