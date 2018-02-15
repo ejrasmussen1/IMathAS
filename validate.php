@@ -258,7 +258,7 @@ if (($line != null) && (
         generateuserprefs();
 
         $enc = base64_encode(serialize($sessiondata));
-
+        
         if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
             $stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :tzname, :sessiondata)");
             $stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$_POST['tzoffset'], ':tzname'=>$_POST['tzname'], ':sessiondata'=>$enc));
@@ -285,7 +285,7 @@ if (($line != null) && (
         //$now = time();
         //DB //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
         //DB //mysql_query($query) or die("Query failed : " . mysql_error());
-        
+
         header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'],strlen($imasroot)) . $querys . '?r=' . Sanitize::randomQueryStringParam());
     } else {
         if (empty($_SESSION['challenge'])) {

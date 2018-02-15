@@ -8,7 +8,7 @@
 	 }
 
 	if (isset($sessionpath)) { session_save_path($sessionpath);}
- 	ini_set('session.gc_maxlifetime',86400);
+ 	ini_set('session.gc_maxlifetime', 86400);
 	session_start();
 	$sessionid = session_id();
 
@@ -269,8 +269,8 @@ if (isset($_POST['SID'])) {
 		}
 		//if ($allowreentry) {
 
-			$sessiondata['mathdisp'] = $_POST['mathdisp'];//1;
-			$sessiondata['graphdisp'] = $_POST['graphdisp'];//1;
+			$sessiondata['mathdisp'] = (int) $_POST['mathdisp'];//1;
+			$sessiondata['graphdisp'] = (int) $_POST['graphdisp'];//1;
 			//$sessiondata['mathdisp'] = 1;
 			//$sessiondata['graphdisp'] = 1;
 			$sessiondata['useed'] = 1;
@@ -281,10 +281,11 @@ if (isset($_POST['SID'])) {
 			} else {
 				$tzname = '';
 			}
+			$tzoffset = (int) $_POST['tzoffset'];
 			//DB $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$tzname','$enc')";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :tzname, :sessiondata)");
-			$stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$_POST['tzoffset'], ':tzname'=>$tzname, ':sessiondata'=>$enc));
+			$stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$tzoffset, ':tzname'=>$tzname, ':sessiondata'=>$enc));
 			$aids = explode(',',$line['aidlist']);
 			$paid = $aids[$_POST['course']];
 			if ((intval($line['forceregen']) & (1<<intval($_POST['course'])))>0) {
@@ -331,8 +332,8 @@ if (isset($_POST['SID'])) {
 	$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,timelimitmult) VALUES (:userid, :courseid, :section, :timelimitmult);");
 	$stm->execute(array(':userid'=>$userid, ':courseid'=>$pcid, ':section'=>$_POST['teachers'], ':timelimitmult'=>$_POST['timelimitmult']));
 
-	$sessiondata['mathdisp'] = $_POST['mathdisp'];//1;
-	$sessiondata['graphdisp'] = $_POST['graphdisp'];//1;
+	$sessiondata['mathdisp'] = (int) $_POST['mathdisp'];//1;
+	$sessiondata['graphdisp'] = (int) $_POST['graphdisp'];//1;
 	$sessiondata['useed'] = 1;
 	$sessiondata['isdiag'] = $diagid;
 	$enc = base64_encode(serialize($sessiondata));
@@ -341,10 +342,11 @@ if (isset($_POST['SID'])) {
 	} else {
 		$tzname = '';
 	}
+	$tzoffset = (int) $_POST['tzoffset'];
 	//DB $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$tzname','$enc')";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :tzname, :sessiondata)");
-	$stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$_POST['tzoffset'], ':tzname'=>$tzname, ':sessiondata'=>$enc));
+	$stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$tzoffset, ':tzname'=>$tzname, ':sessiondata'=>$enc));
 	$aids = explode(',',$line['aidlist']);
 	$paid = $aids[$_POST['course']];
 
