@@ -106,7 +106,7 @@
 				echo "<p>Comments uploaded.". Sanitize::encodeStringForDisplay($successes) ."records.</p> ";
 				if (count($failures)>0) {
 					echo "<p>Comment upload failure on: <br/>";
-					echo implode('<br/>',$failures);
+					echo implode('<br/>', Sanitize::encodeStringForDisplay($failures));
 					echo '</p>';
 				}
 				if ($successes>0) {

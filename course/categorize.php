@@ -226,7 +226,7 @@ END;
 	foreach($itemarr as $qid) {
 		echo "<tr><td><input type=\"checkbox\" id=\"c".Sanitize::onlyInt($qid)."\" value=\"" . Sanitize::encodeStringForDisplay($qsetids[$qid]) . "\"/></td>";
 		echo "<td>" . Sanitize::encodeStringForDisplay($descriptions[$qid]) . "</td><td>";
-		printf("<td><input type=button value=\"Preview\" onClick=\"previewq('selform', %d, %d);\"/>", $qid, $qsetids[$qid]);
+		printf("<td><input type=button value=\"Preview\" onClick=\"previewq('selform', %d, %d);\"/>", Sanitize::onlyInt($qid), Sanitize::encodeStringForDisplay($qsetids[$qid]));
 		echo "<select id=\"".Sanitize::onlyInt($qid)."\" name=\"" . Sanitize::onlyInt($qid) . "\" class=\"qsel\">";
 		echo "<option value=\"0\" ";
 		if ($category[$qid] == 0) { echo "selected=1";}
@@ -239,7 +239,7 @@ END;
 		foreach ($outcomes as $oc) {
 			if ($oc[1]==1) {//is group
 				if ($ingrp) { echo '</optgroup>';}
-				echo '<optgroup label="'.htmlentities($oc[0]).'">';
+				echo '<optgroup label="'.Sanitize::encodeStringForDisplay($oc[0]).'">';
 				$ingrp = true;
 			} else {
 				echo '<option value="' . Sanitize::encodeStringForDisplay($oc[0]) . '" ';
@@ -284,7 +284,7 @@ END;
 		foreach ($outcomes as $oc) {
 			if ($oc[1]==1) {//is group
 				if ($ingrp) { echo '</optgroup>';}
-				echo '<optgroup label="'.htmlentities($oc[0]).'">';
+				echo '<optgroup label="'.Sanitize::encodeStringForDisplay($oc[0]).'">';
 				$ingrp = true;
 			} else {
 				echo '<option value="' . Sanitize::encodeStringForDisplay($oc[0]) . '">' . Sanitize::encodeStringForDisplay($outcomenames[$oc[0]]) . '</option>';

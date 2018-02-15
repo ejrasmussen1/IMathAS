@@ -538,7 +538,7 @@ if ($overwriteBody==1) {
 
 		Summary<BR>
 		<div class=editor>
-			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo htmlentities($line['summary']);?></textarea>
+			<textarea cols=60 rows=10 id=summary name=summary style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['summary']);?></textarea>
 		</div>
 		<br/>
 
@@ -555,13 +555,13 @@ if ($overwriteBody==1) {
 		<div id="textinput" <?php if ($type != 'text') {echo 'style="display:none;"';}?> >
 			Text<BR>
 			<div class=editor>
-				<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo htmlentities($line['text']);?></textarea>
+				<textarea cols=80 rows=20 id=text name=text style="width: 100%"><?php echo Sanitize::encodeStringForDisplay($line['text']);?></textarea>
 			</div>
 		</div>
 		<div id="webinput" <?php if ($type != 'web') {echo 'style="display:none;"';}?> >
 			<span class="form">Weblink (start with http://)</span>
 			<span class="formright">
-				<input size="80" name="web" value="<?php echo htmlentities($webaddr);?>" />
+				<input size="80" name="web" value="<?php echo Sanitize::encodeStringForDisplay($webaddr);?>" />
 			</span><br class="form">
 
 		</div>
@@ -587,8 +587,8 @@ if ($overwriteBody==1) {
 			<?php
 			if (count($toolvals)>0) {
 				writeHtmlSelect('tool',$toolvals,$toollabels,$selectedtool);
-				echo '<br/>Custom parameters: <input type="text" name="toolcustom" size="40" value="'.htmlentities($toolcustom).'" /><br/>';
-				echo 'Custom launch URL: <input type="text" name="toolcustomurl" size="40" value="'.htmlentities($toolcustomurl).'" /><br/>';
+				echo '<br/>Custom parameters: <input type="text" name="toolcustom" size="40" value="'.Sanitize::encodeStringForDisplay($toolcustom).'" /><br/>';
+				echo 'Custom launch URL: <input type="text" name="toolcustomurl" size="40" value="'.Sanitize::encodeStringForDisplay($toolcustomurl).'" /><br/>';
 			} else {
 				echo 'No Tools defined yet<br/>';
 			}
