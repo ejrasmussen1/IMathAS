@@ -246,7 +246,7 @@ function printoutcome($arr,$ind) {
 		}
 		$cnt++;
 		if (is_array($oi)) { //is outcome group
-			echo '<tr class="'.Sanitize::encodeStringForDisplay($class).'" colspan="'.$n.'"><td><span class="ind'.$ind.'"><b>'.Sanitize::encodeStringForDisplay($oi['name']).'</b></span></td></tr>';
+		  echo '<tr class="'.Sanitize::encodeStringForDisplay($class).'" colspan="'.Sanitize::onlyInt($n).'"><td><span class="ind'.Sanitize::onlyInt($ind).'"><b>'.Sanitize::encodeStringForDisplay($oi['name']).'</b></span></td></tr>';
 			printoutcome($oi['outcomes'],$ind+1);
 		} else {
 			echo '<tr class="'.$class.'">';
