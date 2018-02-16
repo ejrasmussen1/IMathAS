@@ -388,7 +388,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions.css?v=100517\" type=\"text/css\" />";
-	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/iconfonts/style.css?v=081316\" type=\"text/css\" />";
+	$loadiconfont = true;
 	$useeditor = "noinit";
 
 	//DEFAULT LOAD PROCESSING GOES HERE
@@ -1243,7 +1243,7 @@ if ($overwriteBody==1) {
 	<p>Assessment points total: <span id="pttotal"></span></p>
 	<?php if (isset($introconvertmsg)) {echo $introconvertmsg;}?>
 	<script>
-		var itemarray = <?php echo json_encode($jsarr); ?>;
+		var itemarray = <?php echo json_encode($jsarr, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS); ?>;
 		var beentaken = <?php echo ($beentaken) ? 1:0; ?>;
 		var displaymethod = "<?php echo Sanitize::encodeStringForDisplay($displaymethod); ?>";
 		document.getElementById("curqtbl").innerHTML = generateTable();
@@ -1448,7 +1448,7 @@ if ($overwriteBody==1) {
 				if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 				<td></td>
-				<td><b><?php echo $page_assessmentQuestions['desc'][$i]; ?></b></td>
+				<td><b><?php echo Sanitize::encodeStringForDisplay($page_assessmentQuestions['desc'][$i]); ?></b></td>
 				<td></td>
 				<td></td>
 				<td></td>

@@ -545,6 +545,9 @@ function togglevideoembed() {
 				var vidid = href.split('list=')[1].split(/[#&]/)[0];
 				var vidsrc = 'www.youtube.com/embed/videoseries?list=';
 				qsconn = '&'
+			} else if (href.match(/\/embed\//)) {
+				var vidid = href.split("/embed/")[1].split(/[#&\?]/)[0];
+				var vidsrc = 'www.youtube.com/embed/';
 			} else {
 				var vidid = href.split('v=')[1].split(/[#&]/)[0];
 				var vidsrc = 'www.youtube.com/embed/';
@@ -863,12 +866,12 @@ function initSageCell(base) {
 		var $this = jQuery(this);
 		if ($this.is("pre")) {
 			ta = this;
-			code = jQuery(ta).val();
+			code = jQuery(ta).html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n");
 		} else {
 			ta = $this.find("textarea");
 			if (ta.length==0 || jQuery(ta[0]).val()=="") {
 				if ($this.find("pre").length>0) {
-					code = $this.find("pre").text();
+					code = $this.find("pre").html().replace(/<br\s*\/?>/g,"\n").replace(/<\/?[a-zA-Z][^>]*>/g,'').replace(/\n\n/g,"\n");
 					if (ta.length==0) {
 						ta = $this.find("pre")[0];
 					} else {

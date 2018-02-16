@@ -488,7 +488,7 @@
 				$togr = array();
 				foreach ($qtypes as $k=>$t) {
 					if ($t=='essay' || $t=='file') {
-						$togr[] = $k;
+					  $togr[] = Sanitize::encodeStringForDisplay($k);
 					}
 				}
 				echo '<br/>Quick grade: <a href="#" class="fullcredlink" onclick="quickgrade('.$cnt.',0,\'scorebox\','.count($prts).',['.$answeights.']);return false;">Full credit all parts</a>';

@@ -4,7 +4,7 @@
 //(c) 2006 David Lippman
 //quadratic inequalities contributed by Cam Joyce
 $GLOBALS['noformatfeedback'] = true;
-$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
+$mathfuncs = array("sin","cos","tan","sinh","cosh","tanh","arcsin","arccos","arctan","arcsinh","arccosh","arctanh","sqrt","ceil","floor","round","log","ln","abs","max","min","count");
 $allowedmacros = $mathfuncs;
 //require_once("mathphp.php");
 require_once("mathphp2.php");
@@ -453,9 +453,9 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	eval("\$evaledsoln = \"$toevalsoln\";");
 
 	if ($returnqtxt===2) {
-		return '<div id="writtenexample" class="review">'.$evaledsoln.'</div>';
+		return '<div id="writtenexample" class="review" role=region aria-label="'._('Writen Example').'">'.$evaledsoln.'</div>';
 	} else if ($returnqtxt===3) {
-		return '<div class="question">'.$evaledqtext.'</div><div id="writtenexample" class="review">'.$evaledsoln.'</div>';
+		return '<div class="question" role=region aria-label="'._('Question').'">'.$evaledqtext.'</div><div id="writtenexample" class="review" role=region aria-label="'._('Writen Example').'">'.$evaledsoln.'</div>';
 	}
 	if (($qdata['solutionopts']&1)==0) {
 		$evaledsoln = '<i>'._('This solution is for a similar problem, not your specific version').'</i><br/>'.$evaledsoln;
@@ -492,10 +492,10 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if ($returnqtxt) {
 		$returntxt = $evaledqtext;
 	} else if ($seqinactive) {
-		echo "<div class=inactive>";
+		echo "<div class=inactive role=region aria-label=\""._('Inactive Question')."\">";
 		echo filter($evaledqtext);
 	} else {
-		echo "<div class=\"question\"><div>\n";
+		echo "<div class=\"question\" role=region aria-label=\""._('Question')."\"><div>\n";
 		echo filter($evaledqtext);
 		echo "</div>\n";
 	}
@@ -1931,7 +1931,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 		if (in_array('nosoln',$ansformats) || in_array('nosolninf',$ansformats)) {
 			list($out,$answer) = setupnosolninf($qn, $out, $answer, $ansformats, $la, $ansprompt, $colorbox);
 		}
-		if (isset($answer)) {
+		if (isset($answer) && !is_array($answer)) {
 			if ($GLOBALS['myrights']>10 && strpos($answer,'|')!==false) {
 				echo 'Warning: use abs(x) not |x| in $answer';
 			}
@@ -6922,9 +6922,12 @@ function checkreqtimes($tocheck,$rtimes) {
 		return 1;
 	}
 	$cleanans = preg_replace('/[^\w\*\/\+\-\(\)\[\],\.\^=]+/','',$tocheck);
+
 	//if entry used pow or exp, we want to replace them with their asciimath symbols for requiretimes purposes
 	$cleanans = str_replace("pow","^",$cleanans);
 	$cleanans = str_replace("exp","e",$cleanans);
+	$cleanans = preg_replace('/\^\((-?[\d\.]+)\)([^\d]|$)/','^$1$2', $cleanans);
+
 	if (is_numeric($cleanans) && $cleanans>0 && $cleanans<1) {
 		$cleanans = ltrim($cleanans,'0');
 	}
@@ -6937,39 +6940,55 @@ function checkreqtimes($tocheck,$rtimes) {
 			if ($list[$i]=='ignore_case') {
 				$ignore_case = ($list[$i+1]==='1' || $list[$i+1]==='true' || $list[$i+1]==='=1');
 				continue;
+			} else if ($list[$i]=='ignore_commas' && ($list[$i+1]==='1' || $list[$i+1]==='true' || $list[$i+1]==='=1')) {
+				$cleanans = str_replace(',','',$cleanans);
+				continue;
+			} else if ($list[$i]=='ignore_symbol') {
+				$cleanans = str_replace($list[$i+1],'',$cleanans);
+				continue;
 			}
 			$comp = substr($list[$i+1],0,1);
 			$num = intval(substr($list[$i+1],1));
-
-			if ($list[$i]=='#') {
-				$nummatch = preg_match_all('/[\d\.]+/',$cleanans,$m);
-			} else if (strlen($list[$i])>6 && substr($list[$i],0,6)=='regex:') {
-				$regex = str_replace('/','\\/',substr($list[$i],6));
-				$nummatch = preg_match_all('/'.$regex.'/'.($ignore_case?'i':''),$cleanans,$m);
-			} else {
-				if ($ignore_case || in_array($list[$i], $mathfuncs)) {
-					$nummatch = substr_count(strtolower($cleanans),strtolower($list[$i]));
+			$grouptocheck = array_map('trim', explode('||',$list[$i]));
+			$okingroup = false;
+			foreach ($grouptocheck as $lookfor) {
+				if ($lookfor=='#') {
+					$nummatch = preg_match_all('/[\d\.]+/',$cleanans,$m);
+				} else if (strlen($lookfor)>6 && substr($lookfor,0,6)=='regex:') {
+					$regex = str_replace('/','\\/',substr($lookfor,6));
+					$nummatch = preg_match_all('/'.$regex.'/'.($ignore_case?'i':''),$cleanans,$m);
 				} else {
-					$nummatch = substr_count($cleanans,$list[$i]);
+					if ($ignore_case || in_array($lookfor, $mathfuncs)) {
+						$nummatch = substr_count(strtolower($cleanans),strtolower($lookfor));
+					} else {
+						$nummatch = substr_count($cleanans,$lookfor);
+					}
+				}
+	
+				if ($comp == "=") {
+					if ($nummatch==$num) {
+						$okingroup = true;
+						break;
+					}
+				} else if ($comp == "<") {
+					if ($nummatch<$num) {
+						$okingroup = true;
+						break;
+					}
+				} else if ($comp == ">") {
+					if ($nummatch>$num) {
+						$okingroup = true;
+						break;
+					}
+				} else if ($comp == "!") {
+					if ($nummatch!=$num) {
+						$okingroup = true;
+						break;
+					}
 				}
 			}
-
-			if ($comp == "=") {
-				if ($nummatch!=$num) {
-					return 0;
-				}
-			} else if ($comp == "<") {
-				if ($nummatch>=$num) {
-					return 0;
-				}
-			} else if ($comp == ">") {
-				if ($nummatch<=$num) {
-					return 0;
-				}
-			} else if ($comp == "!") {
-				if ($nummatch==$num) {
-					return 0;
-				}
+			if (!$okingroup) {
+				return 0;
 			}
 		}
 	}
@@ -7116,7 +7135,7 @@ function checkanswerformat($tocheck,$ansformats) {
 
 	if (in_array("fraction",$ansformats) || in_array("reducedfraction",$ansformats) || in_array("fracordec",$ansformats)) {
 		$tocheck = preg_replace('/\s/','',$tocheck);
-		if (!preg_match('/^\(?\-?\(?\d+\)?\/\(?\d+\)?$/',$tocheck) && !preg_match('/^\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\d*?\.\d*?\s*$/',$tocheck))) {
+		if (!preg_match('/^\(?\-?\s*\(?\d+\)?\/\(?\d+\)?$/',$tocheck) && !preg_match('/^\(?\d+\)?\/\(?\-?\d+\)?$/',$tocheck) && !preg_match('/^\s*?\-?\s*\d+\s*$/',$tocheck) && (!in_array("fracordec",$ansformats) || !preg_match('/^\s*?\-?\s*\d*?\.\d*?\s*$/',$tocheck))) {
 			return false;
 		} else {
 			if (in_array("reducedfraction",$ansformats) && strpos($tocheck,'/')!==false) {
@@ -7146,12 +7165,12 @@ function checkanswerformat($tocheck,$ansformats) {
 	}
 
 	if (in_array("mixednumber",$ansformats) || in_array("sloppymixednumber",$ansformats) || in_array("mixednumberorimproper",$ansformats)) {
-		if (!preg_match('/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$tocheck,$mnmatches) && !preg_match('/^\s*?\-?\d+\s*$/',$tocheck) && !preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {
+		if (!preg_match('/^\s*\-?\s*\d+\s*(_|\s)\s*(\d+)\s*\/\s*(\d+)\s*$/',$tocheck,$mnmatches) && !preg_match('/^\s*?\-?\s*\d+\s*$/',$tocheck) && !preg_match('/^\s*\-?\s*\d+\s*\/\s*\-?\s*\d+\s*$/',$tocheck)) {
 			//if doesn't match any format, exit
 			return false;
 		} else {
-			if (preg_match('/^\s*\-?\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {   //if a fraction
-				$tmpa = explode("/",$tocheck);
+			if (preg_match('/^\s*\-?\s*\d+\s*\/\s*\-?\d+\s*$/',$tocheck)) {   //if a fraction
+				$tmpa = explode("/",str_replace(' ','',$tocheck));
 				if (in_array("mixednumber",$ansformats)) {
 					if ((gcd(abs($tmpa[0]),abs($tmpa[1]))!=1) || abs($tmpa[0])>=abs($tmpa[1])) {
 						return false;
@@ -7161,7 +7180,7 @@ function checkanswerformat($tocheck,$ansformats) {
 						return false;
 					}
 				}
-			} else	if (!preg_match('/^\s*?\-?\d+\s*$/',$tocheck)) {  //is in mixed number format
+			} else	if (!preg_match('/^\s*\-?\s*\d+\s*$/',$tocheck)) {  //is in mixed number format
 				if (in_array("mixednumber",$ansformats)) {
 					if ($mnmatches[2]>=$mnmatches[3] || gcd($mnmatches[2],$mnmatches[3])!=1) {
 						return false;

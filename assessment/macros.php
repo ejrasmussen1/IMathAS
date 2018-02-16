@@ -382,10 +382,13 @@ function showplot($funcs) { //optional arguments:  $xmin,$xmax,$ymin,$ymax,label
 			} else if ($py>$yymax || $py<$yymin) { //coming or staying in bounds?
 				if ($y <= $yymax && $y >= $yymin) { //coming in
 					//need to determine which direction.  Let's calculate an extra value
+					//and need un-rounded y-value for comparison
 					if ($isparametric) {
-						$tempy = round($evalyfunc($t-$dx/10),$yrnd);
+						$y = $evalyfunc($t);
+						$tempy = $evalyfunc($t-$dx/10);
 					} else {
-						$tempy = round($evalfunc($x-$dx/10),$yrnd);
+						$y = $evalfunc($x);
+						$tempy = $evalfunc($x-$dx/10);
 					}
 					if ($tempy>$y) { //seems to be coming down
 						$iy = $yymax;
@@ -1901,16 +1904,21 @@ function numtowords($num,$doth=false,$addcontractiontonum=false) {
 	if ($num==0) {
 		return "zero";
 	}
+	$out = '';
+	if ($num<0) {
+		$out .= 'negative ';
+		$num = abs($num);
+	}
 	$int = floor($num);
 	$dec = 	$num-$int;
-	$out = '';
+	
 	if ($int>0) {
 		$out .= convertTri($int,0,$doth);
-		if ($dec>0) {
+		if (abs($dec)>1e-9) {
 			$out .= " and ";
 		}
 	}
-	if ($dec>0) {
+	if (abs($dec)>1e-9) {
 		$cnt = 0;
 		while (abs($dec-round($dec))>1e-9 && $cnt<9) {
 			$dec *= 10;

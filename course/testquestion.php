@@ -293,7 +293,7 @@ if ($overwriteBody==1) {
 		echo 'It is recommended you discontinue use of this question when possible</p>';
 	}
 	if ($line['replaceby']>0) {
-		echo '<p class=noticetext>This message has been marked as deprecated, and it is recommended you use question ID '.$line['replaceby'].' instead.  You can find this question ';
+	  echo '<p class=noticetext>This message has been marked as deprecated, and it is recommended you use question ID '.Sanitize::encodeStringForDisplay($line['replaceby']).' instead.  You can find this question ';
 		echo 'by searching all libraries with the ID number as the search term</p>';
 	}
 
