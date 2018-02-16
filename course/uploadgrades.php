@@ -123,7 +123,7 @@ if (!(isset($teacherid))) {
 			$body = "<p>Grades uploaded.  $successes records.</p> ";
 			if (count($failures)>0) {
 				$body .= "<p>Grade upload failure on: <br/>";
-				$body .= implode('<br/>',$failures);
+				$body .= implode('<br/>', Sanitize::encodeStringForDisplay($failures));
 				$body .= '</p>';
 			}
 			if ($successes>0) {
