@@ -1907,10 +1907,10 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				    echo " <a href=\"addquestions.php?aid=$typeid&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">", _('Settings'), "</a> | \n";
-				   echo "<a href=\"deleteassessment.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				   echo " <a href=\"addquestions.php?aid=" . Sanitize::onlyInt($typeid) . "&cid=$cid\">", _('Questions'), "</a> | <a href=\"addassessment.php?id=$typeid&cid=$cid\">", _('Settings'), "</a> | \n";
+				   echo "<a href=\"deleteassessment.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
-				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=$typeid\">", _('Grades'), "</a>";
+				   echo " | <a href=\"gb-itemanalysis.php?cid=$cid&asid=average&aid=" . Sanitize::onlyInt($typeid) . "\">", _('Grades'), "</a>";
 				   echo '</span>';
 			   }
 			   echo "</li>";
@@ -1959,8 +1959,8 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addinlinetext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
-				  echo "<a href=\"deleteinlinetext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				   echo " <a href=\"addinlinetext.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+				   echo "<a href=\"deleteinlinetext.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
@@ -2006,8 +2006,8 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addlinkedtext.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
-				  echo "<a href=\"deletelinkedtext.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				   echo " <a href=\"addlinkedtext.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+				   echo "<a href=\"deletelinkedtext.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
@@ -2053,8 +2053,8 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addforum.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
-				  echo "<a href=\"deleteforum.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				   echo " <a href=\"addforum.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+				   echo "<a href=\"deleteforum.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
@@ -2100,8 +2100,8 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   if ($showlinks) {
 				   echo '<span class="links">';
-				   echo " <a href=\"addwiki.php?id=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
-				  echo "<a href=\"deletewiki.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				   echo " <a href=\"addwiki.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+				   echo "<a href=\"deletewiki.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 				  echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
 				  echo '</span>';
 			   }
@@ -2147,10 +2147,10 @@ function showitems($items,$parent,$inpublic=false) {
 			   }
 			   if ($showlinks) {
 				   echo ' <span class="links">';
-				   echo "<a href=\"adddrillassess.php?daid=$typeid&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
-				   echo "<a href=\"deletedrillassess.php?id=$typeid&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
+				   echo "<a href=\"adddrillassess.php?daid=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid\">", _('Modify'), "</a> | \n";
+				   echo "<a href=\"deletedrillassess.php?id=" . Sanitize::onlyInt($typeid) . "&block=$parent&cid=$cid&remove=ask\">", _('Delete'), "</a>\n";
 				   echo " | <a href=\"copyoneitem.php?cid=$cid&copyid=" . Sanitize::encodeUrlParam($items[$i]) . "\">", _('Copy'), "</a>";
-				   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=$typeid\">", _('Scores'), "</a>";
+				   echo " | <a href=\"gb-viewdrill.php?cid=$cid&daid=" . Sanitize::onlyInt($typeid) . "\">", _('Scores'), "</a>";
 				  echo '</span>';
 			   }
 			   echo '</li>';
