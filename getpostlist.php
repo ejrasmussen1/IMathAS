@@ -4,20 +4,21 @@
 //(c) 2009 David Lippman
 	$init_skip_csrfp = true;
    	require("init_without_validate.php");
+   	$keyString = (string) trim($_GET['key']);
 	if (!empty($_COOKIE['remoteaccess']) && strlen($_COOKIE['remoteaccess'])==10) {
-		$_GET['key'] = $_COOKIE['remoteaccess'];
-	} else if (empty($_GET['key']) || strlen(trim($_GET['key']))!=10) {
+        $keyString = $_COOKIE['remoteaccess'];
+	} else if (empty($keyString) || strlen(trim($keyString))!=10) {
 		echo "Key Error";
 		exit;
 	} else {
-		setcookie('remoteaccess',$_GET['key'], time()+60*60*24*30*365*10);
+		setcookie('remoteaccess',$keyString, time()+60*60*24*30*365*10,'','',true,true);
 	}
 	//look up user
 	//DB $query = "SELECT id FROM imas_users WHERE remoteaccess='{$_GET['key']}'";
 	//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	//DB if (mysql_num_rows($result)==0) {
 	$stm = $DBH->prepare("SELECT id FROM imas_users WHERE remoteaccess=:remoteaccess");
-	$stm->execute(array(':remoteaccess'=>$_GET['key']));
+	$stm->execute(array(':remoteaccess'=>$keyString));
 	if ($stm->rowCount()==0) {
 		echo "Access key invalid";
 		exit;

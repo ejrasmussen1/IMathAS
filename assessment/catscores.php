@@ -106,7 +106,7 @@ function catscores($quests,$scores,$defptsposs,$defoutcome=0,$cid) {
 		$outc = preg_split('/<tr/',$outc);
 		for ($i=1;$i<count($outc);$i++) {
 			if ($alt==0) {echo '<tr class="even"'; $alt=1;} else {echo '<tr class="odd"'; $alt=0;}
-			echo $outc[$i];
+			echo Sanitize::encodeStringForDisplay($outc[$i]);
 		}
 	}
 	$assess_name_stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id AND courseid=:courseid LIMIT 1");
