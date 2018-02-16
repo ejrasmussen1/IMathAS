@@ -9,12 +9,13 @@ if (!isset($_GET['threadid'])) {
 }
 
 $ischanged = false;
-
+$tagged = (int) $_GET['tagged'];
+$threadid = (int) $_GET['threadid'];
 //DB $query = "UPDATE imas_forum_views SET tagged='{$_GET['tagged']}' WHERE userid='$userid' AND threadid='{$_GET['threadid']}'";
 //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 //DB if (mysql_affected_rows()>0) {
 $stm = $DBH->prepare("UPDATE imas_forum_views SET tagged=:tagged WHERE userid=:userid AND threadid=:threadid");
-$stm->execute(array(':tagged'=>$_GET['tagged'], ':userid'=>$userid, ':threadid'=>$_GET['threadid']));
+$stm->execute(array(':tagged'=>$tagged, ':userid'=>$userid, ':threadid'=>$threadid));
 if ($stm->rowCount()>0) {
 
 	$ischanged = true;
