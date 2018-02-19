@@ -28,7 +28,7 @@ if (!$ischanged) {
 	$query = "INSERT INTO imas_forum_views (userid,threadid,lastview,tagged) ";
 	$query .= "VALUES (:userid, :threadid, :lastview, :tagged)";
 	$stm = $DBH->prepare($query);
-	$stm->execute(array(':userid'=>$userid, ':threadid'=>$_GET['threadid'], ':lastview'=>0, ':tagged'=>$_GET['tagged']));
+	$stm->execute(array(':userid'=>$userid, ':threadid'=>$threadid, ':lastview'=>0, ':tagged'=>$tagged));
 	if ($stm->rowCount()>0) {
 		$ischanged = true;
 	}

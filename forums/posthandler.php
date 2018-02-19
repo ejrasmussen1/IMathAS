@@ -32,7 +32,7 @@ $now = time();
 
 if (isset($_GET['modify'])) { //adding or modifying post
 	if ($caller=='thread') {
-		$threadid = $_GET['modify'];
+		$threadid = (int) $_GET['modify'];
 	}
 	if ($_GET['modify']!='new' && $threadid==0) {
 		echo "I don't know what thread you're replying to.  Please go back and try again.";
@@ -44,7 +44,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$isanon = 0;
 		}
 		if ($isteacher) {
-			$type = $_POST['type'];
+			$type = (int) $_POST['type'];
 			if (!isset($_POST['replyby']) || $_POST['replyby']=="null") {
 				$replyby = null;
 			} else if ($_POST['replyby']=="Always") {
@@ -86,7 +86,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($groupsetid>0) {
 				if ($isteacher) {
 					if (isset($_POST['stugroup'])) {
-						$groupid = $_POST['stugroup'];
+						$groupid = (int) $_POST['stugroup'];
 					} else {
 						$groupid = 0;
 					}
@@ -167,7 +167,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				//DB $query .= "('$forumid','$threadid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,'{$_GET['replyto']}',0,'$isanon')";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB $_GET['modify'] = mysql_insert_id();
-		    $query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";
+		    	$query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";
 				$query .= "(:forumid, :threadid, :subject, :message, :userid, :postdate, :parent, :posttype, :isanon)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':forumid'=>$forumid, ':threadid'=>$threadid, ':subject'=>$_POST['subject'], ':message'=>$_POST['message'], ':userid'=>$userid, ':postdate'=>$now, ':parent'=>$_GET['replyto'], ':posttype'=>0, ':isanon'=>$isanon));
@@ -195,14 +195,17 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 					//DB if (mysql_num_rows($result)>0) {
 						//DB $gradeid = mysql_result($result,0,0);
-				if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
+				$forum_points = Sanitize::onlyFloat($_POST['points']);
+				// if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
+				if ($isteacher && !empty($forum_points)) {
+					$replyto_id = Sanitize::onlyInt($_GET['replyto']);
 					$stm = $DBH->prepare("SELECT id FROM imas_grades WHERE gradetype='forum' AND refid=:refid");
-					$stm->execute(array(':refid'=>$_GET['replyto']));
+					$stm->execute(array(':refid'=>$replyto_id));
 					if ($stm->rowCount()>0) {
 						$gradeid = $stm->fetchColumn(0);
-          	//DB $query = "UPDATE imas_grades SET score='{$_POST['points']}' WHERE id=$gradeid";
+						//DB $query = "UPDATE imas_grades SET score='{$_POST['points']}' WHERE id=$gradeid";
 						$stm = $DBH->prepare("UPDATE imas_grades SET score=:score WHERE id=:id");
-						$stm->execute(array(':score'=>$_POST['points'], ':id'=>$gradeid));
+						$stm->execute(array(':score'=>$forum_points, ':id'=>$gradeid));
 
 						//$query = "UPDATE imas_forum_posts SET points='{$_POST['points']}' WHERE id='{$_GET['replyto']}'";
 						// mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -217,7 +220,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
 						$query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
 						$stm = $DBH->prepare($query);
-						$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$uid, ':refid'=>$_GET['replyto'], ':score'=>$_POST['points']));
+						$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$uid, ':refid'=>$replyto_id, ':score'=>$forum_points));
 					}
 				}
 				$sendemail = true;
@@ -245,7 +248,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			// mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if ($caller=='thread' || $_GET['thread']==$_GET['modify']) {
 				if ($groupsetid>0 && $isteacher && isset($_POST['stugroup'])) {
-					$groupid = $_POST['stugroup'];
+					$groupid = (int) $_POST['stugroup'];
 					//DB $query = "UPDATE imas_forum_threads SET stugroupid='$groupid' WHERE id='{$_GET['modify']}'";
 					//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_forum_threads SET stugroupid=:stugroupid WHERE id=:id");
