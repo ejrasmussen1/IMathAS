@@ -32,7 +32,7 @@ $now = time();
 
 if (isset($_GET['modify'])) { //adding or modifying post
 	if ($caller=='thread') {
-		$threadid = $_GET['modify'];
+		$threadid = (int) $_GET['modify'];
 	}
 	if ($_GET['modify']!='new' && $threadid==0) {
 		echo "I don't know what thread you're replying to.  Please go back and try again.";
@@ -44,7 +44,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$isanon = 0;
 		}
 		if ($isteacher) {
-			$type = $_POST['type'];
+			$type = (int) $_POST['type'];
 			if (!isset($_POST['replyby']) || $_POST['replyby']=="null") {
 				$replyby = null;
 			} else if ($_POST['replyby']=="Always") {
@@ -86,7 +86,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			if ($groupsetid>0) {
 				if ($isteacher) {
 					if (isset($_POST['stugroup'])) {
-						$groupid = $_POST['stugroup'];
+						$groupid = (int) $_POST['stugroup'];
 					} else {
 						$groupid = 0;
 					}
@@ -167,7 +167,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				//DB $query .= "('$forumid','$threadid','{$_POST['subject']}','{$_POST['message']}','$userid',$now,'{$_GET['replyto']}',0,'$isanon')";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB $_GET['modify'] = mysql_insert_id();
-		    $query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";
+		    	$query = "INSERT INTO imas_forum_posts (forumid,threadid,subject,message,userid,postdate,parent,posttype,isanon) VALUES ";
 				$query .= "(:forumid, :threadid, :subject, :message, :userid, :postdate, :parent, :posttype, :isanon)";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':forumid'=>$forumid, ':threadid'=>$threadid, ':subject'=>$_POST['subject'], ':message'=>$_POST['message'], ':userid'=>$userid, ':postdate'=>$now, ':parent'=>$_GET['replyto'], ':posttype'=>0, ':isanon'=>$isanon));
@@ -195,14 +195,17 @@ if (isset($_GET['modify'])) { //adding or modifying post
 					//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 					//DB if (mysql_num_rows($result)>0) {
 						//DB $gradeid = mysql_result($result,0,0);
-				if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
+				$forum_points = Sanitize::onlyFloat($_POST['points']);
+				// if ($isteacher && isset($_POST['points']) && trim($_POST['points'])!='') {
+				if ($isteacher && !empty($forum_points)) {
+					$replyto_id = Sanitize::onlyInt($_GET['replyto']);
 					$stm = $DBH->prepare("SELECT id FROM imas_grades WHERE gradetype='forum' AND refid=:refid");
-					$stm->execute(array(':refid'=>$_GET['replyto']));
+					$stm->execute(array(':refid'=>$replyto_id));
 					if ($stm->rowCount()>0) {
 						$gradeid = $stm->fetchColumn(0);
-          	//DB $query = "UPDATE imas_grades SET score='{$_POST['points']}' WHERE id=$gradeid";
+						//DB $query = "UPDATE imas_grades SET score='{$_POST['points']}' WHERE id=$gradeid";
 						$stm = $DBH->prepare("UPDATE imas_grades SET score=:score WHERE id=:id");
-						$stm->execute(array(':score'=>$_POST['points'], ':id'=>$gradeid));
+						$stm->execute(array(':score'=>$forum_points, ':id'=>$gradeid));
 
 						//$query = "UPDATE imas_forum_posts SET points='{$_POST['points']}' WHERE id='{$_GET['replyto']}'";
 						// mysql_query($query) or die("Query failed : $query " . mysql_error());
@@ -217,7 +220,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						$query = "INSERT INTO imas_grades (gradetype,gradetypeid,userid,refid,score) VALUES ";
 						$query .= "(:gradetype, :gradetypeid, :userid, :refid, :score)";
 						$stm = $DBH->prepare($query);
-						$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$uid, ':refid'=>$_GET['replyto'], ':score'=>$_POST['points']));
+						$stm->execute(array(':gradetype'=>'forum', ':gradetypeid'=>$forumid, ':userid'=>$uid, ':refid'=>$replyto_id, ':score'=>$forum_points));
 					}
 				}
 				$sendemail = true;
@@ -245,7 +248,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			// mysql_query($query) or die("Query failed : $query " . mysql_error());
 			if ($caller=='thread' || $_GET['thread']==$_GET['modify']) {
 				if ($groupsetid>0 && $isteacher && isset($_POST['stugroup'])) {
-					$groupid = $_POST['stugroup'];
+					$groupid = (int) $_POST['stugroup'];
 					//DB $query = "UPDATE imas_forum_threads SET stugroupid='$groupid' WHERE id='{$_GET['modify']}'";
 					//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 					$stm = $DBH->prepare("UPDATE imas_forum_threads SET stugroupid=:stugroupid WHERE id=:id");
@@ -323,7 +326,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				if (isset($_POST['filedel'][$i])) {
 					if (deleteforumfile($_GET['modify'],$files[2*$i+1])) {
 						array_splice($files,2*$i,2);
-					}
+					}	
 				}
 			}
 		}
@@ -374,12 +377,13 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		echo "&gt; <a href=\"$returnurl\">$returnname</a> &gt; ";
 		$notice = '';
 		if ($_GET['modify']!="reply" && $_GET['modify']!='new') {
+			$modify_id = (int) $_GET['modify'];
 			echo "Modify Posting</div>\n";
 			//DB $query = "SELECT * from imas_forum_posts WHERE id='{$_GET['modify']}'";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT * from imas_forum_posts WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['modify']));
+			$stm->execute(array(':id'=>$modify_id));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$replyby = $line['replyby'];
 			if ($groupsetid>0 && $isteacher && $line['parent']==0) {
@@ -390,6 +394,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			echo '<div id="headerposthandler" class="pagetitle"><h2>Modify Post</h2></div>';
 		} else {
 			if ($_GET['modify']=='reply') {
+				$reply_id = (int) $_GET['replyto'];
 				echo "Post Reply</div>\n";
 					//$query = "SELECT subject,points FROM imas_forum_posts WHERE id='{$_GET['replyto']}'";
 				//DB $query = "SELECT ifp.subject,ig.score FROM imas_forum_posts AS ifp LEFT JOIN imas_grades AS ig ON ";
@@ -399,7 +404,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$query = "SELECT ifp.subject,ig.score FROM imas_forum_posts AS ifp LEFT JOIN imas_grades AS ig ON ";
 				$query .= "ig.gradetype='forum' AND ifp.id=ig.refid WHERE ifp.id=:id";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':id'=>$_GET['replyto']));
+				$stm->execute(array(':id'=>$reply_to));
 				list($sub,$points) = $stm->fetch(PDO::FETCH_NUM);
 
 				$sub = str_replace('"','&quot;',$sub);
@@ -432,6 +437,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				$curstugroupid = 0;
 				$replyby = null;
 				echo "<h2>Add Thread - \n";
+				print_r($_GET);
 				if (isset($_GET['quoteq'])) {
 					require_once("../assessment/displayq2.php");
 					$showa = false;
@@ -446,7 +452,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 						//DB $attempts = explode(',',mysql_result($result,0,1));
 						$stm = $DBH->prepare("SELECT seeds,attempts,questions FROM imas_assessment_sessions WHERE userid=:userid AND assessmentid=:assessmentid");
 						$stm->execute(array(':userid'=>$userid, ':assessmentid'=>$parts[3]));
-						list($seeds, $attempts, $questions) = $stm->fetch(PDO::FETCH_NUM);
+						list($seeds, $attempts, $questions) = $stm->fetch(PDO::FETCH_NUM);	
 						$seeds = explode(',', $seeds);
 						$seeds = $seeds[$parts[0]];
 						$attempts = explode(',', $attempts);
@@ -786,6 +792,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		exit;
 	}
 } else if (isset($_GET['remove']) && $allowdel) {// $isteacher) { //removing post
+	$remove = (int) $_GET['remove'];
 	if (isset($_POST['confirm'])) {
 		$go = true;
 		if (!$isteacher) {
@@ -793,7 +800,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE parent=:parent");
-			$stm->execute(array(':parent'=>$_GET['remove']));
+			$stm->execute(array(':parent'=>$remove));
 			if ($stm->rowCount()>0) {
 				$go = false;
 			}
@@ -805,7 +812,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			//DB $parent = mysql_result($result,0,0);
 			//DB $files = mysql_result($result,0,1);
 			$stm = $DBH->prepare("SELECT parent,files FROM imas_forum_posts WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['remove']));
+			$stm->execute(array(':id'=>$remove));
 			list($parent,$files) = $stm->fetch(PDO::FETCH_NUM);
 
 			if ($parent==0) {
@@ -813,7 +820,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				//DB $r = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB while ($row = mysql_fetch_row($r)) {
 				$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE threadid=:threadid AND files<>''");
-				$stm->execute(array(':threadid'=>$_GET['remove']));
+				$stm->execute(array(':threadid'=>$remove));
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					deleteallpostfiles($row[0]); //delete files for each post
 				}
@@ -821,29 +828,29 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				//DB $query = "DELETE FROM imas_forum_posts WHERE threadid='{$_GET['remove']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_forum_posts WHERE threadid=:threadid");
-				$stm->execute(array(':threadid'=>$_GET['remove']));
+				$stm->execute(array(':threadid'=>$remove));
 
 
 				//DB $query = "DELETE FROM imas_forum_threads WHERE id='{$_GET['remove']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_forum_threads WHERE id=:id");
-				$stm->execute(array(':id'=>$_GET['remove']));
+				$stm->execute(array(':id'=>$remove));
 
 				//DB $query = "DELETE FROM imas_forum_views WHERE threadid='{$_GET['remove']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_forum_views WHERE threadid=:threadid");
-				$stm->execute(array(':threadid'=>$_GET['remove']));
+				$stm->execute(array(':threadid'=>$remove));
 				$lastpost = true;
 
 			} else {
 				//DB $query = "DELETE FROM imas_forum_posts WHERE id='{$_GET['remove']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_forum_posts WHERE id=:id");
-				$stm->execute(array(':id'=>$_GET['remove']));
+				$stm->execute(array(':id'=>$remove));
 				//DB $query = "UPDATE imas_forum_posts SET parent='$parent' WHERE parent='{$_GET['remove']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET parent=:parent WHERE parent=:parent2");
-				$stm->execute(array(':parent'=>$parent, ':parent2'=>$_GET['remove']));
+				$stm->execute(array(':parent'=>$parent, ':parent2'=>$remove));
 				$lastpost = false;
 
 				if ($files!= '') {
@@ -853,7 +860,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			//DB $query = "DELETE FROM imas_grades WHERE gradetype='forum' AND refid='{$_GET['remove']}'";
 			//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='forum' AND refid=:refid");
-			$stm->execute(array(':refid'=>$_GET['remove']));
+			$stm->execute(array(':refid'=>$remove));
 
 		}
 		if ($caller == "posts" && $lastpost) {
@@ -868,7 +875,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 		//DB $parent = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT parent FROM imas_forum_posts WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['remove']));
+		$stm->execute(array(':id'=>$remove));
 		$parent = $stm->fetchColumn(0);
 
 		require("../header.php");
@@ -877,7 +884,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE parent=:parent");
-			$stm->execute(array(':parent'=>$_GET['remove']));
+			$stm->execute(array(':parent'=>$remove));
 			if ($stm->rowCount()>0) {
 			echo "Someone has replied to this post, so you cannot remove it.  <a href=\"$returnurl\">Back</a>";
 				require("../footer.php");
@@ -894,7 +901,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		} else {
 			echo "<p>Are you SURE you want to remove this post?</p>\n";
 		}
-		echo '<form method="post" action="'.$returnurl.'&remove='.Sanitize::onlyInt($_GET['remove']).'">';
+		echo '<form method="post" action="'.$returnurl.'&remove='.Sanitize::onlyInt($_GET['remove']	).'">';
 		echo '<p><button type=submit name=confirm value=true>'._('Yes, Remove').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='$returnurl'\"></p>\n";
 		echo '</form>';
@@ -902,6 +909,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		exit;
 	}
 } else if (isset($_GET['move']) && $isteacher) { //moving post to a different forum   NEW ONE
+	$move = (int) $_GET['move'];
 	if (isset($_POST['movetype'])) {
 		$threadid = intval($_POST['thread']);
 		//DB $query = "SELECT * FROM imas_forum_posts WHERE threadid='$threadid'";
@@ -925,21 +933,22 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			}
 		}
 		addchildren($_GET['move'],$tochange,$children);
-		$tochange[] = $_GET['move'];
+		$tochange[] = $move;
 		//DB $list = "'".implode("','",$tochange)."'";
 		$list = implode(',', array_map('intval', $tochange));
-
+		
 		if ($_POST['movetype']==0) { //move to different forum
+			$movetoforum = (int) $_POST['movetof'];
 			if ($children[0][0] == $_GET['move']) { //is post head of thread?
 				//if head of thread, then :
 				//DB $query = "UPDATE imas_forum_posts SET forumid='{$_POST['movetof']}' WHERE threadid='{$_GET['move']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET forumid=:forumid WHERE threadid=:threadid");
-				$stm->execute(array(':forumid'=>$_POST['movetof'], ':threadid'=>$_GET['move']));
+				$stm->execute(array(':forumid'=>$movetoforum, ':threadid'=>$move));
 				//DB $query = "UPDATE imas_forum_threads SET forumid='{$_POST['movetof']}' WHERE id='{$_GET['move']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_forum_threads SET forumid=:forumid WHERE id=:id");
-				$stm->execute(array(':forumid'=>$_POST['movetof'], ':id'=>$_GET['move']));
+				$stm->execute(array(':forumid'=>$movetoforum, ':id'=>$move));
 			} else {
 				//if not head of thread, need to create new thread, move items to new thread, then move forum
 				//DB $query = "SELECT lastposttime,lastpostuser FROM imas_forum_threads WHERE id='$threadid'";
@@ -952,50 +961,51 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				//DB $query = "UPDATE imas_forum_posts SET threadid='{$_GET['move']}',forumid='{$_POST['movetof']}' WHERE id IN ($list)";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET threadid=:threadid,forumid=:forumid WHERE id IN ($list)");
-				$stm->execute(array(':threadid'=>$_GET['move'], ':forumid'=>$_POST['movetof']));
+				$stm->execute(array(':threadid'=>$move, ':forumid'=>$movetoforum));
 				//set post to head of thread
 				//DB $query = "UPDATE imas_forum_posts SET parent=0 WHERE id='{$_GET['move']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET parent=0 WHERE id=:id");
-				$stm->execute(array(':id'=>$_GET['move']));
+				$stm->execute(array(':id'=>$move));
 				//create new threads listing
 				//DB $query = "INSERT INTO imas_forum_threads (id,forumid,lastposttime,lastpostuser) VALUES ('{$_GET['move']}','{$_POST['movetof']}','{$row[0]}','{$row[1]}')";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("INSERT INTO imas_forum_threads (id,forumid,lastposttime,lastpostuser) VALUES (:id, :forumid, :lastposttime, :lastpostuser)");
-				$stm->execute(array(':id'=>$_GET['move'], ':forumid'=>$_POST['movetof'], ':lastposttime'=>$row[0], ':lastpostuser'=>$row[1]));
+				$stm->execute(array(':id'=>$move, ':forumid'=>$movetoforum, ':lastposttime'=>$row[0], ':lastpostuser'=>$row[1]));
 			}
 			//update grade records
 			//DB $query = "UPDATE imas_grades SET gradetypeid='{$_POST['movetof']}' WHERE gradetype='forum' AND refid IN ($list)";
 			//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_grades SET gradetypeid=:gradetypeid WHERE gradetype='forum' AND refid IN ($list)");
-			$stm->execute(array(':gradetypeid'=>$_POST['movetof']));
+			$stm->execute(array(':gradetypeid'=>$movetoforum));
 
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid");
 			exit;
 		} else if ($_POST['movetype']==1) { //move to different thread
+			$movetothread = (int) $_POST['movetot'];
 			if ($_POST['movetot'] != $threadid) {
 				//DB $query = "SELECT id FROM imas_forum_posts WHERE threadid='{$_POST['movetot']}' AND parent=0";
 				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB $base = mysql_result($result,0,0);
 	   		$stm = $DBH->prepare("SELECT id FROM imas_forum_posts WHERE threadid=:threadid AND parent=0");
-		  	$stm->execute(array(':threadid'=>$_POST['movetot']));
+		  	$stm->execute(array(':threadid'=>$movetothread));
 				$base = $stm->fetchColumn(0);
 
 				//DB $query = "UPDATE imas_forum_posts SET threadid='{$_POST['movetot']}' WHERE id IN ($list)";
 				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET threadid=:threadid WHERE id IN ($list)");
-				$stm->execute(array(':threadid'=>$_POST['movetot']));
+				$stm->execute(array(':threadid'=>$movetothread));
 
 				//DB $query = "UPDATE imas_forum_posts SET parent='$base' WHERE id='{$_GET['move']}'";
 				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_forum_posts SET parent=:parent WHERE id=:id");
-				$stm->execute(array(':parent'=>$base, ':id'=>$_GET['move']));
+				$stm->execute(array(':parent'=>$base, ':id'=>$move));
 				if ($base != $_GET['move'] ) {//if not moving back to self,
 					//delete thread.  One will only exist if moved post was head of thread
 					//DB $query = "DELETE FROM imas_forum_threads WHERE id='{$_GET['move']}'";
 					//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 					$stm = $DBH->prepare("DELETE FROM imas_forum_threads WHERE id=:id");
-					$stm->execute(array(':id'=>$_GET['move']));
+					$stm->execute(array(':id'=>$move));
 				}
 			}
 
@@ -1022,7 +1032,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		//DB if (mysql_result($result,0,0)==0) {
 
 		$stm = $DBH->prepare("SELECT parent FROM imas_forum_posts WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['move']));
+		$stm->execute(array(':id'=>(int) $_GET['move']));
 		if ($stm->fetchColumn(0)==0) {
 			$ishead = true;
 			echo "<h3>Move Thread</h3>\n";
