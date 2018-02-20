@@ -228,12 +228,12 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			if ($FCMtokenTo != '') {
 				require_once("../includes/FCM.php");
 				$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($_POST['courseid'])."&msgid=$msgid";
-				sendFCM($FCMtokenTo,"Msg from: $userfullname",$_POST['subject'],$url);
+				sendFCM($FCMtokenTo,"Msg from: $userfullname".Sanitize::encodeStringForDisplay($_POST['subject']),$url);
 			}
 			if ($type=='new') {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&" .Sanitize::randomQueryStringParam());
 			} else {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid&" .Sanitize::randomQueryStringParam());
 			}
 			exit;
 		} else {
@@ -256,9 +256,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 						$(el).after($("<img>", {src: imasroot+"/img/updating.gif", alt: "Loading recipients..."}));
 						$.ajax({
 							url: "msglist.php?cid=0&getstulist="+newcid,
-							dataType: "json"
+							dataType: "json",
 						}).done(function(optarr) {
-							$("#to").empty().append("<option value=\"0\">Select a recipient...</option>");
+							$("#to").empty().append("<option value=\'0\'>Select a recipient...</option>");
 							for (var i=0;i<optarr.length;i++) {
 								$("#to").append($(optarr[i]));
 							}
@@ -604,9 +604,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
       //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
       $DBH->query($query);
   		if ($type=='new') {
-  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid");
+  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&" .Sanitize::randomQueryStringParam());
   		} else {
-  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
+  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid&" .Sanitize::randomQueryStringParam());
   		}
   		exit;
   	}
