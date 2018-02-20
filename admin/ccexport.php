@@ -158,7 +158,6 @@ if (isset($_GET['delete'])) {
 			if (is_array($item)) {
 				if (!$usechecked || array_search($parent.'-'.($k+1),$checked)!==FALSE) {
 					if (strlen($ind)>2) {
-						print_r($item);
 						$canvout .= '<item identifier="BLOCK'.$item['id'].'">'."\n";
 						$canvout .= '<content_type>ContextModuleSubHeader</content_type>';
 						$canvout .= '<title>'.htmlentities($item['name'],ENT_XML1,'UTF-8',false).'</title>'."\n";
@@ -227,9 +226,9 @@ if (isset($_GET['delete'])) {
 					$out .= $ind.'</item>'."\n";
 					$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$canvout .= '<content_type>WikiPage</content_type>';
+					$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-					$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 					$ccnt++;
 
@@ -239,6 +238,7 @@ if (isset($_GET['delete'])) {
 					fwrite($fp,'<meta name="identifier" content="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'"/>');
 					if ($linktype=="canvas") {
 						fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
+						fwrite($fp,'<meta name="workflow_state" content="'.($row[3]==0?'unpublished':'active').'"/>');
 					}
 					fwrite($fp,"</head><body>");
 					fwrite($fp,filtercapture($row[1],$res));
@@ -285,10 +285,10 @@ if (isset($_GET['delete'])) {
 						$out .= $ind.'</item>'."\n";
 						$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 						$canvout .= '<content_type>ExternalUrl</content_type>';
+						$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
 						$canvout .= '<url>'.htmlentities($alink,ENT_XML1,'UTF-8',false).'</url>';
-						$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="imswl_xmlv1p1">'."\n";
@@ -305,9 +305,9 @@ if (isset($_GET['delete'])) {
 						$out .= $ind.'</item>'."\n";
 						$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 						$canvout .= '<content_type>Attachment</content_type>';
+						$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-						$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$resitem =  '<resource href="'.$filedir.basename($filename).'" identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'" type="webcontent">'."\n";
@@ -320,9 +320,9 @@ if (isset($_GET['delete'])) {
 						$out .= $ind.'</item>'."\n";
 						$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 						$canvout .= '<content_type>WikiPage</content_type>';
+						$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-						$canvout .= '<workflow_state>'.($row[3]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$fp = fopen($newdir.'/'.$htmldir.'linkedtext'.$iteminfo[$item][1].'.html','w');
@@ -331,6 +331,7 @@ if (isset($_GET['delete'])) {
 						fwrite($fp,'<meta name="identifier" content="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'"/>');
 						if ($linktype=="canvas") {
 							fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
+							fwrite($fp,'<meta name="workflow_state" content="'.($row[3]==0?'unpublished':'active').'"/>');
 						}
 						fwrite($fp,"</head><body>");
 						fwrite($fp,filtercapture($row[1],$res));
@@ -353,9 +354,9 @@ if (isset($_GET['delete'])) {
 					$out .= $ind.'</item>'."\n";
 					$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$canvout .= '<content_type>DiscussionTopic</content_type>';
+					$canvout .= '<workflow_state>'.($row[2]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-					$canvout .= '<workflow_state>'.($row[2]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 					$ccnt++;
 					$fp = fopen($newdir.'/forum'.$iteminfo[$item][1].'.xml','w');
@@ -372,6 +373,7 @@ if (isset($_GET['delete'])) {
 							  <topic_id>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</topic_id>
 							  <title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>
 							  <type>topic</type>
+							  <workflow_state>'.($row[2]==0?'unpublished':'active').'</workflow_state>
 							</topicMeta>');
 						fclose($fp);
 						$resitem =  '<resource identifier="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta" type="associatedcontent/imscc_xmlv1p1/learning-application-resource" href="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'meta.xml">'."\n";
@@ -403,9 +405,9 @@ if (isset($_GET['delete'])) {
 					if ($linktype=='canvas') {
 						$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 						$canvout .= '<content_type>Assignment</content_type>'."\n";
+						$canvout .= '<workflow_state>'.($row[6]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>'."\n";
 						$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-						$canvout .= '<workflow_state>'.($row[6]==0?'unpublished':'active').'</workflow_state>'."\n";
 						$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 						$ccnt++;
 						$aitems = explode(',',$row[3]);
@@ -502,9 +504,9 @@ if (isset($_GET['delete'])) {
 					$out .= $ind.'</item>'."\n";
 					$canvout .= '<item identifier="'.$iteminfo[$item][0].$iteminfo[$item][1].'">'."\n";
 					$canvout .= '<content_type>WikiPage</content_type>';
+					$canvout .= '<workflow_state>'.($row[1]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= '<identifierref>RES'.$iteminfo[$item][0].$iteminfo[$item][1].'</identifierref>';
 					$canvout .= '<title>'.htmlentities($row[0],ENT_XML1,'UTF-8',false).'</title>'."\n";
-					$canvout .= '<workflow_state>'.($row[1]==0?'unpublished':'active').'</workflow_state>'."\n";
 					$canvout .= "<position>$ccnt</position> <indent>".max(strlen($ind)/2 - 2, 0)."</indent> </item>";
 					$ccnt++;
 
@@ -514,6 +516,7 @@ if (isset($_GET['delete'])) {
 					fwrite($fp,'<meta name="identifier" content="RES'.$iteminfo[$item][0].$iteminfo[$item][1].'"/>');
 					if ($linktype=="canvas") {
 						fwrite($fp,'<meta name="editing_roles" content="teachers"/>');
+						fwrite($fp,'<meta name="workflow_state" content="'.($row[1]==0?'unpublished':'active').'"/>');
 					}
 					fwrite($fp,"</head><body>");
 
@@ -763,13 +766,13 @@ if (isset($_GET['delete'])) {
 	echo '<p>This feature will allow you to export a v1.1 compliant IMS Common Cartridge export of your course, which can ';
 	echo 'then be loaded into other Learning Management Systems that support this standard.  Inline text, web links, ';
 	echo 'course files, and forums will all transfer reasonably well, but be aware that any math exported will call back to this server for display.</p>';
-	echo '<p>Since LMSs cannot support the type of assessment that this system ';
+	echo '<p>Since LMSs cannot support the type of question types that this system ';
 	echo 'does, assessments are exported as LTI (learning tools interoperability) placements back to this system.  Not all LMSs ';
 	echo 'support this standard yet, so your assessments may not transfer.  If they do, you will need to set up the LTI tool on your LMS ';
 	echo 'to work with this system by supplying an LTI key and secret.  If this system and your LMS have domain credentials set up, you may not have to do ';
-	echo 'anything.  Otherwise, you can use the LTI secret you set in your course settings, along with the key placein_###_0 (if you want students ';
-	echo 'to create an account on this system) or placein_###_1 (if you want students to only be able to log in through the LMS), where ### is ';
-	echo 'replaced with your course key.  <b>Important:</b> The key form placein_###_1 is necessary if you want grades from '.$installname.' to be ';
+	echo 'anything.  Otherwise, you can use the LTI secret you set in your course settings, along with the key LTIkey_###_0 (if you want students ';
+	echo 'to create an account on this system) or LTIkey_###_1 (if you want students to only be able to log in through the LMS - recommended), where ### is ';
+	echo 'replaced with your course key.  <b>Important:</b> The key form LTIkey_###_1 is necessary if you want grades from '.$installname.' to be ';
 	echo 'reported back to the LMS automatically.  ';
 	echo 'If you do not see the LTI key setting in your course settings, then your system administrator does ';
 	echo 'not have LTI enabled on your system, and you cannot use this feature.</p>';
