@@ -357,7 +357,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm = $DBH->prepare("UPDATE imas_forum_posts SET files=:files WHERE id=:id");
 		$stm->execute(array(':files'=>$files, ':id'=>$_GET['modify']));
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl?r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else { //display mod
 		if ($caller=='thread') {
@@ -864,7 +864,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 
 		}
 		if ($caller == "posts" && $lastpost) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid&r=" . Sanitize::randomQueryStringParam());
 		} else {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl");
 		}
@@ -979,7 +979,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 			$stm = $DBH->prepare("UPDATE imas_grades SET gradetypeid=:gradetypeid WHERE gradetype='forum' AND refid IN ($list)");
 			$stm->execute(array(':gradetypeid'=>$movetoforum));
 
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if ($_POST['movetype']==1) { //move to different thread
 			$movetothread = (int) $_POST['movetot'];
@@ -1009,7 +1009,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 				}
 			}
 
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?page=$page&cid=$cid&forum=$forumid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 
 		}
