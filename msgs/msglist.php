@@ -151,8 +151,10 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	}
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject']) && isset($_POST['to']) && $_POST['to']!='0') {
-      $_POST['message'] = Sanitize::incomingHtml($_POST['message']);
-			$_POST['subject'] = Sanitize::stripHtmlTags($_POST['subject']);
+            $message = Sanitize::incomingHtml($_POST['message']);
+            $subject = Sanitize::stripHtmlTags($_POST['subject']);
+            $postTo = Sanitize::onlyInt($_POST['to']);
+
 
       $now = time();
 			//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
@@ -162,11 +164,11 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 			$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':title'=>$_POST['subject'], ':message'=>$_POST['message'], ':msgto'=>$_POST['to'],
-        ':msgfrom'=>$userid, ':senddate'=>$now, ':isread'=>0, ':courseid'=>$_POST['courseid']));
+			$stm->execute(array(':title'=>$subject, ':message'=>$message, ':msgto'=>$postTo,
+        ':msgfrom'=>$userid, ':senddate'=>$now, ':isread'=>0, ':courseid'=>$cid));
 			$msgid = $DBH->lastInsertId();
-
-			if ($_GET['replyto']>0) {
+            $getReplyTo = (int) trim($_GET[$replyto]);
+			if ($getReplyTo>0) {
 				$query = "UPDATE imas_msgs SET replied=1";
 				if (isset($_POST['sendunread'])) {
 					$query .= ',isread=(isread&~1)';
@@ -175,32 +177,33 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				//DB $query .= " WHERE id='{$_GET['replyto']}'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':id'=>$_GET['replyto']));
+				$stm->execute(array(':id'=>$getReplyTo));
 				//DB $query = "SELECT baseid FROM imas_msgs WHERE id='{$_GET['replyto']}'";
 				//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 				//DB $baseid = mysql_result($result,0,0);
 				$stm = $DBH->prepare("SELECT baseid FROM imas_msgs WHERE id=:id");
-				$stm->execute(array(':id'=>$_GET['replyto']));
+				$stm->execute(array(':id'=>$getReplyTo));
 				$baseid = $stm->fetchColumn(0);
 				if ($baseid==0) {
-					$baseid = $_GET['replyto'];
+					$baseid = (int) trim($_GET['replyto']);
 				}
 				//DB $query = "UPDATE imas_msgs SET baseid='$baseid',parent='{$_GET['replyto']}' WHERE id='$msgid'";
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_msgs SET baseid=:baseid,parent=:parent WHERE id=:id");
-				$stm->execute(array(':baseid'=>$baseid, ':parent'=>$_GET['replyto'], ':id'=>$msgid));
+				$stm->execute(array(':baseid'=>$baseid, ':parent'=>$getReplyTo, ':id'=>$msgid));
 			}
 			//DB $query = "SELECT name FROM imas_courses WHERE id='{$_POST['courseid']}'";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			//DB $cname = mysql_result($result,0,0);
+            $sanitizedCID = Sanitize::courseId($_POST['courseid']);
 			$stm = $DBH->prepare("SELECT name FROM imas_courses WHERE id=:id");
-			$stm->execute(array(':id'=>$_POST['courseid']));
+			$stm->execute(array(':id'=>$sanitizedCID));
 			$cname = $stm->fetchColumn(0);
 
 			//DB $query = "SELECT msgnotify,email FROM imas_users WHERE id='{$_POST['to']}'";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$stm = $DBH->prepare("SELECT msgnotify,email,FCMtoken FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$_POST['to']));
+			$stm->execute(array(':id'=>$postTo));
       list($msgnotify, $email, $FCMtokenTo) = $stm->fetch(PDO::FETCH_NUM);
 			//DB if (mysql_result($result,0,0)==1) {
       if ($msgnotify==1) {

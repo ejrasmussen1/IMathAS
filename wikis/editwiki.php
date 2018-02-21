@@ -186,7 +186,7 @@ if ($cid==0) {
 
 			}
 			if (!$inconflict) {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/wikis/viewwiki.php?cid=$cid&id=" . Sanitize::onlyInt($id) . "&grp=" . Sanitize::onlyInt($groupid) . Sanitize::encodeStringForDisplay($framed));
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/wikis/viewwiki.php?cid=$cid&id=" . Sanitize::onlyInt($id) . "&grp=" . Sanitize::onlyInt($groupid) . Sanitize::encodeStringForDisplay($framed) . "&r=" . Sanitize::randomQueryStringParam());
 				exit;
 			}
 
