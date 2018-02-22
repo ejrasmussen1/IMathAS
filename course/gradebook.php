@@ -1024,7 +1024,7 @@ function gbstudisp($stu) {
 				if ($gbt[1][1][$i][1]=='') {
 					echo '<td></td>';
 				} else {
-					echo '<td><a href="#" class="small feedbacksh pointer" onclick="return showhidefb(this,'.$i.')">', _('[Show Feedback]'), '</a><span style="display:none;" id="feedbackholder'.$i.'">'.$gbt[1][1][$i][1].'</span></td>';
+					echo '<td><a href="#" class="small feedbacksh pointer" onclick="return showhidefb(this,'.$i.')">', _('[Show Feedback]'), '</a><span style="display:none;" id="feedbackholder'.$i.'">'.Sanitize::encodeStringForDisplay($gbt[1][1][$i][1]).'</span></td>';
 				}
 			}
 			echo '</tr>';
