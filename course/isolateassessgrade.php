@@ -326,7 +326,8 @@
 				$tottime += $timeused;
 				$ntime++;
 			}
-			echo "<td>{$line['feedback']}&nbsp;</td>";
+			$feedbackCol = Sanitize::encodeStringForDisplay($line['feedback']);
+			echo "<td>{$feedbackCol}&nbsp;</td>";
 		}
 		echo "</tr>";
 	}
