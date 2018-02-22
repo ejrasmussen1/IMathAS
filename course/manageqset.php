@@ -1369,7 +1369,7 @@ function getnextprev(formn,loc) {
 				echo '<td>'.$page_questionTable[$qid]['action'].'</td>';
 				echo '<td>'.Sanitize::encodeStringForDisplay($page_questionTable[$qid]['type']).'</td>';
 				echo '<td class="c">'.Sanitize::encodeStringForDisplay($page_questionTable[$qid]['times']).'</td>';
-				echo '<td>'.$page_questionTable[$qid]['lastmod'].'</td>';
+				echo '<td>'.Sanitize::encodeStringForDisplay($page_questionTable[$qid]['lastmod']).'</td>';
 				echo '<td class="c">'.$page_questionTable[$qid]['mine'].'</td>';
 				if ($searchall==1) {
 					echo '<td>'.$page_questionTable[$qid]['lib'].'</td>';

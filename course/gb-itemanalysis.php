@@ -21,7 +21,7 @@
 		$gbmode = $stm->fetchColumn(0);
 	}
 	if (isset($_GET['stu']) && $_GET['stu']!='') {
-		$stu = $_GET['stu'];
+		$stu = Sanitize::onlyInt($_GET['stu']);
 	} else {
 		$stu = 0;
 	}

@@ -443,7 +443,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	} else if (isset($_GET['grpsetid'])) {
 		//groupset selected, show groups
-		$grpsetid = $_GET['grpsetid'];
+		$grpsetid = Sanitize::onlyInt($_GET['grpsetid']);
 		//DB $query = "SELECT name FROM imas_stugroupset WHERE id='$grpsetid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $page_grpsetname = mysql_result($result,0,0);
@@ -618,7 +618,7 @@ if ($overwriteBody==1) {
 		} else {
 			echo '<p>This set of groups is not currently being used</p>';
 		}
-		$querystring = http_build_query(array('cid'=>$cid, 'delgrpset'=>$_GET['delgrpset']));
+		$querystring = http_build_query(array('cid'=>$cid, 'delgrpset'=>Sanitize::onlyInt($_GET['delgrpset'])));
 		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
 		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Delete').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
@@ -665,7 +665,7 @@ if ($overwriteBody==1) {
 		echo '<h4>Remove ALL group members</h4>';
 		echo "<p>Are you SURE you want to remove <b>ALL</b> members of the student group <b>" . Sanitize::encodeStringForDisplay($page_grpname) . "</b>?</p>";
 		
-		$querystring = http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'removeall'=>$_GET['removeall']));
+		$querystring = http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'removeall'=>Sanitize::onlyInt($_GET['removeall'])));
 		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
 		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Remove').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
@@ -675,7 +675,7 @@ if ($overwriteBody==1) {
 		echo '<h4>Remove group member</h4>';
 		echo "<p>Are you SURE you want to remove <b>" . Sanitize::encodeStringForDisplay($page_stuname) . "</b> from the student group <b>" . Sanitize::encodeStringForDisplay($page_grpname) . "</b>?</p>";
 		
-		$querystring = http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'grpid'=>$_GET['grpid'], 'remove'=>$_GET['remove']));
+		$querystring = http_build_query(array('cid'=>$cid, 'grpsetid'=>$grpsetid, 'grpid'=>Sanitize::onlyInt($_GET['grpid']), 'remove'=>Sanitize::onlyInt($_GET['remove'])));
 		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
 		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Remove').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeStringForJavascript($grpsetid) . "'\" /></p>";
