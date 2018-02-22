@@ -103,7 +103,7 @@
 	echo "<div class=breadcrumb>$breadcrumbbase ".Sanitize::encodeStringForDisplay($titlesimp)."</div>";
 
 	echo '<div style="padding-left:10px; padding-right: 10px;">';
-	echo filter($text);
+	echo Sanitize::outgoingHtml(filter($text));
 	echo '</div>';
 	if (!($_GET['from'])) {
 		echo "<div class=right><a href=\"course.php?cid=$cid\">Back</a></div>\n";

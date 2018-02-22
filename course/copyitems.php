@@ -828,7 +828,7 @@ if ($overwriteBody==1) {
 	<input type=hidden name=ctc id=ctc value="<?php echo Sanitize::encodeStringForDisplay($_POST['ctc']); ?>">
 	<p>What to copy:
 	<?php
-		if ($_POST['ekey']=='') { echo ' <a class="small" target="_blank" href="course.php?cid='.$_POST['ctc'].'">Preview source course</a>';}
+		if ($_POST['ekey']=='') { echo ' <a class="small" target="_blank" href="course.php?cid='.Sanitize::onlyInt($_POST['ctc']).'">Preview source course</a>';}
 	?>
 	<br/>
 	<input type=radio name=whattocopy value="all" id=whattocopy1 onchange="updatetocopy(this)"> <label for=whattocopy1>Copy whole course</label><br/>

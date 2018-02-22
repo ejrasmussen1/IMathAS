@@ -132,7 +132,7 @@ if ($canviewall) {
 }
 
 if ($canviewall && !empty($_GET['stu'])) {
-	$stu = $_GET['stu'];
+  $stu = Sanitize::onlyInt($_GET['stu']);
 } else {
 	$stu = 0;
 }
@@ -199,10 +199,10 @@ if ($isteacher) {
 			$value = $_POST['checked'];
 			$last = count($value)-1;
 			for($i = 0; $i < $last; $i++){
-				gbstudisp($value[$i]);
+				gbstudisp(Sanitize::olnyInt($value[$i]));
 				echo "<div style=\"page-break-after:always\"></div>";
 			}
-			gbstudisp($value[$last]);//no page break after last report
+			gbstudisp(Sanitize::olnyInt($value[$last]));//no page break after last report
 
 			echo "</div></div></div>";
 		}
