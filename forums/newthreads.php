@@ -109,9 +109,9 @@ if (isset($_GET['markallread'])) {
     }
   }
   if ($from=='home') {
-    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php");
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php?r=" . Sanitize::randomQueryStringParam());
   } else {
-    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid");
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
   }
   exit;
 }
