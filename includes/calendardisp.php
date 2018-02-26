@@ -3,11 +3,11 @@ $cid = Sanitize::courseId($_GET['cid']);
 
 
 if (isset($_GET['calstart'])) {
-	setcookie("calstart".$cid, Sanitize::onlyInt($_GET['calstart']));
+	setcookie("calstart".$cid, Sanitize::onlyInt($_GET['calstart']),'','','','',true);
 	$_COOKIE["calstart".$cid] = Sanitize::onlyInt($_GET['calstart']);
 }
 if (isset($_GET['callength'])) {
-	setcookie("callength".$cid, Sanitize::onlyInt($_GET['callength']));
+	setcookie("callength".$cid, Sanitize::onlyInt($_GET['callength']),'','','','',true);
 	$_COOKIE["callength".$cid] = Sanitize::onlyInt($_GET['callength']);
 }
 
