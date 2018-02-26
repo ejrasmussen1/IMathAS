@@ -54,7 +54,8 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 	//DB $query = "SELECT id,userid FROM imas_forum_posts WHERE id IN ($refids)";
 	//DB $res = mysql_query($query) or die("Query failed : $query " . mysql_error());
 	//DB while ($row = mysql_fetch_row($res)) {
-	$stm = $DBH->query("SELECT id,userid FROM imas_forum_posts WHERE id IN ($refids)");
+	$stm = $DBH->prepare("SELECT id,userid FROM imas_forum_posts WHERE id IN (:refids)");
+	$stm->execute(array(':refids'=>$refids));
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		$postuserids[$row[0]] = $row[1];
 	}
@@ -97,7 +98,8 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 					'forum' => Sanitize::onlyInt($forumid),
 					'thread' => Sanitize::encodeUrlParam($_GET['thread']),
 					'modify' => 'reply',
-					'replyto' => Sanitize::onlyInt($actionid)
+					'replyto' => Sanitize::onlyInt($actionid),
+					'r' => Sanitize::randomQueryStringParam(),
 				)));
 		} else if ($action=='modify') {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/posts.php?"
@@ -107,6 +109,7 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 					'forum' => Sanitize::onlyInt($forumid),
 					'thread' => Sanitize::encodeUrlParam($_GET['thread']),
 					'modify' => Sanitize::onlyInt($actionid),
+					'r' => Sanitize::randomQueryStringParam(),
 				)));
 		}
 	} else if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Previous') {
@@ -116,6 +119,7 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 				'cid' => Sanitize::courseId($cid),
 				'forum' => Sanitize::onlyInt($forumid),
 				'thread' => Sanitize::encodeUrlParam($_POST['prevth']),
+				'r' => Sanitize::randomQueryStringParam(),
 			)));
 	} else if (isset($_POST['save']) && $_POST['save']=='Save Grades and View Next') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/posts.php?"
@@ -124,6 +128,7 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 				'cid' => Sanitize::courseId($cid),
 				'forum' => Sanitize::onlyInt($forumid),
 				'thread' => Sanitize::encodeUrlParam($_POST['nextth']),
+				'r' => Sanitize::randomQueryStringParam(),
 			)));
 	} else {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?"
@@ -131,6 +136,7 @@ if (($isteacher || isset($tutorid)) && isset($_POST['score'])) {
 				'page' => Sanitize::onlyInt($page),
 				'cid' => Sanitize::courseId($cid),
 				'forum' => Sanitize::onlyInt($forumid),
+				'r' => Sanitize::randomQueryStringParam(),				
 			)));
 	}
 	exit;
@@ -437,7 +443,7 @@ echo '<div id="headerthread" class="pagetitle"><h2>Forum: '.Sanitize::encodeStri
 
 if ($duedates!='') {
 	//$duedates contains HTML from above
-	echo '<p id="forumduedates">'.$duedates.'</p>';
+	echo '<p id="forumduedates">'.Sanitize::outgoingHtml($duedates).'</p>';
 }
 
 if ($postinstr != '' || $replyinstr != '') {
@@ -568,7 +574,7 @@ if ($page>0) {
 			$prevnext .= "| Next ";
 		}
 
-		echo "<div>$prevnext</div>";
+		echo "<div>".Sanitize::encodeStringForDisplay($prevnext)."</div>";
 	}
 }
 echo "<form method=get action=\"thread.php\">";
@@ -863,7 +869,7 @@ echo "</p>";
 		echo "<p><button type=\"button\" onclick=\"window.location.href='thread.php?page=".Sanitize::onlyInt($page)."&cid=$cid&forum=$forumid&modify=new'\">"._('Add New Thread')."</button></p>\n";
 	}
 	if ($prevnext!='') {
-		echo "<p>$prevnext</p>";
+		echo "<p>".Sanitize::encodeStringForDisplay($prevnext)."</p>";
 	}
 
 	require("../footer.php");
