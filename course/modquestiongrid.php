@@ -223,7 +223,7 @@ if (isset($_POST['checked'])) { //modifying existing
 					$row[3] = '';
 				}
 
-				$qrows[$row[0]] = '<tr><td>'.$qns[$row[0]].'</td><td>'.$row[1].'</td>';
+				$qrows[$row[0]] = '<tr><td>'.Sanitize::onlyInt($qns[$row[0]]).'</td><td>'.$row[1].'</td>';
 				$qrows[$row[0]] .= '<td>';
 				if ($row[5]!='') {
 					$extref = explode('~~',$row[5]);
