@@ -253,7 +253,7 @@ if ($overwriteBody==1) {
 	echo 'for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
 	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
-	echo "<input type=hidden name=attempt value=\"$attempt\">\n";
+	echo "<input type=hidden name=attempt value=\"" . Sanitize::onlyInt($attempt) . "\">\n";
 
 	if (isset($rawscores)) {
 		if (strpos($rawscores[$qn],'~')!==false) {
