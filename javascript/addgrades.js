@@ -562,15 +562,13 @@ function sendtoall(w,type) {
 		 if (w==1) {
 			if (el.type=="textarea" && el.id!="toallfeedback") {
                 var feedbackContent = $("#toallfeedback").val();
-
+                console.log(feedbackContent);
 				if (type==1) {
-                    feedbackContent = $(feedbackContent)[0].textContent;
                     el.value = el.value+feedbackContent;
 				}
 				//el.value = document.getElementById("toallfeedback").value + el.value;}
 				else if (type==0) {
-                    feedbackContent = $(feedbackContent)[0].textContent;
-									el.value = el.value+feedbackContent;
+					el.value = el.value+feedbackContent;
 				}
 
 				else if (type==2) {
@@ -579,7 +577,6 @@ function sendtoall(w,type) {
                         el.value = feedbackContent;
                     } else {
                         el.value = "";
-                        feedbackContent = $(feedbackContent)[0].textContent;
                         el.value = el.value + feedbackContent;
                     }
                 }
