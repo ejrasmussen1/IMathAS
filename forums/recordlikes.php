@@ -33,7 +33,7 @@ if ($like==0) {
 	$stm = $DBH->prepare("SELECT id FROM imas_forum_likes WHERE postid=:postid AND userid=:userid");
 	$stm->execute(array(':postid'=>$postid, ':userid'=>$userid));
 	if ($stm->rowCount()>0) {
-		$aff =0;
+		$aff = 0;
 	} else {
 		//DB $query = "SELECT threadid FROM imas_forum_posts WHERE id=$postid";
 		//DB $result = mysql_query($query);
@@ -99,5 +99,5 @@ if ($like==1) {
 	$likemsg = 'Click to like this post. '.$likemsg;;
 }
 header('Content-type: application/json');
-echo '{"aff":'.$aff.', "classn":"'.$likeclass.'", "msg":"'.$likemsg.'", "cnt":'.$likecnt.'}';
+echo '{"aff":'.$aff.', "classn":"'.$likeclass.'", "msg":"'.$likemsg.'", "cnt":'.Sanitize::onlyInt($likecnt).'}';
 ?>

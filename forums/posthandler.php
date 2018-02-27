@@ -358,7 +358,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
 		$stm = $DBH->prepare("UPDATE imas_forum_posts SET files=:files WHERE id=:id");
 		$stm->execute(array(':files'=>$files, ':id'=>$_GET['modify']));
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl?r=" . Sanitize::randomQueryStringParam());
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else { //display mod
 		if ($caller=='thread') {
