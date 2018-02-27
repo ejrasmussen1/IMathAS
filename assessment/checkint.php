@@ -17,6 +17,7 @@
 	if (isset($_POST['txt'])) {
 		//echo "Post: $cleaned<BR>\n";
 		$res = interpret('answer','numfunc',$cleaned);
+
 		echo str_replace("\n","<BR>",$res);
 		//eval("\$res = {$_POST['txt']};");
 		//echo "$res<BR>\n";

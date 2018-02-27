@@ -92,7 +92,7 @@ if (isset($_POST['tname'])) {
 
 	}
 	$ltfrom = str_replace('&amp;','&',$ltfrom);
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/externaltools.php?cid=$cid$ltfrom");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/externaltools.php?cid=$cid$ltfrom&r=" .Sanitize::randomQueryStringParam());
 	exit;
 } else if (isset($_POST['delete']) && $_POST['delete']=='true') {
 	$id = Sanitize::onlyInt($_GET['id']);
@@ -113,7 +113,7 @@ if (isset($_POST['tname'])) {
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 	}
 	$ltfrom = str_replace('&amp;','&',$ltfrom);
-	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/externaltools.php?cid=$cid$ltfrom");
+	header('Location: ' . $GLOBALS['basesiteurl'] . "/admin/externaltools.php?cid=$cid$ltfrom&r=" .Sanitize::randomQueryStringParam());
 	exit;
 } else {
 	require("../header.php");

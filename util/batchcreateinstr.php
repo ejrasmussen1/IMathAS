@@ -18,14 +18,21 @@ if ($myrights < 100 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {
 }
 $curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> &gt; Batch Create Instructors</div>\n";
 
-if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_name'])) {
+$uploadedcsv = $_FILES['uploadedfile'];
+
+if (isset($_POST['groupid']) && is_uploaded_file($uploadedcsv['tmp_name'])) {
   if ($myrights == 100 || ($myspecialrights&32)==32) {
+      if (iscsv($uploadedcsv)){
   	  if ($_POST['groupid']<1) {
   	  	  echo "Invalid group selection";
   	  	  exit;
   	  } else {
   	  	  $newusergroupid = $_POST['groupid'];
   	  }
+      } else {
+          echo "Not a CSV";
+          exit;
+      }
   } else {
   	  $newusergroupid = $groupid;
   }
@@ -38,7 +45,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     $homelayout = '|0,1,2||0,1';
   }
   $now = time();
-  $handle = fopen_utf8($_FILES['uploadedfile']['tmp_name'],'r');
+  $handle = fopen_utf8($uploadedcsv['tmp_name'],'r');
   while (($data = fgetcsv($handle,2096))!==false) {
     if (trim($data[0])=='') {continue;}
     if (count($data)<5) {
@@ -263,4 +270,23 @@ function fopen_utf8 ($filename, $mode) {
         rewind($file);
     }
     return $file;
+}
+//Whitelist to confirm the uploaded file is a CSV
+function iscsv($filename){
+    $csv_mimetypes = array(
+        'text/csv',
+        'text/plain',
+        'application/csv',
+        'text/comma-separated-values',
+        'application/excel',
+        'application/vnd.ms-excel',
+        'application/vnd.msexcel',
+        'text/anytext',
+        'application/octet-stream',
+        'application/txt',
+    );
+
+    if (in_array($filename['type'], $csv_mimetypes)) {
+        return true;
+    }
 }

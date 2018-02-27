@@ -558,11 +558,29 @@ function sendtoall(w,type) {
 	}
 	for (var e = 0; e<form.elements.length; e++) {
 		 var el = form.elements[e];
+		 console.log(w,type);
 		 if (w==1) {
 			if (el.type=="textarea" && el.id!="toallfeedback") {
-				if (type==1) { el.value = document.getElementById("toallfeedback").value + el.value;}
-				else if (type==0) { el.value = el.value+document.getElementById("toallfeedback").value;}
-				else if (type==2) { el.value = document.getElementById("toallfeedback").value;}
+                var feedbackContent = $("#toallfeedback").val();
+                console.log(feedbackContent);
+				if (type==1) {
+                    el.value = el.value+feedbackContent;
+				}
+				//el.value = document.getElementById("toallfeedback").value + el.value;}
+				else if (type==0) {
+					el.value = el.value+feedbackContent;
+				}
+
+				else if (type==2) {
+
+                    if (feedbackContent == "") {
+                        el.value = feedbackContent;
+                    } else {
+                        el.value = "";
+                        el.value = el.value + feedbackContent;
+                    }
+                }
+					//el.value = document.getElementById("toallfeedback").value;}
 			}
 		 } else if (w==0) {
 			if (document.getElementById("toallgrade").value.match(/\d/)) {

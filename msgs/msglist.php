@@ -43,6 +43,7 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	$threadsperpage = intval($listperpage);
 
 	$cid = Sanitize::courseId($_GET['cid']);
+    $cidP = Sanitize::courseId($_POST['courseid']);
 	if (!isset($_GET['page']) || $_GET['page']=='') {
 		$page = 1;
 	} else {
@@ -151,8 +152,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 	}
 	if (isset($_GET['add'])) {
 		if (isset($_POST['subject']) && isset($_POST['to']) && $_POST['to']!='0') {
-      $_POST['message'] = Sanitize::incomingHtml($_POST['message']);
-			$_POST['subject'] = Sanitize::stripHtmlTags($_POST['subject']);
+      $messagePost = Sanitize::incomingHtml($_POST['message']);
+			$subjectPost = Sanitize::stripHtmlTags($_POST['subject']);
+			$msgToPost = Sanitize::onlyInt($_POST['to']);
 
       $now = time();
 			//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
@@ -162,8 +164,8 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 			$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':title'=>$_POST['subject'], ':message'=>$_POST['message'], ':msgto'=>$_POST['to'],
-        ':msgfrom'=>$userid, ':senddate'=>$now, ':isread'=>0, ':courseid'=>$_POST['courseid']));
+			$stm->execute(array(':title'=>$subjectPost, ':message'=>$messagePost, ':msgto'=>$msgToPost,
+        ':msgfrom'=>$userid, ':senddate'=>$now, ':isread'=>0, ':courseid'=>$cidP));
 			$msgid = $DBH->lastInsertId();
 
 			if ($_GET['replyto']>0) {
@@ -228,12 +230,12 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 			if ($FCMtokenTo != '') {
 				require_once("../includes/FCM.php");
 				$url = $GLOBALS['basesiteurl'] . "/msgs/viewmsg.php?cid=".Sanitize::courseId($_POST['courseid'])."&msgid=$msgid";
-				sendFCM($FCMtokenTo,"Msg from: $userfullname",$_POST['subject'],$url);
+				sendFCM($FCMtokenTo,"Msg from: $userfullname".Sanitize::encodeStringForDisplay($_POST['subject']),$url);
 			}
 			if ($type=='new') {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&" .Sanitize::randomQueryStringParam());
 			} else {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid&" .Sanitize::randomQueryStringParam());
 			}
 			exit;
 		} else {
@@ -256,9 +258,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 						$(el).after($("<img>", {src: imasroot+"/img/updating.gif", alt: "Loading recipients..."}));
 						$.ajax({
 							url: "msglist.php?cid=0&getstulist="+newcid,
-							dataType: "json"
+							dataType: "json",
 						}).done(function(optarr) {
-							$("#to").empty().append("<option value=\"0\">Select a recipient...</option>");
+							$("#to").empty().append("<option value=\'0\'>Select a recipient...</option>");
 							for (var i=0;i<optarr.length;i++) {
 								$("#to").append($(optarr[i]));
 							}
@@ -604,9 +606,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
       //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
       $DBH->query($query);
   		if ($type=='new') {
-  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid");
+  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&" .Sanitize::randomQueryStringParam());
   		} else {
-  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid");
+  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid&" .Sanitize::randomQueryStringParam());
   		}
   		exit;
   	}

@@ -37,6 +37,7 @@
 	} else {
 		$filteruid = 0;
 	}
+
 	/*
 isread:
 # to  frm
@@ -75,15 +76,19 @@ Read   Deleted   Deleted by Sender   Tagged
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 	}
+
 	if (isset($_GET['removeid'])) {
+        $removedId = intval($_GET['removeid']);
 		//DB $query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&2)=2";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id AND (isread&2)=2");
-		$stm->execute(array(':id'=>$_GET['removeid']));
+		$stm->execute(array(':id'=>$removedId));
 		//DB $query = "UPDATE imas_msgs SET isread=(isread|4) WHERE id='{$_GET['removeid']}'";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_msgs SET isread=(isread|4) WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['removeid']));
+		$stm->execute(array(':id'=>$removedId));
+
+
 	}
 
 	$pagetitle = "Messages";

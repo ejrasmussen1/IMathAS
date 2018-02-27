@@ -26,6 +26,7 @@ require("i18n/i18n.php");
 require("includes/JWT.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 $sessiondata = array();
+
 /*
 if (isset($_GET['graphdisp'])) {
 	$sessiondata['graphdisp'] = intval($_GET['graphdisp']);
@@ -53,14 +54,16 @@ foreach($prefdefaults as $key=>$def) {
 		$sessiondata['userprefs'][$key] = $def;
 	}
 }
+
 if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and drawentry
 	$sessiondata['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
 	$sessiondata['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
 	setcookie("embedquserprefs", json_encode(array(
 		'graphdisp'=>$sessiondata['userprefs']['graphdisp'],
 		'drawentry'=>$sessiondata['userprefs']['drawentry']
-		)));
+		)),	'','','',true,true);
 }
+
 foreach(array('graphdisp','mathdisp','useed') as $key) {
 	$sessiondata[$key] = $sessiondata['userprefs'][$key];
 }

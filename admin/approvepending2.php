@@ -4,33 +4,35 @@ require("../init.php");
 
 if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
+$newStatus = (int) trim($_POST['newstatus']);
+$instId = (int) trim($_POST['userid']);
 //handle ajax postback
-if (isset($_POST['newstatus'])) {
+if (!empty($newStatus)) {
 	$stm = $DBH->prepare("SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?");
-	$stm->execute(array($_POST['userid']));
+	$stm->execute(array($instId));
 	$reqdata = json_decode($stm->fetchColumn(0), true);
-	
+
 	if (!isset($reqdata['actions'])) {
 		$reqdata['actions'] = array();
 	}
 	$reqdata['actions'][] = array(
 		'by'=>$userid,
 		'on'=>time(),
-		'status'=>$_POST['newstatus']);
+		'status'=>$newStatus);
 	
 	$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=?,reqdata=? WHERE userid=?");
-	$stm->execute(array($_POST['newstatus'], json_encode($reqdata), $_POST['userid']));
+	$stm->execute(array($newStatus, json_encode($reqdata), $instId));
 	
-	if ($_POST['newstatus']==10) { //deny
+	if ($newStatus==10) { //deny
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
-		$stm->execute(array(':id'=>$_POST['userid']));
+		$stm->execute(array(':id'=>$instId));
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
 			require("../includes/unenroll.php");
 			foreach ($CFG['GEN']['enrollonnewinstructor'] as $rcid) {
-				unenrollstu($rcid, array(intval($_POST['userid'])));
+				unenrollstu($rcid, array(intval($instId)));
 			}
 		}
-	} else if ($_POST['newstatus']==11) { //approve
+	} else if ($newStatus==11) { //approve
 		if ($_POST['group']>-1) {
 			$group = intval($_POST['group']);
 		} else if (trim($_POST['newgroup'])!='') {
@@ -39,7 +41,7 @@ if (isset($_POST['newstatus'])) {
 			$group = $stm->fetchColumn(0);
 			if ($group === false) {
 				$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
-				$stm->execute(array(':name'=>$_POST['newgroup']));
+				$stm->execute(array(':name'=>$newGroupName));
 				$group = $DBH->lastInsertId();
 			}
 		} else {
