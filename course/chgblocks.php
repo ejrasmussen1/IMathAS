@@ -53,14 +53,15 @@ function updateBlocksArray(&$items,$tochg,$sets) {
 
 $overwriteBody = 0;
 $body = "";
-$pagetitle = "Mass Change Block Settings";
-$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId($_GET['cid']).'">'.Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Block Settings";
 
+$cid = Sanitize::courseId($_GET['cid']);
+$pagetitle = "Mass Change Block Settings";
+$curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".$cid.'">'.Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Mass Change Block Settings";
 //DB $query = "SELECT itemorder FROM imas_courses WHERE id='{$_GET['cid']}'";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 //DB $items = unserialize(mysql_result($result,0,0));
 $stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-$stm->execute(array(':id'=>$_GET['cid']));
+$stm->execute(array(':id'=>$cid));
 $items = unserialize($stm->fetchColumn(0));
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher

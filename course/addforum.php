@@ -152,12 +152,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $_POST['replyinstr'] = addslashes(myhtmLawed(stripslashes($_POST['replyinstr'])));
 			$_POST['replyinstr'] = myhtmLawed($_POST['replyinstr']);
 		}
-		if (isset($_GET['id'])) {  //already have id; update
+		$forumId = (int) trim($_GET['id']);
+		if (isset($forumId)) {  //already have id; update
 			//DB $query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $oldgroupsetid = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT groupsetid FROM imas_forums WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
+			$stm->execute(array(':id'=>$forumId));
 			$oldgroupsetid = $stm->fetchColumn(0);
 			if ($oldgroupsetid!=$_POST['groupsetid']) {
 				//change of groupset; zero out stugroupid
@@ -260,7 +261,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_forum_subscriptions WHERE forumid=:forumid AND userid=:userid");
-			$stm->execute(array(':forumid'=>$_GET['id'], ':userid'=>$userid));
+			$stm->execute(array(':forumid'=>$forumId, ':userid'=>$userid));
 			if ($stm->rowCount()>0) {
 				$hassubscrip = true;
 			}

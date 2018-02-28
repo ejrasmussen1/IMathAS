@@ -40,7 +40,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $items = unserialize(mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['cid']));
+		$stm->execute(array(':id'=>$cid));
 		$items = unserialize($stm->fetchColumn(0));
 		$blocktree = explode('-',$block);
 		$sub =& $items;
@@ -88,7 +88,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		//DB $query = "UPDATE imas_courses SET itemorder='$itemlist' WHERE id='{$_GET['cid']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder WHERE id=:id");
-		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$_GET['cid']));
+		$stm->execute(array(':itemorder'=>$itemlist, ':id'=>$cid));
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
 	}
 
@@ -398,14 +398,14 @@ if ($overwriteBody==1) {
 	if (isset($teacherid)) {
  ?>
 	<script type="text/javascript">
-		/*function moveitem(from,blk) {
-			var to = document.getElementById(blk+'-'+from).value;
-
-			if (to != from) {
-				var toopen = '<?php echo $jsAddress1 ?>&block=' + blk + '&from=' + from + '&to=' + to;
-				window.location = toopen;
-			}
-		}*/
+		///*function moveitem(from,blk) {
+		//	var to = document.getElementById(blk+'-'+from).value;
+        //
+		//	if (to != from) {
+		//		var toopen = '<?php //echo $jsAddress1 ?>//&block=' + blk + '&from=' + from + '&to=' + to;
+		//		window.location = toopen;
+		//	}
+		//}*/
 		function moveDialog(block,item) {
 			GB_show(_("Move Item"), imasroot+"/course/moveitem.php?cid="+cid+"&item="+item+"&block="+block, 600, "auto");
 			return false;
