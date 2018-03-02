@@ -3427,11 +3427,11 @@ function getsnapwidthheight($xmin,$xmax,$ymin,$ymax,$width,$height,$snaptogrid) 
 function getscorenonzero() {
 	global $scores;
 	$out = array();
-	for ($i=0;$i<count($scores);$i++) {
-		if (strpos($scores[$i],'~')===false) {
-			$out[$i+1] = ($scores[$i]<0)?-1:(($scores[$i]>0)?1:0);
+	foreach ($scores as $i=>$v) {
+		if (strpos($v,'~')===false) {
+			$out[$i+1] = ($v<0)?-1:(($v>0)?1:0);
 		} else {
-			$sp = explode('~',$scores[$i]);
+			$sp = explode('~',$v);
 			$out[$i+1] = array();
 			for ($j=0;$j<count($sp);$j++) {
 				$out[$i+1][$j] = ($sp[$j]>0)?1:0;
@@ -3444,11 +3444,11 @@ function getscorenonzero() {
 function getiscorrect() {
 	global $rawscores;
 	$out = array();
-	for ($i=0;$i<count($rawscores);$i++) {
-		if (strpos($rawscores[$i],'~')===false) {
-			$out[$i+1] = ($rawscores[$i]<0)?-1:(($rawscores[$i]==1)?1:0);
+	foreach ($rawscores as $i=>$v) {
+		if (strpos($v,'~')===false) {
+			$out[$i+1] = ($v<0)?-1:(($v==1)?1:0);
 		} else {
-			$sp = explode('~',$rawscores[$i]);
+			$sp = explode('~',$v);
 			$out[$i+1] = array();
 			for ($j=0;$j<count($sp);$j++) {
 				$out[$i+1][$j] = ($sp[$j]==1)?1:0;
@@ -3614,13 +3614,14 @@ function checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigof
 			if ($anans != 0 && $reqsigfigoffset>0 && $v<0 && strlen($givenans) - $gadploc-1 + $v>$reqsigfigoffset) {return false;} //too many sigfigs
 		} else {
 			$gadploc = strpos($givenans,'.');
+			$absgivenans = str_replace('-','',$givenans);
 			if ($gadploc===false) { //no decimal place
-				if (strlen(rtrim($givenans,'0')) != $reqsigfigs) { return false;}
+				if (strlen(rtrim($absgivenans,'0')) != $reqsigfigs) { return false;}
 			} else {
 				if (abs($givenans)<1) {
-					if (strlen(ltrim(substr($givenans,$gadploc+1),'0')) != $reqsigfigs) { return false;}
+					if (strlen(ltrim(substr($absgivenans,$gadploc+1),'0')) != $reqsigfigs) { return false;}
 				} else {
-					if (strlen(ltrim($givenans,'0'))-1 != $reqsigfigs) { return false;}
+					if (strlen(ltrim($absgivenans,'0'))-1 != $reqsigfigs) { return false;}
 				}
 			}
 		}

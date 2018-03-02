@@ -258,7 +258,7 @@ if (($line != null) && (
         generateuserprefs();
 
         $enc = base64_encode(serialize($sessiondata));
-        
+
         if (isset($_POST['tzname']) && strpos(basename($_SERVER['PHP_SELF']),'upgrade.php')===false) {
             $stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :tzname, :sessiondata)");
             $stm->execute(array(':sessionid'=>$sessionid, ':userid'=>$userid, ':time'=>$now, ':tzoffset'=>$_POST['tzoffset'], ':tzname'=>$_POST['tzname'], ':sessiondata'=>$enc));
@@ -432,6 +432,69 @@ if ($hasusername) {
     } else {
         $breadcrumbbase = "<a href=\"$imasroot/index.php\">Home</a> &gt; ";
     }
+	if (isset($_GET['readernavon'])) {
+		$sessiondata['readernavon'] = true;
+		writesessiondata();
+	}
+	if (isset($_GET['useflash'])) {
+		$sessiondata['useflash'] = true;
+		writesessiondata();
+	}
+	if (isset($_GET['graphdisp'])) {
+		$sessiondata['graphdisp'] = $_GET['graphdisp'];
+		writesessiondata();
+	}
+	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php");
+		exit;
+	}
+
+	if (isset($sessiondata['ltiitemtype']) && $_SERVER['PHP_SELF']==$imasroot.'/index.php') {
+		if ($myrights>18) {
+			foreach ($sessiondata as $k=>$v) {
+				if (substr($k,0,3)=='lti') {
+					unset($sessiondata[$k]);
+				}
+			}
+			writesessiondata();
+		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
+			require(__DIR__.'/includes/userutils.php');
+			logout();
+			header('Location: ' . $GLOBALS['basesiteurl'] . '/index.php');
+			exit;
+		}
+	}
+
+	if (isset($sessiondata['ltiitemtype'])) {
+		$flexwidth = true;
+		if ($sessiondata['ltiitemtype']==1) {
+			if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && isset($_GET['cid']) && $sessiondata['ltiitemid']!=$_GET['cid']) {
+				echo "You do not have access to this page";
+				echo "<a href=\"$imasroot/course/course.php?cid={$sessiondata['ltiitemid']}\">Return to course page</a>";
+				exit;
+			}
+		} else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
+			$breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
+			$urlparts = parse_url($_SERVER['PHP_SELF']);
+			if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php'))) {
+			//if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
+				//DB $query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
+				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+				//DB $cid = mysql_result($result,0,0);
+				$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
+				$stm->execute(array(':id'=>$sessiondata['ltiitemid']));
+				$cid = Sanitize::courseId($stm->fetchColumn(0));
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
+				exit;
+			}
+		} else if ($sessiondata['ltirole']=='instructor') {
+			$breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
+		} else {
+			$breadcrumbbase = '';
+		}
+	} else {
+		$breadcrumbbase = "<a href=\"$imasroot/index.php\">Home</a> &gt; ";
+	}
 
     if ((isset($_GET['cid']) && $_GET['cid']!="admin" && $_GET['cid']>0) || (isset($sessiondata['courseid']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')!==false)) {
         if (isset($_GET['cid'])) {
@@ -519,12 +582,12 @@ if ($hasusername) {
                     $tutorid = $line['id'];
                     $tutorsection = trim($line['section']);
                 } else if ($myrights==5 && isset($_GET['guestaccess']) && isset($CFG['GEN']['guesttempaccts'])) {
-                    //guest user not enrolled, but trying via guestaccess; enroll    
+                    //guest user not enrolled, but trying via guestaccess; enroll
                     $stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid) VALUES (?,?)");
                     $stm->execute(array($userid, $cid));
                     $studentid = $DBH->lastInsertId();
                     $studentinfo = array('latepasses'=>0, 'timelimitmult'=>1, 'section'=>null);
-                } 
+                }
             }
         }
         $query = "SELECT imas_courses.name,imas_courses.available,imas_courses.lockaid,imas_courses.copyrights,imas_users.groupid,imas_courses.theme,imas_courses.newflag,imas_courses.msgset,imas_courses.toolset,imas_courses.deftime,imas_courses.picicons,imas_courses.latepasshrs ";
