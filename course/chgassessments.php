@@ -196,12 +196,12 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['chgisgroup'])) {
 				//DB $sets[] = "isgroup='{$_POST['isgroup']}'";
 				$sets[] = "isgroup=:isgroup";
-				$qarr[':isgroup'] = $_POST['isgroup'];
+				$qarr[':isgroup'] = Sanitize::onlyInt($_POST['isgroup']);
 			}
 			if (isset($_POST['chggroupmax'])) {
 				//DB $sets[] = "groupmax='{$_POST['groupmax']}'";
 				$sets[] = "groupmax=:groupmax";
-				$qarr[':groupmax'] = $_POST['groupmax'];
+				$qarr[':groupmax'] = Sanitize::onlyInt($_POST['groupmax']);
 			}
 			if (isset($_POST['chgcntingb'])) {
 				//DB $sets[] = "cntingb='{$_POST['cntingb']}'";
