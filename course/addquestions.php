@@ -1153,7 +1153,7 @@ if ($overwriteBody==1) {
 	<script type="text/javascript">
 		var curcid = <?php echo $cid ?>;
 		var curaid = <?php echo $aid ?>;
-		var defpoints = <?php echo Sanitize::encodeStringForDisplay($defpoints); ?>;
+		var defpoints = <?php echo Sanitize::encodeStringForDisplay($defpoints); ?>';
 		var AHAHsaveurl = '<?php echo $GLOBALS['basesiteurl'] ?>/course/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
 		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs); ?>';
 	</script>

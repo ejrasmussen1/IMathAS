@@ -772,10 +772,11 @@ if ($myrights<20) {
 		}
 
 		if (isset($_POST['libs'])) {
-			if ($_POST['libs']=='') {
-				$_POST['libs'] = $userdeflib;
+			$postLibs = (int) trim($_POST['libs']);
+			if ($postLibs=='') {
+				$postLibs = $userdeflib;
 			}
-			$searchlibs = $_POST['libs'];
+			$searchlibs = $postLibs;
 			//$sessiondata['lastsearchlibs'] = implode(",",$searchlibs);
 			$sessiondata['lastsearchlibs'.$cid] = $searchlibs;
 			writesessiondata();

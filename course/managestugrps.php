@@ -58,10 +58,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Add Group Set";
 	} else if (isset($_GET['delgrpset'])) {
+		$deleteGroupSet = (int) trim($_GET['delgrpset']);
 		//deleting groupset
 		if (isset($_POST['confirm'])) {
 			//if name is set
-			deletegroupset(Sanitize::onlyInt($_GET['delgrpset']));
+			deletegroupset($deleteGroupSet);
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
 			exit();
 		} else {
@@ -69,19 +70,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $page_grpsetname = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['delgrpset']));
+			$stm->execute(array(':id'=>$deleteGroupSet));
 			$page_grpsetname = $stm->fetchColumn(0);
 		}
 
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Delete Group Set";
 	} else if (isset($_GET['rengrpset'])) {
+		$renameGrpSet = (int) trim($_GET['rengrpset']);
 		//renaming groupset
 		if (isset($_POST['grpsetname'])) {
 			//if name is set
 			//DB $query = "UPDATE imas_stugroupset SET name='{$_POST['grpsetname']}' WHERE id='{$_GET['rengrpset']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_stugroupset SET name=:name WHERE id=:id");
-			$stm->execute(array(':name'=>$_POST['grpsetname'], ':id'=>$_GET['rengrpset']));
+			$stm->execute(array(':name'=>$_POST['grpsetname'], ':id'=>$renameGrpSet));
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
 			exit();
 		} else {
@@ -89,17 +91,18 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $page_grpsetname = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['rengrpset']));
+			$stm->execute(array(':id'=>$renameGrpSet));
 			$page_grpsetname = $stm->fetchColumn(0);
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Rename Group Set";
 	} else if (isset($_GET['copygrpset'])) {
 		//copying groupset
+		$copygrpset = (int) trim($_GET['copygrpset']);
 		//DB $query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['copygrpset']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $grpsetname = addslashes(mysql_result($result,0,0)) . ' (copy)';
 		$stm = $DBH->prepare("SELECT name FROM imas_stugroupset WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['copygrpset']));
+		$stm->execute(array(':id'=>$copygrpset));
 		$grpsetname = $stm->fetchColumn(0) . ' (copy)';
 
 		//DB $query = "INSERT INTO imas_stugroupset (name,courseid) VALUES ('$grpsetname','$cid')";
@@ -113,7 +116,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT id,name FROM imas_stugroups WHERE groupsetid=:groupsetid");
-		$stm->execute(array(':groupsetid'=>$_GET['copygrpset']));
+		$stm->execute(array(':groupsetid'=>$copygrpset));
 		$ins_grp_stm = $DBH->prepare("INSERT INTO imas_stugroups (name,groupsetid) VALUES (:name, :groupsetid)");
 		$sel_grpmem_stm = $DBH->prepare("SELECT userid FROM imas_stugroupmembers WHERE stugroupid=:stugroupid");
 
@@ -343,6 +346,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Add Group";
 	} else if (isset($_GET['delgrp'])) {
 		//deleting groupset
+		$delgrp = (int) trim($_GET['delgrp']);
 		if (isset($_GET['confirm']) && isset($_POST['delposts'])) {
 			//if name is set
 			deletegroup($_GET['delgrp'], $_POST['delposts']==1);
@@ -353,7 +357,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $page_grpname = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_stugroups WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['delgrp']));
+			$stm->execute(array(':id'=>$delgrp));
 			$page_grpname = $stm->fetchColumn(0);
 			//DB $query = "SELECT name FROM imas_stugroupset WHERE id='$grpsetid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -366,12 +370,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Delete Group";
 	} else if (isset($_GET['rengrp'])) {
 		//renaming groupset
+		$renGrp = (int) trim($_GET['rengrp']);
 		if (isset($_POST['grpname'])) {
 			//if name is set
 			//DB $query = "UPDATE imas_stugroups SET name='{$_POST['grpname']}' WHERE id='{$_GET['rengrp']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_stugroups SET name=:name WHERE id=:id");
-			$stm->execute(array(':name'=>$_POST['grpname'], ':id'=>$_GET['rengrp']));
+			$stm->execute(array(':name'=>$_POST['grpname'], ':id'=>$renGrp));
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
@@ -379,7 +384,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $page_grpname = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_stugroups WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['rengrp']));
+			$stm->execute(array(':id'=>$renGrp));
 			$page_grpname = $stm->fetchColumn(0);
 			//DB $query = "SELECT name FROM imas_stugroupset WHERE id='$grpsetid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -391,9 +396,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Rename Group";
 	} else if (isset($_GET['removeall'])) {
 		//removing all group members
+		$removeall = (int) trim($_GET['removeall']);
 		if (isset($_POST['confirm'])) {
 			//if name is set
-			removeallgroupmembers($_GET['removeall']);
+			removeallgroupmembers($removeall);
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
@@ -401,7 +407,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $page_grpname = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_stugroups WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['removeall']));
+			$stm->execute(array(':id'=>$removeall));
 			$page_grpname = $stm->fetchColumn(0);
 			//DB $query = "SELECT name FROM imas_stugroupset WHERE id='$grpsetid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -414,9 +420,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	} else if (isset($_GET['remove']) && isset($_GET['grpid'])) {
 		//removing one group member
+		$removegrpid = (int) trim($_GET['grpid']);
+		$remove = (int) trim($_GET['remove']);
 		if (isset($_POST['confirm'])) {
 			//if name is set
-			removegroupmember($_GET['grpid'],$_GET['remove']);
+			removegroupmember($removegrpid,$remove);
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
 			exit();
 		} else {
@@ -424,13 +432,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $page_stuname = mysql_result($result,0,0).', '.mysql_result($result,0,1);
 			$stm = $DBH->prepare("SELECT LastName, FirstName FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['remove']));
+			$stm->execute(array(':id'=>$remove));
 			$page_stuname = implode(', ', $stm->fetch(PDO::FETCH_NUM));
 			//DB $query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['grpid']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $page_grpname = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT name FROM imas_stugroups WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['grpid']));
+			$stm->execute(array(':id'=>$removegrpid));
 			$page_grpname = $stm->fetchColumn(0);
 			//DB $query = "SELECT name FROM imas_stugroupset WHERE id='$grpsetid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -585,6 +593,7 @@ if ($overwriteBody==1) {
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['delgrpset'])) {
+		
 		echo '<h4>Delete student group set</h4>';
 		echo "<p>Are you SURE you want to delete the set of student groups <b>" . Sanitize::encodeStringForDisplay($page_grpsetname) . "</b> and all the groups contained within it? ";
 		$used = '';
@@ -592,7 +601,7 @@ if ($overwriteBody==1) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE isgroup>0 AND groupsetid=:groupsetid");
-		$stm->execute(array(':groupsetid'=>$_GET['delgrpset']));
+		$stm->execute(array(':groupsetid'=>$deleteGroupSet));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$used .= "Assessment: " . Sanitize::encodeStringForDisplay($row[0]) . "<br/>";
 		}
@@ -600,7 +609,7 @@ if ($overwriteBody==1) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT name FROM imas_forums WHERE groupsetid=:groupsetid");
-		$stm->execute(array(':groupsetid'=>$_GET['delgrpset']));
+		$stm->execute(array(':groupsetid'=>$deleteGroupSet));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$used .= "Forum: " . Sanitize::encodeStringForDisplay($row[0]) . "<br/>";
 		}
@@ -608,7 +617,7 @@ if ($overwriteBody==1) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while ($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT name FROM imas_wikis WHERE groupsetid=:groupsetid");
-		$stm->execute(array(':groupsetid'=>$_GET['delgrpset']));
+		$stm->execute(array(':groupsetid'=>$deleteGroupSet));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$used .= "Wiki: " . Sanitize::encodeStringForDisplay($row[0]) . "<br/>";
 		}
@@ -618,7 +627,7 @@ if ($overwriteBody==1) {
 		} else {
 			echo '<p>This set of groups is not currently being used</p>';
 		}
-		$querystring = http_build_query(array('cid'=>$cid, 'delgrpset'=>Sanitize::onlyInt($_GET['delgrpset'])));
+		$querystring = http_build_query(array('cid'=>$cid, 'delgrpset'=>$deleteGroupSet));
 		echo "<form method=\"post\" action=\"managestugrps.php?$querystring\">";
 		echo '<p><button type="submit" name="confirm" value="true">'._('Yes, Delete').'</button> ';
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
