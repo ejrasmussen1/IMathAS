@@ -1236,7 +1236,13 @@ function encodeDraw() {
 		}
 	}
 	out += tpineqout.join(",");
-	targetOuts[curTarget].value = out;
+	if (targetOuts[curTarget].value != out) {
+		var dochange = (targetOuts[curTarget].value != '' || out != ';;;;;;;;');
+		targetOuts[curTarget].value = out;
+		if (dochange) {
+			$(targetOuts[curTarget]).trigger("change");
+		} 
+	}
 }
 var clickcnt=0;
 function drawMouseDown(ev) {

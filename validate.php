@@ -386,6 +386,52 @@ if ($hasusername) {
         writesessiondata();
     }
 
+    if (isset($_GET['readernavon'])) {
+        $sessiondata['readernavon'] = true;
+        writesessiondata();
+    }
+    if (isset($_GET['useflash'])) {
+        $sessiondata['useflash'] = true;
+        writesessiondata();
+    }
+    if (isset($_GET['graphdisp'])) {
+        $sessiondata['graphdisp'] = $_GET['graphdisp'];
+        writesessiondata();
+    }
+    if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
+        header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php" . '?r=' . Sanitize::randomQueryStringParam());
+    }
+
+    if (isset($sessiondata['ltiitemtype'])) {
+        $flexwidth = true;
+        if ($sessiondata['ltiitemtype']==1) {
+            if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && isset($_GET['cid']) && $sessiondata['ltiitemid']!=$_GET['cid']) {
+                echo "You do not have access to this page";
+                echo "<a href=\"$imasroot/course/course.php?cid={$sessiondata['ltiitemid']}\">Return to course page</a>";
+                exit;
+            }
+        } else if ($sessiondata['ltiitemtype']==0 && $sessiondata['ltirole']=='learner') {
+            $breadcrumbbase = "<a href=\"$imasroot/assessment/showtest.php?cid=".Sanitize::courseId($_GET['cid'])."&id={$sessiondata['ltiitemid']}\">Assignment</a> &gt; ";
+            $urlparts = parse_url($_SERVER['PHP_SELF']);
+            if (!in_array(basename($urlparts['path']),array('showtest.php','printtest.php','msglist.php','sentlist.php','viewmsg.php','msghistory.php','redeemlatepass.php','gb-viewasid.php','showsoln.php','ltiuserprefs.php'))) {
+                //if (strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'printtest.php')===false && strpos(basename($_SERVER['PHP_SELF']),'msglist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'sentlist.php')===false && strpos(basename($_SERVER['PHP_SELF']),'viewmsg.php')===false ) {
+                //DB $query = "SELECT courseid FROM imas_assessments WHERE id='{$sessiondata['ltiitemid']}'";
+                //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+                //DB $cid = mysql_result($result,0,0);
+                $stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=:id");
+                $stm->execute(array(':id'=>$sessiondata['ltiitemid']));
+                $cid = Sanitize::courseId($stm->fetchColumn(0));
+                header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}" . "&r=" . Sanitize::randomQueryStringParam());
+                exit;
+            }
+        } else if ($sessiondata['ltirole']=='instructor') {
+            $breadcrumbbase = "<a href=\"$imasroot/ltihome.php?showhome=true\">LTI Home</a> &gt; ";
+        } else {
+            $breadcrumbbase = '';
+        }
+    } else {
+        $breadcrumbbase = "<a href=\"$imasroot/index.php\">Home</a> &gt; ";
+    }
 	if (isset($_GET['readernavon'])) {
 		$sessiondata['readernavon'] = true;
 		writesessiondata();
@@ -399,8 +445,8 @@ if ($hasusername) {
 		writesessiondata();
 	}
 	if (isset($sessiondata['isdiag']) && strpos(basename($_SERVER['PHP_SELF']),'showtest.php')===false) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php". '?r=' . Sanitize::randomQueryStringParam());
-	exit;
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php");
+		exit;
 	}
 
 	if (isset($sessiondata['ltiitemtype']) && $_SERVER['PHP_SELF']==$imasroot.'/index.php') {
@@ -416,7 +462,8 @@ if ($hasusername) {
 			logout();
 			header('Location: ' . $GLOBALS['basesiteurl'] . '/index.php');
 			exit;
-		}}
+		}
+	}
 
 	if (isset($sessiondata['ltiitemtype'])) {
 		$flexwidth = true;
