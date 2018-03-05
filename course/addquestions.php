@@ -33,9 +33,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = $_GET['grp']; writesessiondata();}
+	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']); writesessiondata();}
 	if (isset($_GET['selfrom'])) {
-		$sessiondata['selfrom'.$aid] = $_GET['selfrom'];
+		$sessiondata['selfrom'.$aid] = (string) trim($_GET['selfrom']);
 		writesessiondata();
 	} else {
 		if (!isset($sessiondata['selfrom'.$aid])) {

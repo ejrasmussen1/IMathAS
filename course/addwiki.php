@@ -159,11 +159,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 		if (isset($_GET['id'])) { //MODIFY MODE
+			$wikiid = intval($_GET['id']);
 			//DB $query = "SELECT * FROM imas_wikis WHERE id='{$_GET['id']}';";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT * FROM imas_wikis WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
+			$stm->execute(array(':id'=>$wikiid));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];
@@ -173,7 +174,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_wiki_revisions WHERE wikiid=:wikiid");
-			$stm->execute(array(':wikiid'=>$_GET['id']));
+			$stm->execute(array(':wikiid'=>$wikiid));
 			if ($stm->rowCount()>0) {
 				$started = true;
 			} else {
