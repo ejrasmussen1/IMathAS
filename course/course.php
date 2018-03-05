@@ -198,8 +198,9 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 		}
 	}
 	//DEFAULT DISPLAY PROCESSING
-	$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']);
-	$jsAddress2 = $GLOBALS['basesiteurl'] . "/course";
+	//$jsAddress1 = $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']);
+	$jsAddress2 = $GLOBALS['basesiteurl'] . "/course/";
+	//$jsAddress2 = $GLOBALS['basesiteurl'] . "/course";
 
 	$openblocks = Array(0);
 	$prevloadedblocks = array(0);
@@ -398,14 +399,14 @@ if ($overwriteBody==1) {
 	if (isset($teacherid)) {
  ?>
 	<script type="text/javascript">
-		///*function moveitem(from,blk) {
+		//function moveitem(from,blk) {
 		//	var to = document.getElementById(blk+'-'+from).value;
         //
 		//	if (to != from) {
 		//		var toopen = '<?php //echo $jsAddress1 ?>//&block=' + blk + '&from=' + from + '&to=' + to;
 		//		window.location = toopen;
 		//	}
-		//}*/
+		//}
 		function moveDialog(block,item) {
 			GB_show(_("Move Item"), imasroot+"/course/moveitem.php?cid="+cid+"&item="+item+"&block="+block, 600, "auto");
 			return false;

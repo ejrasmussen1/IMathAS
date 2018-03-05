@@ -11,12 +11,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=7, IE=Edge" />
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
   if (!window.jQuery) {  document.write('<script src="<?php echo $imasroot;?>/javascript/jquery.min.js"><\/script>');}
 </script>
 <link rel="stylesheet" href="<?php echo $imasroot . "/imascore.css?ver=021518";?>" type="text/css" />
 <?php
+
 if (isset($coursetheme)) {
 	if (isset($flexwidth) || isset($usefullwidth)) {
 		$coursetheme = str_replace(array('_fw1920','_fw1000','_fw'),'',$coursetheme);

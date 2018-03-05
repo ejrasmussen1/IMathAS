@@ -48,15 +48,15 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-    $assessmentId = (int) trim($_GET['id']);
+    $assessmentId = Sanitize::onlyInt($_GET['id']);
 	$cid = Sanitize::courseId($_GET['cid']);
-	$block = (int) trim($_GET['block']);
+	$block = $_GET['block'];
 	$assessName = (string) trim($_POST['name']);
 
 	if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
 			require_once('../includes/filehandler.php');
-			deleteallaidfiles(Sanitize::onlyInt($_GET['id']));
+			deleteallaidfiles(Sanitize::onlyInt($assessmentId));
 			//DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
@@ -86,32 +86,30 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$cid, $assessmentId);
 			$body .= sprintf("<h3>%s</h3>", Sanitize::encodeStringForDisplay($assessmentname));
 			$body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
-			$body .= '<form method="POST" action="'.sprintf('addassessment.php?cid=%s&id=%d',$cid, Sanitize::onlyInt($_GET['id'])).'">';
+			$body .= '<form method="POST" action="'.sprintf('addassessment.php?cid=%s&id=%d',$cid, $assessmentId).'">"';
 			$body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
 			$body .= sprintf("<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid=%s&id=%d'\"></p>\n",
 				$cid, $assessmentId);
 			$body .= '</form>';
-
 		}
-	} elseif ($assessName != null) { //if the form has been submitted
-        $startDateType = (string) trim($_POST['sdatetype']);
-        $endDateType = (string) trim($_POST['edatetype']);
-        $doReview = (string) trim($_POST['doreview']);
-	    require_once("../includes/parsedatetime.php");
+	} elseif ($_POST['name']!= null) { //if the form has been submitted
+
+		require_once("../includes/parsedatetime.php");
 		if ($_POST['avail']==1) {
-			if ( $startDateType=='0') {
+			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
 			} else {
 				$startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
 			}
-			if ($endDateType=='2000000000') {
+			if ($_POST['edatetype']=='2000000000') {
 				$enddate = 2000000000;
 			} else {
 				$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 			}
-			if ($doReview=='0') {
+
+			if ($_POST['doreview']=='0') {
 				$reviewdate = 0;
-			} else if ($doReview=='2000000000') {
+			} else if ($_POST['doreview']=='2000000000') {
 				$reviewdate = 2000000000;
 			} else {
 				$reviewdate = parsedatetime($_POST['rdate'],$_POST['rtime']);
@@ -133,7 +131,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['minscore'] = intval($_POST['minscore'])+10000;
 		}
 
-		$isgroup = (int) trim($_POST['isgroup']);
+		$isgroup = $_POST['isgroup'];
 
 		if (isset($_POST['showhints'])) {
 			$showhints = 1;
@@ -154,21 +152,21 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['allowlate'] += 10;
 		}
 
-		$timelimit = (int) trim($_POST['timelimit'])*60;
+		$timelimit = $_POST['timelimit']*60;
 		if (isset($_POST['timelimitkickout'])) {
 			$timelimit = -1*$timelimit;
 		}
 
 		if (isset($_POST['usedeffb'])) {
-			$deffb = (string) Sanitize::simpleString($_POST['deffb']);
+			$deffb = $_POST['deffb'];
 		} else {
 			$deffb = '';
 		}
 
 		if ($_POST['deffeedback']=="Practice" || $_POST['deffeedback']=="Homework") {
-			$deffeedback = Sanitize::simpleString($_POST['deffeedback']).'-'.Sanitize::simpleString($_POST['showansprac']);
+			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showansprac'];
 		} else {
-			$deffeedback = Sanitize::simpleString($_POST['deffeedback']).'-'.Sanitize::simpleString($_POST['showans']);
+			$deffeedback = $_POST['deffeedback'].'-'.$_POST['showans'];
 		}
 		if (!isset($_POST['doposttoforum'])) {
 			$_POST['posttoforum'] = 0;
@@ -184,13 +182,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else if ($_POST['skippenalty']>0) {
 			$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 		}
-		$copyFromId = (int) trim($_POST['copyfrom']);
-		if ($copyFromId!=0) {
+		if ($_POST['copyfrom']!=0) {
 			//DB $query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = addslashes_deep(mysql_fetch_row($result));
 			$stm = $DBH->prepare("SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>$copyFromId));
+			$stm->execute(array(':id'=>$_POST['copyfrom']));
 			list($timelimit,$_POST['minscore'],$_POST['displaymethod'],$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$_POST['showqcat'],$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$_POST['groupsetid'],$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$_POST['eqnhelper'],$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = $stm->fetch(PDO::FETCH_NUM);
 			if (isset($_POST['copyinstr'])) {
 				if (($introjson=json_decode($cpintro))!==null) { //is json intro
@@ -255,23 +252,25 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			//DB $updategroupset = "groupsetid='{$_POST['groupsetid']}',";
-			$updategroupset = (int) trim($_POST['groupsetid']);
+			$updategroupset = $_POST['groupsetid'];
 
 		}
+
 		if ($_POST['isgroup']>0 && isset($_POST['groupsetid']) && $_POST['groupsetid']==0) {
 			//create new groupset
 			//DB $query = "INSERT INTO imas_stugroupset (courseid,name) VALUES ('$cid','Group set for {$_POST['name']}')";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $_POST['groupsetid'] = mysql_insert_id();
 			$stm = $DBH->prepare("INSERT INTO imas_stugroupset (courseid,name) VALUES (:courseid, :name)");
-			$stm->execute(array(':courseid'=>$cid, ':name'=>'Group set for '.$assessName));
+			$stm->execute(array(':courseid'=>$cid, ':name'=>'Group set for '.$_POST['name']));
 			$_POST['groupsetid'] = $DBH->lastInsertId();
 			//DB $updategroupset = "groupsetid='{$_POST['groupsetid']}',";
-			$updategroupset = (int) trim($_POST['groupsetid']);
+			$updategroupset = $_POST['groupsetid'];
 		}
 
-		$caltag = (string) trim($_POST['caltagact']);
-		$calrtag = (string) trim($_POST['caltagrev']);
+
+		$caltag = $_POST['caltagact'];
+		$calrtag = $_POST['caltagrev'];
 
 		//DB $_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
 		$_POST['name'] = htmlentities($_POST['name']);
@@ -317,7 +316,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "displaymethod=:displaymethod,defattempts=:defattempts,deffeedback=:deffeedback,shuffle=:shuffle,gbcategory=:gbcategory,password=:password,cntingb=:cntingb,showcat=:showcat,caltag=:caltag,calrtag=:calrtag,";
 			$query .= "reqscore=:reqscore,reqscoreaid=:reqscoreaid,noprint=:noprint,avail=:avail,groupmax=:groupmax,allowlate=:allowlate,exceptionpenalty=:exceptionpenalty,ltisecret=:ltisecret,deffeedbacktext=:deffeedbacktext,";
 			$query .= "msgtoinstr=:msgtoinstr,posttoforum=:posttoforum,istutorial=:istutorial,defoutcome=:defoutcome";
-			$qarr = array(':name'=>$assessName, ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'], ':timelimit'=>$timelimit,
+			$qarr = array(':name'=>$_POST['name'], ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'], ':timelimit'=>$timelimit,
 				':minscore'=>$_POST['minscore'], ':isgroup'=>$isgroup, ':showhints'=>$showhints, ':tutoredit'=>$tutoredit,
 				':eqnhelper'=>$_POST['eqnhelper'], ':showtips'=>$_POST['showtips'], ':displaymethod'=>$_POST['displaymethod'],
 				':defattempts'=>$_POST['defattempts'], ':deffeedback'=>$deffeedback, ':shuffle'=>$shuffle, ':gbcategory'=>$_POST['gbcat'],
@@ -332,13 +331,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$query .= ",groupsetid=:groupsetid";
 				$qarr[':groupsetid'] = $updategroupset;
 			}
-			$defpoints = (string) trim($_POST['defpoints']);
-            $defpenalty = (string) trim($_POST['defpenalty']);
-			if (isset($defpoints)) {
+			if (isset($_POST['defpoints'])) {
 				//DB $query .= ",defpoints='{$_POST['defpoints']}',defpenalty='{$_POST['defpenalty']}'";
 				$query .= ",defpoints=:defpoints,defpenalty=:defpenalty";
-				$qarr[':defpoints'] = $defpoints;
-				$qarr[':defpenalty'] = $defpenalty;
+				$qarr[':defpoints'] = $_POST['defpoints'];
+				$qarr[':defpenalty'] = $_POST['defpenalty'];
 			}
 			if (isset($_POST['copyendmsg'])) {
 				//DB $query .= ",endmsg='$endmsg' ";
@@ -391,10 +388,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= ":reqscoreaid, :noprint, :avail, :allowlate, :exceptionpenalty, :ltisecret, :endmsg, :deffeedbacktext, :msgtoinstr, ";
 			$query .= ":posttoforum, :istutorial, :defoutcome)";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':courseid'=>$cid, ':name'=>$assessName, ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'],
+			$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['name'], ':summary'=>$_POST['summary'], ':intro'=>$_POST['intro'],
 				':startdate'=>$startdate, ':enddate'=>$enddate, ':reviewdate'=>$reviewdate, ':timelimit'=>$timelimit,
-				':minscore'=>$_POST['minscore'], ':displaymethod'=>$_POST['displaymethod'], ':defpoints'=>$defpoints,
-				':defattempts'=>$_POST['defattempts'], ':defpenalty'=>$defpenalty, ':deffeedback'=>$deffeedback,
+				':minscore'=>$_POST['minscore'], ':displaymethod'=>$_POST['displaymethod'], ':defpoints'=>$_POST['defpoints'],
+				':defattempts'=>$_POST['defattempts'], ':defpenalty'=>$_POST['defpenalty'], ':deffeedback'=>$deffeedback,
 				':shuffle'=>$shuffle, ':gbcategory'=>$_POST['gbcat'], ':password'=>$_POST['assmpassword'], ':cntingb'=>$_POST['cntingb'],
 				':tutoredit'=>$tutoredit, ':showcat'=>$_POST['showqcat'], ':eqnhelper'=>$_POST['eqnhelper'], ':showtips'=>$_POST['showtips'],
 				':caltag'=>$caltag, ':calrtag'=>$calrtag, ':isgroup'=>$isgroup, ':groupmax'=>$_POST['groupmax'],
@@ -450,7 +447,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 	} else { //INITIAL LOAD
-		if (isset($assessmentId)) {  //INITIAL LOAD IN MODIFY MODE
+		if (isset($_GET['id'])) {  //INITIAL LOAD IN MODIFY MODE
 			//DB $query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
 			//DB $query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
 			//DB $result = mysql_query($query) or die("Query failed : $query; " . mysql_error());
@@ -980,14 +977,14 @@ if ($overwriteBody==1) {
 			<span class=formright>
 				<select id="deffeedback" name="deffeedback" onChange="chgfb()" >
 					<option value="NoScores" <?php if ($testtype=="NoScores") {echo "SELECTED";} ?>>No scores shown (last attempt is scored)</option>
-					<option value="EndScore" <?php if ($testtype=="EndScore") {echo "SELECTED";} ?>>Just show final score (total points & average) - only whole test can be reattemped</option>
+					<option value="EndScore" <?php if ($testtype=="EndScore") {echo "SELECTED";} ?>>Just show final score (total points &amp; average) - only whole test can be reattemped</option>
 					<option value="EachAtEnd" <?php if ($testtype=="EachAtEnd") {echo "SELECTED";} ?>>Show score on each question at the end of the test </option>
 					<option value="EndReview" <?php if ($testtype=="EndReview") {echo "SELECTED";} ?>>Reshow question with score at the end of the test </option>
 					<option value="EndReviewWholeTest" <?php if ($testtype=="EndReviewWholeTest") {echo "SELECTED";} ?>>Reshow question with score at the end of the test  - only whole test can be reattemped </option>
 
 					<option value="AsGo" <?php if ($testtype=="AsGo") {echo "SELECTED";} ?>>Show score on each question as it's submitted (does not apply to Full test at once display)</option>
-					<option value="Practice" <?php if ($testtype=="Practice") {echo "SELECTED";} ?>>Practice test: Show score on each question as it's submitted & can restart test; scores not saved</option>
-					<option value="Homework" <?php if ($testtype=="Homework") {echo "SELECTED";} ?>>Homework: Show score on each question as it's submitted & allow similar question to replace missed question</option>
+					<option value="Practice" <?php if ($testtype=="Practice") {echo "SELECTED";} ?>>Practice test: Show score on each question as it's submitted &amp; can restart test; scores not saved</option>
+					<option value="Homework" <?php if ($testtype=="Homework") {echo "SELECTED";} ?>>Homework: Show score on each question as it's submitted &amp; allow similar question to replace missed question</option>
 				</select>
 			</span><BR class=form>
 
@@ -1234,7 +1231,7 @@ if ($overwriteBody==1) {
 		</div>
 	</fieldset>
 	<div class=submit><input type=submit value="<?php echo $savetitle;?>"></div>
-
+    </form>
 <?php
 }
 	require("../footer.php");
