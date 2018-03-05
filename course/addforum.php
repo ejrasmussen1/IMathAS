@@ -40,7 +40,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$block = $_GET['block'];
 
 	if ($_POST['name']!= null) { //FORM SUBMITTED, DATA PROCESSING
-		require_once("../includes/parsedatetime.php");
+		require_once("../includes/parsedatetime.php");	
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
 				$startdate = 0;
@@ -102,9 +102,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['cntingb'] = 0;
 		}
 
-		$caltag = $_POST['caltagpost'].'--'.$_POST['caltagreply'];
+		$caltagpost = (string) trim($_POST['caltagpost']);
+		$caltagreply = (string) trim($_POST['caltagreply']);
+		$caltag = $caltagpost.'--'.$caltagreply
 		if (isset($_POST['usetags'])) {
-			$taglist = trim($_POST['taglist']);
+			$taglist = (string) trim($_POST['taglist']);
 		} else {
 			$taglist = '';
 		}
@@ -115,7 +117,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$allowlate = 0;
 		if ($_POST['allowlate']>0) {
-			$allowlate = $_POST['allowlate'] + 10*$_POST['allowlateon'];
+			$allowlate = Sanitize::onlyInt($_POST['allowlate']);
+			$allowlateon = Sanitize::onlyInt($_POST['allowlateon']);
+			$allowlate = $allowlate + 10*$allowlateon;
 			if (isset($_POST['latepassafterdue'])) {
 				$allowlate += 100;
 			}
@@ -152,7 +156,22 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $_POST['replyinstr'] = addslashes(myhtmLawed(stripslashes($_POST['replyinstr'])));
 			$_POST['replyinstr'] = myhtmLawed($_POST['replyinstr']);
 		}
-		if (isset($_GET['id'])) {  //already have id; update
+
+		$forumname = (string) trim($_POST['name']);
+		$forumdesc = (string) trim($_POST['description']);
+		$postinstruction = (string) trim($_POST['postinstr']);
+		$replyinstruction = (string) trim($_POST['replyinstr']);
+		$defaultdisplay = Sanitize::onlyInt($_POST['defdisplay']);
+		$groupsetid = Sanitize::onlyInt($_POST['groupsetid']);
+		$points = Sanitize::onlyInt($_POST['points']);
+		$graded = Sanitize::onlyInt($_POST['cntingb']);
+		$gradebookcategory = Sanitize::onlyInt($_POST['gbcat']);
+		$available = Sanitize::onlyInt($_POST['avail']);
+		$sortby = Sanitize::onlyInt($_POST['sortby']);
+		$forumtype = Sanitize::onlyInt($_POST['forumtype']);
+		$forumid = (int) $_GET['id'];
+		
+		if (!empty($forumid)) {  //already have id; update
 			//DB $query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $oldgroupsetid = mysql_result($result,0,0);
@@ -176,11 +195,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "gbcategory=:gbcategory,avail=:avail,sortby=:sortby,forumtype=:forumtype,taglist=:taglist,rubric=:rubric,outcomes=:outcomes,allowlate=:allowlate ";
 			$query .= "WHERE id=:id;";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':name'=>$_POST['name'], ':description'=>$_POST['description'], ':postinstr'=>$_POST['postinstr'], ':replyinstr'=>$_POST['replyinstr'],
-				':startdate'=>$startdate, ':enddate'=>$enddate, ':settings'=>$fsets, ':caltag'=>$caltag, ':defdisplay'=>$_POST['defdisplay'], ':replyby'=>$replyby,
-				':postby'=>$postby, ':groupsetid'=>$_POST['groupsetid'], ':points'=>$_POST['points'], ':cntingb'=>$_POST['cntingb'], ':tutoredit'=>$tutoredit,
-				':gbcategory'=>$_POST['gbcat'], ':avail'=>$_POST['avail'], ':sortby'=>$_POST['sortby'], ':forumtype'=>$_POST['forumtype'], ':taglist'=>$taglist,
-				':rubric'=>$rubric, ':outcomes'=>$outcomes, ':allowlate'=>$allowlate, ':id'=>$_GET['id']));
+			$stm->execute(array(':name'=>$forumname, ':description'=>$forumdesc, ':postinstr'=>$postinstruction, ':replyinstr'=>$replyinstruction,
+				':startdate'=>$startdate, ':enddate'=>$enddate, ':settings'=>$fsets, ':caltag'=>$caltag, ':defdisplay'=>$defaultdisplay, ':replyby'=>$replyby,
+				':postby'=>$postby, ':groupsetid'=>$groupsetid, ':points'=>$points, ':cntingb'=>$graded, ':tutoredit'=>$tutoredit,
+				':gbcategory'=>$gradebookcategory, ':avail'=>$available, ':sortby'=>$sortby, ':forumtype'=>$forumtype, ':taglist'=>$taglist,	
+				':rubric'=>$rubric, ':outcomes'=>$outcomes, ':allowlate'=>$allowlate, ':id'=>$forumid));
 			$newforumid = $_GET['id'];
 
 		} else { //add new
@@ -191,11 +210,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query = "INSERT INTO imas_forums (courseid,name,description,postinstr,replyinstr,startdate,enddate,settings,defdisplay,replyby,postby,groupsetid,points,cntingb,tutoredit,gbcategory,avail,sortby,caltag,forumtype,taglist,rubric,outcomes,allowlate) VALUES ";
 			$query .= "(:courseid, :name, :description, :postinstr, :replyinstr, :startdate, :enddate, :settings, :defdisplay, :replyby, :postby, :groupsetid, :points, :cntingb, :tutoredit, :gbcategory, :avail, :sortby, :caltag, :forumtype, :taglist, :rubric, :outcomes, :allowlate);";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['name'], ':description'=>$_POST['description'], ':postinstr'=>$_POST['postinstr'],
-				':replyinstr'=>$_POST['replyinstr'], ':startdate'=>$startdate, ':enddate'=>$enddate, ':settings'=>$fsets, ':defdisplay'=>$_POST['defdisplay'],
-				':replyby'=>$replyby, ':postby'=>$postby, ':groupsetid'=>$_POST['groupsetid'], ':points'=>$_POST['points'], ':cntingb'=>$_POST['cntingb'],
-				':tutoredit'=>$tutoredit, ':gbcategory'=>$_POST['gbcat'], ':avail'=>$_POST['avail'], ':sortby'=>$_POST['sortby'], ':caltag'=>$caltag,
-				':forumtype'=>$_POST['forumtype'], ':taglist'=>$taglist, ':rubric'=>$rubric, ':outcomes'=>$outcomes, ':allowlate'=>$allowlate));
+			$stm->execute(array(':courseid'=>$cid, ':name'=>$forumname, ':description'=>$forumdesc, ':postinstr'=>$postinstruction,
+				':replyinstr'=>$replyinstruction, ':startdate'=>$startdate, ':enddate'=>$enddate, ':settings'=>$fsets, ':defdisplay'=>$defaultdisplay,
+				':replyby'=>$replyby, ':postby'=>$postby, ':groupsetid'=>$groupsetid, ':points'=>$points, ':cntingb'=>$graded,
+				':tutoredit'=>$tutoredit, ':gbcategory'=>$gradebookcategory, ':avail'=>$available, ':sortby'=>$sortby, ':caltag'=>$caltag,
+				':forumtype'=>$forumtype, ':taglist'=>$taglist, ':rubric'=>$rubric, ':outcomes'=>$outcomes, ':allowlate'=>$allowlate));
 			$newforumid = $DBH->lastInsertId();
 
 			//DB $query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ('$cid','Forum','$newforumid');";
