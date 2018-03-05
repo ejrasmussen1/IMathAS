@@ -57,6 +57,8 @@ if ($myrights<20) {
 	$rawscores = array();
 	$qn = 27;  //question number to use during testing
 	$lastanswers[$qn] = '';
+	$rawscores[$qn] = -1;
+	$scores[$qn] = -1;
 
 	if (isset($_POST['seed'])) {
 		list($score,$rawscores[$qn]) = scoreq($qn,$_GET['qsetid'],$_POST['seed'],$_POST['qn'.$qn],$attempt-1);
@@ -65,8 +67,6 @@ if ($myrights<20) {
 		$page_scoreMsg =  "<p>Score on last answer: ".Sanitize::encodeStringForDisplay($score)."/1</p>\n";
 	} else {
 		$page_scoreMsg = "";
-		$scores = array(-1);
-		$rawscores = array(-1);
 		$_SESSION['choicemap'] = array();
 	}
   $cid = Sanitize::courseId($_GET['cid']);
@@ -251,7 +251,7 @@ if ($overwriteBody==1) {
 	echo $page_scoreMsg;
 	echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div");';
 	echo 'for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
-	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
+	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit(this,true,true)\">\n";
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 	echo "<input type=hidden name=attempt value=\"" . Sanitize::onlyInt($attempt) . "\">\n";
 
