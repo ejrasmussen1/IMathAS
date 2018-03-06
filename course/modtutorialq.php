@@ -37,7 +37,6 @@ if (!isset($_GET['aid'])) {
 }
 $now = time();
 $editmsg = '';
-var_dump($_POST);
 if (isset($_POST['text'])) {
 	if (!isset($_GET['id'])) {
 		$id = 'new';
@@ -1381,9 +1380,9 @@ calculations you'll need to display simplified values below. <a href="#" onclick
 <div id="randvarsexamples" style="display:none;">
 <p>Example: Suppose we wanted to ask a Numeric expression randomized question like: Add 2/3 + 3/5</p>
 <table>
-<tr><td><code>$d1,$d2 = diffrands(3,7,2)</code></td><td> Pick two different random values for the denominators</br>
-<tr><td><code>$n1 = rand(1,$d1-1) where (gcd($n1,$d1)==1)</code></td><td>Pick a numerator that is relatively prime with the denominator</br>
-<tr><td><code>$n2 = rand(1,$d2-1) where (gcd($n2,$d2)==1)</code></td><td>ditto</br>
+    <tr><td><code>$d1,$d2 = diffrands(3,7,2)</code></td><td> Pick two different random values for the denominators</br></td>
+    <tr><td><code>$n1 = rand(1,$d1-1) where (gcd($n1,$d1)==1)</code></td><td>Pick a numerator that is relatively prime with the denominator</br></td>
+    <tr><td><code>$n2 = rand(1,$d2-1) where (gcd($n2,$d2)==1)</code></td><td>ditto</br></td>
 <tr><td><code>$fans = makereducedfraction($n1*$d2 + $n2*$d1, $d1*$d2)</code></td><td> Create a simplified fraction for the answer, which we can use below in the Answer spot</td></tr>
 <tr><td><code>$f2 = makereducedfraction($n1+$n2, $d1+$d2)</code></td><td> We can create this simplified fraction for a misconception, but it's not necessary since students will never
   see this. You could just put ($n1+$n2)/($d1+$d2) in the Answer spot below.</td></tr>

@@ -90,7 +90,7 @@ function getpointspossible($aid, $itemorder, $defaultpoints) {
 //set some page specific variables and counters
 $overwriteBody = 0;
 $body = "";
-$cid = intval($_GET['cid']);
+$cid = (int) trim($_GET['cid']);
 $pagetitle = 'Activity Report - Lab Style Course';
 
 if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by someone not in the course

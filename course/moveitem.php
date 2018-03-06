@@ -4,7 +4,7 @@
 
 require("../init.php");
 
-$cid = intval($_GET['cid']);
+$cid = (int) trim($_GET['cid']);
 if (!isset($teacherid)) {
 	echo 'You must be a teacher to access this page';
 	exit;
