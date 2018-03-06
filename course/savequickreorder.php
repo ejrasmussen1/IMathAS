@@ -11,8 +11,9 @@
 	 echo "Cannot access this page directly";
 	 exit;
  }
+ var_dump($_GET);
  $cid = Sanitize::courseId($_GET['cid']);
- $order = $_POST['order'];
+ $order = strval($_POST['order']);
 
  //DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
  //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
