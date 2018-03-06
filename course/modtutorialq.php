@@ -37,7 +37,7 @@ if (!isset($_GET['aid'])) {
 }
 $now = time();
 $editmsg = '';
-
+var_dump($_POST);
 if (isset($_POST['text'])) {
 	if (!isset($_GET['id'])) {
 		$id = 'new';
@@ -45,7 +45,7 @@ if (isset($_POST['text'])) {
 		$id = Sanitize::onlyInt($_GET['id']);
 	}
 	//DB $_POST = stripslashes_deep($_POST);
-	$qtext = stripsmartquotes($_POST['text']);
+	$qtext = (string) trim(stripsmartquotes($_POST['text']));
 	$nparts = intval($_POST['nparts']);
 	$qtypes = array();
 	$qparts = array();
@@ -61,34 +61,34 @@ if (isset($_POST['text'])) {
 	$partial = array();
 	$qtol = array();
 	for ($n=0;$n<$nparts;$n++) {
-		$qtypes[$n] = $_POST['qtype'.$n];
+		$qtypes[$n] = (string) trim($_POST['qtype'.$n]);
 		$feedback[$n] = array();
 		if ($qtypes[$n] == 'choices') {
 			$questions[$n] = array();
-			$answer[$n] = $_POST['ans'.$n];
+			$answer[$n] = (string) trim($_POST['ans'.$n]);
 		} else if ($qtypes[$n] == 'number') {
 			$partialans[$n] = array();
-			$qtol[$n] = (($_POST['qtol'.$n]=='abs')?'|':'') . $_POST['tol'.$n];
-			$feedbacktxtdef[$n] = $_POST['fb'.$n.'-def'];
-			$answer[$n] = $_POST['txt'.$n.'-'.$_POST['ans'.$n]];
+			$qtol[$n] = (((float) trim($_POST['qtol'.$n])=='abs')?'|':'') . (float) trim($_POST['tol'.$n]);
+			$feedbacktxtdef[$n] = (string) trim($_POST['fb'.$n.'-def']);
+			$answer[$n] =  (string) trim($_POST['txt'.$n.'-'.$_POST['ans'.$n]]);
 			$_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
 			$answerboxsize[$n] = intval($_POST['numboxsize'.$n]);
 		} else if ($qtypes[$n] == 'calculated') {
 			$partialans[$n] = array();
-			$qtol[$n] = (($_POST['qtol'.$n]=='abs')?'|':'') . $_POST['tol'.$n];
-			$feedbacktxtdef[$n] = $_POST['fb'.$n.'-def'];
-			$answer[$n] = '"'.$_POST['txt'.$n.'-'.$_POST['ans'.$n]].'"';
+            $qtol[$n] = (((float) trim($_POST['qtol'.$n])=='abs')?'|':'') . (float) trim($_POST['tol'.$n]);
+            $feedbacktxtdef[$n] = (string) trim($_POST['fb'.$n.'-def']);
+			$answer[$n] = '"'.(string) trim($_POST['txt'.$n.'-'.$_POST['ans'.$n]]).'"';
 			$_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
 			$answerboxsize[$n] = intval($_POST['numboxsize'.$n]);
-			$answerformat[$n] = $_POST['answerformat'.$n].(trim($_POST['answerformat'.$n])!=''?",":"")."noval";
+			$answerformat[$n] = (string) trim($_POST['answerformat'.$n]).(string) (trim($_POST['answerformat'.$n])!=''?",":"")."noval";
 		} else if ($qtypes[$n] == 'numfunc') {
 			$partialans[$n] = array();
-			$qtol[$n] = (($_POST['funcqtol'.$n]=='abs')?'|':'') . $_POST['functol'.$n];
-			$feedbacktxtdef[$n] = $_POST['fb'.$n.'-def'];
-			$answer[$n] = '"'.$_POST['txt'.$n.'-'.$_POST['ans'.$n]].'"';
+			$qtol[$n] = (((float) trim((($_POST['funcqtol'.$n]=='abs')?'|':'') . $_POST['functol'.$n])));
+			$feedbacktxtdef[$n] = (string) trim($_POST['fb'.$n.'-def']);
+			$answer[$n] = '"'.(string) trim($_POST['txt'.$n.'-'.$_POST['ans'.$n]]).'"';
 			$_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
 			$answerboxsize[$n] = intval($_POST['funcboxsize'.$n]);
-			$variables[$n] = $_POST['variables'.$n];
+			$variables[$n] = (string) trim($_POST['variables'.$n]);
 		} else if ($qtypes[$n] == 'essay') {
 			$answer[$n] = '"'.str_replace('"','\\"',$_POST['essay'.$n.'-fb']).'"';
 			if (isset($_POST['useeditor'.$n])) {
@@ -108,24 +108,24 @@ if (isset($_POST['text'])) {
 			for ($i=0;$i<$qparts[$n];$i++) {
 				if (trim($_POST['txt'.$n.'-'.$i])=='') {continue;}
 				if ($qtypes[$n] == 'choices') {
-					$questions[$n][] = $_POST['txt'.$n.'-'.$i];
+					$questions[$n][] = (string) trim($_POST['txt'.$n.'-'.$i]);
 				} else if ($qtypes[$n] == 'number' || $qtypes[$n] == 'calculated' || $qtypes[$n] == 'numfunc') {
 					$partialans[$n][] = $_POST['txt'.$n.'-'.$i];
 				}
-				$feedbacktxt[$n][] = $_POST['fb'.$n.'-'.$i];
+				$feedbacktxt[$n][] = (string) trim($_POST['fb'.$n.'-'.$i]);
 				$partial[$n][] = floatval($_POST['pc'.$n.'-'.$i]);
 			}
 			$qparts[$n] = count($feedbacktxt[$n]);
 		} else if ($qtypes[$n] == 'essay') {
 			$qparts[$n] = 0;
-			$feedbacktxtessay[$n] = $_POST['essay'.$n.'-fb'];
+			$feedbacktxtessay[$n] = (string) trim($_POST['essay'.$n.'-fb']);
 		}
 	}
 	$nhints = intval($_POST['nhints']);
 	$hinttext = array();
 	for ($n=0;$n<$nhints;$n++) {
 		if (!empty($_POST['hint'.$n])) {
-			$hinttext[] = $_POST['hint'.$n];
+			$hinttext[] = (string) trim($_POST['hint'.$n]);
 		}
 	}
 	$nhints = count($hinttext);
@@ -134,7 +134,7 @@ if (isset($_POST['text'])) {
 	//this part stores the values in the question code, in form that makes
 	//them easy to recover later.
 	$code = "//start randomization code - Tutorial Style question\n\n";
-	$code .= $_POST['randvars'];
+	$code .= (string) trim($_POST['randvars']);
 	$code .= "\n\n//end randomization code - Tutorial Style question\n\n";
 	if ($nparts==1) {
 		$qtype = $qtypes[0];
@@ -160,12 +160,12 @@ if (isset($_POST['text'])) {
 			$code .= '$partialcredit = array('.implode(',',$partialout).')'."\n";
 		}
 		if ($qtypes[0]=='choices') {
-			$code .= '$displayformat = "'.$_POST['qdisp0'].'"'."\n";
-			$code .= '$noshuffle = "'.$_POST['qshuffle0'].'"'."\n";
+			$code .= '$displayformat = "'.(string) trim($_POST['qdisp0']).'"'."\n";
+			$code .= '$noshuffle = "'.(string) trim($_POST['qshuffle0']).'"'."\n";
 		} else if ($qtypes[0]=='number' || $qtypes[0]=='calculated' || $qtypes[0] == 'numfunc') {
 			$code .= '$feedbacktxtdef = "'.str_replace('"','\\"',$feedbacktxtdef[0]).'"'."\n";
 			$code .= '$answerboxsize = '.$answerboxsize[0]."\n";
-			$code .= (($_POST['qtol0']=='abs')?'$abstolerance':'$reltolerance').' = '.$_POST['tol0']."\n";
+			$code .= (((string) trim($_POST['qtol0'])=='abs')?'$abstolerance':'$reltolerance').' = '.(string) trim($_POST['tol0'])."\n";
 			if ($qtypes[0] == 'numfunc') {
 				$code .= '$variables = "'.$variables[0].'"'."\n";
 				$code .= '$requiretimes = ""'."\n";
@@ -213,12 +213,12 @@ if (isset($_POST['text'])) {
 				$code .= '$partialcredit['.$n.'] = array('.implode(',',$partialout).')'."\n";
 			}
 			if ($qtypes[$n]=='choices') {
-				$code .= '$displayformat['.$n.'] = "'.$_POST['qdisp'.$n].'"'."\n";
-				$code .= '$noshuffle['.$n.'] = "'.$_POST['qshuffle'.$n].'"'."\n";
+				$code .= '$displayformat['.$n.'] = "'.(string) trim($_POST['qdisp'.$n]).'"'."\n";
+				$code .= '$noshuffle['.$n.'] = "'.(string) trim($_POST['qshuffle'.$n]).'"'."\n";
 			} else if ($qtypes[$n]=='number' || $qtypes[$n] == 'numfunc' || $qtypes[$n] == 'calculated') {
 				$code .= '$feedbacktxtdef['.$n.'] = "'.str_replace('"','\\"',$feedbacktxtdef[$n]).'"'."\n";
 				$code .= '$answerboxsize['.$n.'] = '.$answerboxsize[$n]."\n";
-				$code .= (($_POST['qtol'.$n]=='abs')?'$abstolerance[':'$reltolerance[').$n.'] = '.$_POST['tol'.$n]."\n";
+				$code .= (((float) trim($_POST['qtol'.$n])=='abs')?'$abstolerance[':'$reltolerance[').$n.'] = '.(float) trim($_POST['tol'.$n])."\n";
 				if ($qtypes[$n] == 'numfunc') {
 					$code .= '$variables['.$n.'] = "'.$variables[$n].'"'."\n";
 					$code .= '$requiretimes['.$n.'] = ""'."\n";
@@ -247,7 +247,7 @@ if (isset($_POST['text'])) {
 	}
 
 	$code .= "\n//end stored values - Tutorial Style question\n\n";
-	$code .= $_POST['keepcode']."\n";
+	$code .= (string) trim($_POST['keepcode'])."\n";
 	$code .= "\n//end retained code - Tutorial Style question\n\n";
 	//$code .= '$noshuffle = "all"'."\n";
 
@@ -302,27 +302,32 @@ if (isset($_POST['text'])) {
 		$uqid = substr($mt,11).substr($mt,2,6);
 		$ancestors = '';
 		if (isset($_GET['templateid'])) {
+		    $templateid = (int) trim($_GET['templateid']);
 			//DB $query = "SELECT ancestors FROM imas_questionset WHERE id='{$_GET['templateid']}'";
 			//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 			//DB $ancestors = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT ancestors FROM imas_questionset WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['templateid']));
+			$stm->execute(array(':id'=> $templateid));
 			$ancestors = $stm->fetchColumn(0);
 			if ($ancestors!='') {
-				$ancestors = $_GET['templateid'] . ','. $ancestors;
+				$ancestors =  $templateid . ','. $ancestors;
 			} else {
-				$ancestors = $_GET['templateid'];
+				$ancestors =  $templateid;
 			}
 		}
 		//DB $query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qtext,ancestors) VALUES ";
 		//DB $query .= "($uqid,$now,$now,'{$_POST['description']}','$userid','{$_POST['author']}','{$_POST['userights']}','$qtype','$code','$qtext','$ancestors');";
 		//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 		//DB $id = mysql_insert_id();
+        $description = (string) trim($_POST['description']);
+		$question_set_author = (string) trim($_POST['author']);
+		$userrights = (int) trim($_POST['userights']);
+
 		$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qtext,ancestors) VALUES ";
 		$query .= "(:uniqueid, :adddate, :lastmoddate, :description, :ownerid, :author, :userights, :qtype, :control, :qtext, :ancestors);";
 		$stm = $DBH->prepare($query);
-		$stm->execute(array(':uniqueid'=>$uqid, ':adddate'=>$now, ':lastmoddate'=>$now, ':description'=>$_POST['description'], ':ownerid'=>$userid,
-			':author'=>$_POST['author'], ':userights'=>$_POST['userights'], ':qtype'=>$qtype, ':control'=>$code, ':qtext'=>$qtext, ':ancestors'=>$ancestors));
+		$stm->execute(array(':uniqueid'=>$uqid, ':adddate'=>$now, ':lastmoddate'=>$now, ':description'=>$description, ':ownerid'=>$userid,
+			':author'=>$question_set_author, ':userights'=>$userrights, ':qtype'=>$qtype, ':control'=>$code, ':qtext'=>$qtext, ':ancestors'=>$ancestors));
 		$id = $DBH->lastInsertId();
 		$_GET['id'] = $id;
 		if (isset($_GET['makelocal'])) {
