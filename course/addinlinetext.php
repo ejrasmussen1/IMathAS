@@ -62,7 +62,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_formActionTag = "addinlinetext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
             'cid' => $cid, 'folder' => $_GET['folder']));
 	$page_formActionTag .= "&tb=$totb";
-	$caltag = $_POST['caltag'];
+	$caltag = (string) trim($_POST['caltag']);
 	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
@@ -75,7 +75,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 			}
-			$oncal = $_POST['oncal'];
+			$oncal = Sanitize::onlyInt($_POST['oncal']);
 		} else if ($_POST['avail']==2) {
 			if ($_POST['altoncal']==0) {
 				$startdate = 0;
@@ -83,7 +83,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$startdate = parsedatetime($_POST['cdate'],"12:00 pm");
 				$oncal = 1;
-				$caltag = $_POST['altcaltag'];
+				$caltag = (string) trim($_POST['altcaltag']);
 			}
 			$enddate =  2000000000;
 		}else {
@@ -120,6 +120,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$filestoremove = array();
 		if (isset($_GET['id'])) {  //already have id; update
+			$posttitle = (string) trim($_POST['title']);
+			$posttext = (string) trim($_POST['text']);
+			$available = Sanitize::onlyInt($_POST['avail']);
+			$gid = Sanitizie::onlyInt($_GET['id']);
 			//DB $query = "UPDATE imas_inlinetext SET title='{$_POST['title']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',";
 			//DB $query .= "oncal='$oncal',caltag='$caltag',outcomes='$outcomes',isplaylist=$isplaylist ";
 			//DB $query .= "WHERE id='{$_GET['id']}'";
@@ -128,8 +132,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "oncal=:oncal,caltag=:caltag,outcomes=:outcomes,isplaylist=:isplaylist ";
 			$query .= "WHERE id=:id";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':title'=>$_POST['title'], ':text'=>$_POST['text'], ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':avail'=>$_POST['avail'], ':oncal'=>$oncal, ':caltag'=>$caltag, ':outcomes'=>$outcomes, ':isplaylist'=>$isplaylist, ':id'=>$_GET['id']));
+			$stm->execute(array(':title'=>$posttitle, ':text'=>$posttext, ':startdate'=>$startdate, ':enddate'=>$enddate,
+				':avail'=>$available, ':oncal'=>$oncal, ':caltag'=>$caltag, ':outcomes'=>$outcomes, ':isplaylist'=>$isplaylist, ':id'=>$gid));
 
 			//update attached files
 			$del_file_stm = $DBH->prepare("DELETE FROM imas_instr_files WHERE id=:id");
