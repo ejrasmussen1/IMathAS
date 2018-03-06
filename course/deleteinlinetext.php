@@ -25,9 +25,9 @@ if (!(isset($teacherid))) {
 } elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = Sanitize::stripHtmlTags($_GET['block']);
+	$textid = (int) trim($_GET['id']);
 	if ($_POST['remove']=="really") {
 		require_once("../includes/filehandler.php");
-		$textid = $_GET['id'];
 		$DBH->beginTransaction();
 		//DB $query = "SELECT id FROM imas_items WHERE typeid='$textid' AND itemtype='InlineText' AND courseid='$cid'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -103,7 +103,7 @@ if (!(isset($teacherid))) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $itemname = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT title FROM imas_inlinetext WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['id']));
+		$stm->execute(array(':id'=>$textid));
 		$itemname = $stm->fetchColumn(0);
 	}
 }

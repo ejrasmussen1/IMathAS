@@ -17,7 +17,7 @@ $pagetitle = "Make Exception";
 $cid = Sanitize::courseId($_GET['cid']);
 $asid = $_GET['asid'];
 $aid = Sanitize::onlyInt($_GET['aid']);
-$uid = $_GET['uid'];
+$uid = (int) trim($_GET['uid']);
 if (isset($_GET['stu'])) {
 	$stu = $_GET['stu'];
 } else {
@@ -182,7 +182,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $stuname = implode(', ', mysql_fetch_row($result));
 		$stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['uid']));
+		$stm->execute(array(':id'=>$uid));
 		$stuname = implode(', ', $stm->fetch(PDO::FETCH_NUM));
 
 		//DB $query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_GET['aid']}'";

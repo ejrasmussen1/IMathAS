@@ -12,15 +12,16 @@
 	$isteacher = false;
 	if (isset($tutorid)) { $istutor = true;}
 	if (isset($teacherid)) { $isteacher = true;}
-
+    $gbItem = (int) trim($_GET['gbitem']);
 	if ($istutor) {
 		$isok = false;
-		if (is_numeric($_GET['gbitem'])) {
+
+		if (!empty($gbItem)) {
 			//DB $query = "SELECT tutoredit FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_result($result,0,0)==1) {
 			$stm = $DBH->prepare("SELECT tutoredit FROM imas_gbitems WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['gbitem']));
+			$stm->execute(array(':id'=>$gbItem));
 			if ($stm->fetchColumn(0)==1) {
 				$isok = true;
 				$_GET['isolate'] = true;
@@ -39,19 +40,19 @@
 		exit;
 	}
 	$cid = Sanitize::courseId($_GET['cid']);
-
+    $delItem = (int) trim($_GET['del']);
 
 	if (isset($_GET['del']) && $isteacher) {
 		if (isset($_POST['confirm'])) {
 			//DB $query = "DELETE FROM imas_gbitems WHERE id='{$_GET['del']}'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_gbitems WHERE id=:id AND courseid=:courseid");
-			$stm->execute(array(':id'=>$_GET['del'], ':courseid'=>$cid));
+			$stm->execute(array(':id'=>$delItem, ':courseid'=>$cid));
 			if ($stm->rowCount()>0) {
 				//DB $query = "DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid='{$_GET['del']}'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("DELETE FROM imas_grades WHERE gradetype='offline' AND gradetypeid=:gradetypeid");
-				$stm->execute(array(':gradetypeid'=>$_GET['del']));
+				$stm->execute(array(':gradetypeid'=>$delItem));
 			}
 
 			header(sprintf('Location: %s/course/gradebook.php?stu=%s&cid=%s', $GLOBALS['basesiteurl'],
@@ -60,13 +61,13 @@
 		} else {
 			require("../header.php");
 			$stm = $DBH->prepare("SELECT name FROM imas_gbitems WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['del']));
+			$stm->execute(array(':id'=>$delItem));
 			$itemname = $stm->fetchColumn(0);
 
 			echo "<p>Are you SURE you want to delete <strong>".Sanitize::encodeStringForDisplay($itemname);
 			echo "</strong> and all associated grades from the gradebook?</p>";
 			echo '<form method="POST" action="'.sprintf("addgrades.php?stu=%s&cid=%s&del=%s",
-				Sanitize::encodeUrlParam($_GET['stu']), $cid, Sanitize::encodeUrlParam($_GET['del'])).'">';
+				Sanitize::encodeUrlParam($_GET['stu']), $cid, Sanitize::encodeUrlParam($delItem)).'">';
 			echo '<p><button type=submit name=confirm value=true>'._('Delete Item').'</button>';
 
 			printf(" <input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addgrades.php?stu=%s&cid=%s&gbitem=%d&grades=all'\" />",
@@ -141,14 +142,16 @@
 
 		}
 	}
-
-	if (isset($_POST['assesssnap'])) {
+    $assessmentSnapId = (int) trim($_POST['assesssnapaid']);
+	if (isset($assessmentSnapId)) {
+	    $assessSnapAtt = (float) trim($_POST['assesssnapatt']);
+        $assessSnapPts = (float) trim($_POST['assesssnappts']);
 		//doing assessment snapshot
 		//DB $query = "SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid='{$_POST['assesssnapaid']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
-		$stm->execute(array(':assessmentid'=>$_POST['assesssnapaid']));
+		$stm->execute(array(':assessmentid'=>$assessmentSnapId));
 		while($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$sp = explode(';',$row[1]);
 			$sc = explode(',',$sp[0]);
@@ -164,7 +167,7 @@
 				$score = $tot;
 			} else {
 				$attper = $att/count($sc);
-				if ($attper>=$_POST['assesssnapatt']/100-.001 && $tot>=$_POST['assesssnappts']-.00001) {
+				if ($attper>=$assessSnapAtt/100-.001 && $tot>=$assessSnapPts -.00001) {
 					$score = $_POST['points'];
 				} else {
 					$score = 0;
@@ -339,7 +342,7 @@
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB list($name,$points,$showdate,$gbcat,$cntingb,$tutoredit,$rubric,$gradeoutcomes) = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT name,points,showdate,gbcategory,cntingb,tutoredit,rubric,outcomes FROM imas_gbitems WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['gbitem']));
+			$stm->execute(array(':id'=>$gbItem));
 			list($name,$points,$showdate,$gbcat,$cntingb,$tutoredit,$rubric,$gradeoutcomes) = $stm->fetch(PDO::FETCH_NUM);
 			if ($gradeoutcomes != '') {
 				$gradeoutcomes = explode(',',$gradeoutcomes);
@@ -501,7 +504,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 		//DB $query = "SELECT name,rubric,points FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT name,rubric,points FROM imas_gbitems WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['gbitem']));
+		$stm->execute(array(':id'=>$gbItem));
 		list($rubname, $rubric, $points) = $stm->fetch(PDO::FETCH_NUM);
 		echo '<h3>'.Sanitize::encodeStringForDisplay($rubname).'</h3>';
 		//DB $rubric = mysql_result($result,0,1);
@@ -511,7 +514,7 @@ at <input type=text size=10 name=stime value="<?php echo Sanitize::encodeStringF
 		//DB $query = "SELECT name,rubric,points FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT name,rubric,points FROM imas_gbitems WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['gbitem']));
+		$stm->execute(array(':id'=>$gbItem));
 		list($rubname, $rubric, $points) = $stm->fetch(PDO::FETCH_NUM);
 		echo '<h3>'.Sanitize::encodeStringForDisplay($rubname).'</h3>';
 		//DB $rubric = mysql_result($result,0,1);
