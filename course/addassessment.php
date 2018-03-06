@@ -51,7 +51,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
     $assessmentId = Sanitize::onlyInt($_GET['id']);
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = $_GET['block'];
-	$assessName = (string) trim($_POST['name']);
+	$assessName = Sanitize::encodeStringForDisplay($_POST['name']);
 
 	if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
 		if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {

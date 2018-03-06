@@ -364,9 +364,6 @@ if (!(isset($teacherid))) {
 				$stmupd->execute(array(':id'=>$row['id'], ':intro'=>$outintro));
 			}
 		}
-		echo "<pre>";
-		print_r($_POST);
-		echo "</pre>";
 		exit;
 		if (isset($_POST['removeperq'])) {
 			//DB $query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid IN ($checkedlist)";

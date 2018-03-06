@@ -104,7 +104,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$caltagpost = (string) trim($_POST['caltagpost']);
 		$caltagreply = (string) trim($_POST['caltagreply']);
-		$caltag = $caltagpost.'--'.$caltagreply
+		$caltag = $caltagpost.'--'.$caltagreply;
 		if (isset($_POST['usetags'])) {
 			$taglist = (string) trim($_POST['taglist']);
 		} else {
