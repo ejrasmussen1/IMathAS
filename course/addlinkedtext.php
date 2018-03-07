@@ -50,7 +50,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::onlyInt($_GET['id']) : "";
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
-	$caltag = $_POST['caltag'];
+	$caltag = (string) trim($_POST['caltag']);
 	$points = 0;
 
 	if ($_POST['title']!= null) { //if the form has been submitted
@@ -67,7 +67,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 			}
-			$oncal = $_POST['oncal'];
+			$oncal = Sanitize::onlyInt($_POST['oncal']);
 		} else if ($_POST['avail']==2) {
 			if ($_POST['altoncal']==0) {
 				$startdate = 0;
@@ -229,6 +229,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			if (!$processingerror) {
+				$title = (string) trim($_POST['title']);
+				$summary = (string) trim($_POST['summary']);
+				$text = (string) trim($_POST['summary']);
+				$available = sanitize::onlyInt($_POST['avail']);
+				$target = Sanitize::onlyInt($_POST['target']);
+				$id = Sanitize::onlyInt($_GET['id']]);
 				//DB $query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}',outcomes='$outcomes',points=$points ";
 				//DB $query .= "WHERE id='{$_GET['id']}'";
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
