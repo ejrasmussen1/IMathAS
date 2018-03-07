@@ -84,6 +84,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['description'] = myhtmLawed($_POST['description']);
 		}
 		if (isset($_GET['id'])) {  //already have id - update
+			$wikiname = (string) trim($_POST['name']);
+			$description = (string) trim($_POST['description']);
+			$availiable = Sanitize::onlyInt($_POST['avail']);
+			$groupsetid = Sanitize::onlyInt($_POST['groupsetid']);
+			$courseid = Sanitize::onlyInt($_GET['id']);
 			//DB $query = "UPDATE imas_wikis SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,";
 			//DB $query .= "editbydate=$revisedate,avail='{$_POST['avail']}',groupsetid='{$_POST['groupsetid']}',settings=$settings ";
 			//DB $query .= "WHERE id='{$_GET['id']}'";
