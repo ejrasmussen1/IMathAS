@@ -59,11 +59,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = Sanitize::encodeStringForDisplay($_GET['block']);
-	$getId = (int) trim($_GET['id']);
 	$page_formActionTag = "addinlinetext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
             'cid' => $cid, 'folder' => $_GET['folder']));
 	$page_formActionTag .= "&tb=$totb";
-	$caltag = $_POST['caltag'];
+	$caltag = (string) trim($_POST['caltag']);
 	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
@@ -76,7 +75,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$enddate = parsedatetime($_POST['edate'],$_POST['etime']);
 			}
-			$oncal = $_POST['oncal'];
+			$oncal = Sanitize::onlyInt($_POST['oncal']);
 		} else if ($_POST['avail']==2) {
 			if ($_POST['altoncal']==0) {
 				$startdate = 0;
@@ -84,7 +83,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$startdate = parsedatetime($_POST['cdate'],"12:00 pm");
 				$oncal = 1;
-				$caltag = $_POST['altcaltag'];
+				$caltag = (string) trim($_POST['altcaltag']);
 			}
 			$enddate =  2000000000;
 		}else {
@@ -120,10 +119,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$outcomes = implode(',',$outcomes);
 
 		$filestoremove = array();
-        $getId = (int) trim($_GET['id']);
-		if (isset($getId)) {
-
-		    //already have id; update
+		if (isset($_GET['id'])) {  //already have id; update
+			$posttitle = (string) trim($_POST['title']);
+			$posttext = (string) trim($_POST['text']);
+			$available = Sanitize::onlyInt($_POST['avail']);
+			$gid = Sanitizie::onlyInt($_GET['id']);
 			//DB $query = "UPDATE imas_inlinetext SET title='{$_POST['title']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',";
 			//DB $query .= "oncal='$oncal',caltag='$caltag',outcomes='$outcomes',isplaylist=$isplaylist ";
 			//DB $query .= "WHERE id='{$_GET['id']}'";
@@ -132,8 +132,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "oncal=:oncal,caltag=:caltag,outcomes=:outcomes,isplaylist=:isplaylist ";
 			$query .= "WHERE id=:id";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':title'=>$_POST['title'], ':text'=>$_POST['text'], ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':avail'=>$_POST['avail'], ':oncal'=>$oncal, ':caltag'=>$caltag, ':outcomes'=>$outcomes, ':isplaylist'=>$isplaylist, ':id'=>$getId));
+			$stm->execute(array(':title'=>$posttitle, ':text'=>$posttext, ':startdate'=>$startdate, ':enddate'=>$enddate,
+				':avail'=>$available, ':oncal'=>$oncal, ':caltag'=>$caltag, ':outcomes'=>$outcomes, ':isplaylist'=>$isplaylist, ':id'=>$gid));
 
 			//update attached files
 			$del_file_stm = $DBH->prepare("DELETE FROM imas_instr_files WHERE id=:id");
@@ -144,7 +144,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB while ($row = mysql_fetch_row($result)) {
 			$stm = $DBH->prepare("SELECT id,description,filename FROM imas_instr_files WHERE itemid=:itemid");
-			$stm->execute(array(':itemid'=>$getId));
+			$stm->execute(array(':itemid'=>$_GET['id']));
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if (isset($_POST['delfile-'.$row[0]])) {
 					//DB $query = "DELETE FROM imas_instr_files WHERE id='{$row[0]}'";
@@ -165,10 +165,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				} else if ($_POST['filedescr-'.$row[0]]!=$row[1]) {
 					//DB $query = "UPDATE imas_instr_files SET description='{$_POST['filedescr-'.$row[0]]}' WHERE id='{$row[0]}'";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$upd_descr_stm->execute(array(':description'=> Sanitize::simpleString($_POST['filedescr-'.$row[0]]), ':id'=>$row[0]));
+					$upd_descr_stm->execute(array(':description'=>$_POST['filedescr-'.$row[0]], ':id'=>$row[0]));
 				}
 			}
-			$newtextid = $getId;
+			$newtextid = $_GET['id'];
 		} else { //add new
 
 			//DB $query = "INSERT INTO imas_inlinetext (courseid,title,text,startdate,enddate,avail,oncal,caltag,outcomes,isplaylist) VALUES ";
@@ -273,7 +273,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $fileorder = explode(',',mysql_result($result,0,0));
 		$stm = $DBH->prepare("SELECT fileorder FROM imas_inlinetext WHERE id=:id");
-		$stm->execute(array(':id'=>$getId));
+		$stm->execute(array(':id'=>$_GET['id']));
 		$fileorder = explode(',',$stm->fetchColumn(0));
 		if ($fileorder[0]=='') {
 			$fileorder = array();
@@ -300,7 +300,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//DB $query = "UPDATE imas_inlinetext SET fileorder='$fileorder' WHERE id='{$_GET['id']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_inlinetext SET fileorder=:fileorder WHERE id=:id");
-		$stm->execute(array(':fileorder'=>$fileorder, ':id'=>$getId));
+		$stm->execute(array(':fileorder'=>$fileorder, ':id'=>$_GET['id']));
 	}
 	if ($_POST['submitbtn']=='Submit') {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
