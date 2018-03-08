@@ -33,9 +33,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	$cid = Sanitize::courseId($_GET['cid']);
 	$aid = Sanitize::onlyInt($_GET['aid']);
-	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = $_GET['grp']; writesessiondata();}
+	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']); writesessiondata();}
 	if (isset($_GET['selfrom'])) {
-		$sessiondata['selfrom'.$aid] = $_GET['selfrom'];
+		$sessiondata['selfrom'.$aid] = (string) trim($_GET['selfrom']);
 		writesessiondata();
 	} else {
 		if (!isset($sessiondata['selfrom'.$aid])) {
@@ -1153,7 +1153,7 @@ if ($overwriteBody==1) {
 	<script type="text/javascript">
 		var curcid = <?php echo $cid ?>;
 		var curaid = <?php echo $aid ?>;
-		var defpoints = <?php echo Sanitize::encodeStringForDisplay($defpoints); ?>;
+		var defpoints = '<?php echo Sanitize::encodeStringForDisplay($defpoints); ?>';
 		var AHAHsaveurl = '<?php echo $GLOBALS['basesiteurl'] ?>/course/addquestionssave.php?cid=<?php echo $cid ?>&aid=<?php echo $aid ?>';
 		var curlibs = '<?php echo Sanitize::encodeStringForJavascript($searchlibs); ?>';
 	</script>

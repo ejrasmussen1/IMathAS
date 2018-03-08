@@ -1,78 +1,96 @@
 <?php
-//IMathAS:  show items function for main course page
-//(c) 2007 David Lippman
+// IMathAS: show items function for main course page
+// (c) 2007 David Lippman
+require_once ('../includes/loaditemshowdata.php');
+require_once ("../includes/exceptionfuncs.php");
 
-require_once('../includes/loaditemshowdata.php');
-require_once("../includes/exceptionfuncs.php");
-
-if (isset($studentid) && !isset($sessiondata['stuview'])) {
-	$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
+if (isset ( $studentid ) && ! isset ( $sessiondata ['stuview'] )) {
+	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, true, $studentinfo ['latepasses'], $latepasshrs );
 } else {
-	$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
+	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, false );
 }
-function beginitem($canedit,$aname='') {
-	 if ($aname != '') {
-		 echo "<div class=\"item\" id=\"$aname\">\n";
-	 } else {
-	 	 echo "<div class=\"item\">\n";
-	 }
+function beginitem($canedit, $aname = '') {
+	if ($aname != '') {
+		echo "<div class=\"item\" id=\"$aname\">\n";
+	} else {
+		echo "<div class=\"item\">\n";
+	}
 }
 function enditem($canedit) {
 	echo '<div class="clear"></div>';
 	echo "</div>\n";
 }
 
-if (!isset($CFG['CPS']['itemicons'])) {
-  $itemicons = array('folder'=>'folder2.gif', 'foldertree'=>'folder_tree.png', 'assess'=>'assess.png',
-	'inline'=>'inline.png',	'web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
-	'drill'=>'drill.png','html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
-	'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
-	'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png',
-	'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png',
-	'swf'=>'video.png', 'avi'=>'video.png', 'mpg'=>'video.png',
-	'nb'=>'mathnb.png', 'mws'=>'maple.png', 'mw'=>'maple.png');
+if (! isset ( $CFG ['CPS'] ['itemicons'] )) {
+	$itemicons = array (
+			'folder' => 'folder2.gif',
+			'foldertree' => 'folder_tree.png',
+			'assess' => 'assess.png',
+			'inline' => 'inline.png',
+			'web' => 'web.png',
+			'doc' => 'doc.png',
+			'wiki' => 'wiki.png',
+			'drill' => 'drill.png',
+			'html' => 'html.png',
+			'forum' => 'forum.png',
+			'pdf' => 'pdf.png',
+			'ppt' => 'ppt.png',
+			'zip' => 'zip.png',
+			'png' => 'image.png',
+			'xls' => 'xls.png',
+			'gif' => 'image.png',
+			'jpg' => 'image.png',
+			'bmp' => 'image.png',
+			'mp3' => 'sound.png',
+			'wav' => 'sound.png',
+			'wma' => 'sound.png',
+			'swf' => 'video.png',
+			'avi' => 'video.png',
+			'mpg' => 'video.png',
+			'nb' => 'mathnb.png',
+			'mws' => 'maple.png',
+			'mw' => 'maple.png' 
+	);
 } else {
-   $itemicons = $CFG['CPS']['itemicons'];
+	$itemicons = $CFG ['CPS'] ['itemicons'];
 }
 
 /*
-echo '<div class="itemhdr">';
-
-echo '<div class="itemhdricon">';
-echo '</div>';
-
-
-echo '</div>'; //itemhdr
-
-*/
-
-function getItemIcon($type, $alt, $faded=false) {
-	global $imasroot,$itemicons;
+ * echo '<div class="itemhdr">';
+ *
+ * echo '<div class="itemhdricon">';
+ * echo '</div>';
+ *
+ *
+ * echo '</div>'; //itemhdr
+ *
+ */
+function getItemIcon($type, $alt, $faded = false) {
+	global $imasroot, $itemicons;
 	$out = '<div class="itemhdricon">';
 	if ($faded) {
 		$class = 'class="faded"';
 	}
-	$out .= '<img alt="'.$alt.'" '.$class.' src="'.$imasroot.'/img/'.$itemicons[$type].'"/>';
+	$out .= '<img alt="' . $alt . '" ' . $class . ' src="' . $imasroot . '/img/' . $itemicons [$type] . '"/>';
 	$out .= '</div>';
 	return $out;
 }
-
 function getBlockDD($blocktype, $i, $parent, $bnum, $blockid) {
 	global $cid;
 	$out = '<div class="itemhdrdd dropdown">';
-	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
 	$out .= '</a>';
-	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
-	if ($blocktype=='T') {
-		$out .= " <li><a href=\"course.php?cid=$cid&folder=$parent-$bnum\">" . _('Edit Contents') . "</a></li>";
-	} else if ($blocktype=='E') {
-		$out .= " <li><a href=\"course.php?cid=$cid&folder=$parent-$bnum\">" . _('Isolate') . "</a></li>";
+	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu' . $i . '">';
+	if ($blocktype == 'T') {
+		$out .= " <li><a href=\"course.php?cid=$cid&folder=$parent-$bnum\">" . _ ( 'Edit Contents' ) . "</a></li>";
+	} else if ($blocktype == 'E') {
+		$out .= " <li><a href=\"course.php?cid=$cid&folder=$parent-$bnum\">" . _ ( 'Isolate' ) . "</a></li>";
 	}
-	$out .= " <li><a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">" . _('Modify') . "</a></li>";
-	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','B{$blockid}');\">" . _('Move') . '</a></li>';
-	$out .= " <li><a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">" . _('Delete') . "</a></li>";
-	$out .=  " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">" . _('Copy') . "</a></li>";
+	$out .= " <li><a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">" . _ ( 'Modify' ) . "</a></li>";
+	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','B{$blockid}');\">" . _ ( 'Move' ) . '</a></li>';
+	$out .= " <li><a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">" . _ ( 'Delete' ) . "</a></li>";
+	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">" . _('Copy') . "</a></li>";
 	$out .= " <li><a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">" . _('Toggle NewFlag') . "</a></li>";
 	$out .= '</ul>';
 	$out .= '</div>';
@@ -1543,6 +1561,7 @@ function showitems($items,$parent,$inpublic=false) {
 
    function generateadditem($blk,$tb) {
    	global $cid, $CFG,$imasroot;
+   	
    	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
    		if ($tb=='t' && $blk=='0') {
@@ -1552,7 +1571,7 @@ function showitems($items,$parent,$inpublic=false) {
    		} else {
    			$html = '<div class="additembox"><span><b>' . _('Add here:') . '</b> ';
    		}
-
+		
    		$blkUrlParam = Sanitize::encodeUrlParam($blk);
    		$tbUrlParam = Sanitize::encodeUrlParam($tb);
 
@@ -1849,7 +1868,7 @@ function showitems($items,$parent,$inpublic=false) {
 			}
 			if (count($items[$i]['items'])>0) {
 				echo '<ul class=qview '.$qviewstyle.'>';
-				quickview($items[$i]['items'],$parent.'-'.$bnum,$showdats,$showlinks);
+				quickview($items[$i]['items'],$parent.'-'.$bnum,$showdates,$showlinks);
 				echo '</ul>';
 			}
 			echo '</li>';
