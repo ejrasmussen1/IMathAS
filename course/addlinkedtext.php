@@ -234,7 +234,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$text = (string) trim($_POST['summary']);
 				$available = sanitize::onlyInt($_POST['avail']);
 				$target = Sanitize::onlyInt($_POST['target']);
-				$id = Sanitize::onlyInt($_GET['id']]);
+				$id = Sanitize::onlyInt($_GET['id']);
 				//DB $query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}',outcomes='$outcomes',points=$points ";
 				//DB $query .= "WHERE id='{$_GET['id']}'";
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
