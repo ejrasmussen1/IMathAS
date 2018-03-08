@@ -636,4 +636,5 @@ function generaterandstring() {
     $pass .= substr($chars,rand(0,61),1);
   }
   return $pass;
+}
 ?>
