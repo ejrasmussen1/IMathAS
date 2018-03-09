@@ -11,7 +11,6 @@ if (isset($sessiondata['emulateuseroriginaluser']) && isset($_GET['unemulateuser
 }
 
 $emu_id = (int) trim($_GET['emulateuser']);
-var_dump($_GET);
 if ($myrights >= 75 && !empty($emu_id)) {
 	if ($myrights<100) {
 		$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");

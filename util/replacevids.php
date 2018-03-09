@@ -4,8 +4,8 @@ if ($myrights<100) {exit;}
 
 require("../header.php");
 if (!empty($_POST['from']) && !empty($_POST['to'])) {
-	$from = trim($_POST['from']);
-	$to = trim($_POST['to']);
+	$from = (string) trim($_POST['from']);
+	$to = (string) trim($_POST['to']);
 	if (strlen($from)!=11 || strlen($to)!=11 || preg_match('/[^A-Za-z0-9_\-]/',$from) || preg_match('/[^A-Za-z0-9_\-]/',$to)) {
 		echo "<p>Check the video ID formats; they don't appear to be correct.</p>";
 		echo '<p><a href="replacevids.php">Try again</p>';
