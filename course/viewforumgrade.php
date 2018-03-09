@@ -87,7 +87,7 @@
 				}
 			}
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?stu=$stu&cid=$cid&" . Sanitize::randomQueryStringParam());
 		exit;
 	}
 

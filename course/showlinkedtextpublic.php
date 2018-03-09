@@ -93,7 +93,7 @@
 	//DB $query = "SELECT text,title FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT text,title FROM imas_linkedtext WHERE id=:id");
-	$stm->execute(array(':id'=>$_GET['id']));
+	$stm->execute(array(':id'=>intval($_GET['id'])));
 	//DB $text = mysql_result($result, 0,0);
 	//DB $title = mysql_result($result,0,1);
 	list($text,$title) = $stm->fetch(PDO::FETCH_NUM);
