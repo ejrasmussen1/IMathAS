@@ -128,40 +128,43 @@ if (isset($_POST['libs'])) {
 	function createLibs($items, $curparent) {
 		global $now, $thisowner, $thisgroup, $librights, $inslib, $inslibitem, $DBH, $nlibs, $nlibitems;
 		global $assessdata, $itemdata;
-		foreach ($items as $item) {
-			if (is_array($item)) { //is a block
-				$inslib->execute(array(getuniqid(), $now, $now, $item['name'], $thisowner, $librights, $curparent, $thisgroup));
-				$libid = $DBH->lastInsertId();
-				$nlibs++;
-				createLibs($item['items'], $libid);
-			} else {
-				$aid = $itemdata[$item];
-				
-				if ($_POST['libtype']=='yes') {
-					$inslib->execute(array(getuniqid(), $now, $now, $assessdata[$aid]['name'], $thisowner, $librights, $curparent, $thisgroup));
-					$qlibid = $DBH->lastInsertId();
-					$nlibs++;
-				} else {
-					$qlibid = $curparent;
-				}
-				foreach ($assessdata[$aid]['itemorder'] as $qsetid) {
-					$inslibitem->execute(array($qlibid, $qsetid, $thisowner, $now));
-					$nlibitems++;
-				}
-			}
-		}
+		foreach ($items as $item) {                    
+                        if (is_array($item)) { //is a block                                
+                                $inslib->execute(array(getuniqid(), $now, $now, $item['name'], $thisowner, $librights, $curparent, $thisgroup));
+                                $libid = $DBH->lastInsertId();
+                                $nlibs++;
+                                createLibs($item['items'], $libid);                                
+                        } else {
+                            //if ($librights<6 || $librights==8){
+                            $aid = $itemdata[$item];
+                            if ($_POST['libtype']=='yes') {
+                                    $inslib->execute(array(getuniqid(), $now, $now, $assessdata[$aid]['name'], $thisowner, $librights, $curparent, $thisgroup));
+                                    $qlibid = $DBH->lastInsertId();
+                                    $nlibs++;
+                            } else {
+                                    $qlibid = $curparent;
+                            }
+                            foreach ($assessdata[$aid]['itemorder'] as $qsetid) {
+                                    $inslibitem->execute(array($qlibid, $qsetid, $thisowner, $now));
+                                    $nlibitems++;
+                                }                             
+                        }                                                
+                 }
 	}
 	$inslib = $DBH->prepare("INSERT INTO imas_libraries (uniqueid, adddate, lastmoddate, name, ownerid, userights, parent, groupid) VALUES (?,?,?,?,?,?,?,?)");
 	$inslibitem = $DBH->prepare("INSERT INTO imas_library_items (libid, qsetid, ownerid, lastmoddate) VALUES (?,?,?,?)");
 	
-	$inslib->execute(array(getuniqid(), $now, $now, $_POST['baselibname'], $thisowner, $librights, $_POST['libs'], $thisgroup));
-	$libid = $DBH->lastInsertId();
-	$nlibs = 1;
-	$nlibitems = 0;
-	createLibs($assessblocks, $libid);
-	$DBH->commit();
-	echo 'Done. Added '.$nlibs.' libraries, and '.$nlibitems.' library entries';
-	
+        if($librights < 6 || $librights==8){
+            $inslib->execute(array(getuniqid(), $now, $now, $_POST['baselibname'], $thisowner, $librights, $_POST['libs'], $thisgroup));
+            $libid = $DBH->lastInsertId();
+            $nlibs = 1;
+            $nlibitems = 0;
+            createLibs($assessblocks, $libid);
+            $DBH->commit();
+            echo 'Done. Added '.$nlibs.' libraries, and '.$nlibitems.' library entries';
+        } else{
+            echo "Please select a valid rights option.";
+        }
 	exit;
 }
 function buildexistblocks($items,$parent,$pre='') {
