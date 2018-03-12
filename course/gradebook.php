@@ -199,10 +199,10 @@ if ($isteacher) {
 			$value = $_POST['checked'];
 			$last = count($value)-1;
 			for($i = 0; $i < $last; $i++){
-				gbstudisp(Sanitize::olnyInt($value[$i]));
+				gbstudisp(Sanitize::onlyInt($value[$i]));
 				echo "<div style=\"page-break-after:always\"></div>";
 			}
-			gbstudisp(Sanitize::olnyInt($value[$last]));//no page break after last report
+			gbstudisp(Sanitize::onlyInt($value[$last]));//no page break after last report
 
 			echo "</div></div></div>";
 		}

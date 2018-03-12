@@ -32,7 +32,7 @@
 
 	}
 
-	$qsetid = $_GET['id'];
+	$qsetid = (int) trim($_GET['id']);
 	//DB $query = "SELECT * FROM imas_questionset WHERE id='$qsetid'";
 	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);

@@ -7,7 +7,7 @@
 	require("../init.php");
 	require("../includes/htmlutil.php");
 
-
+    var_dump($_GET);
 	$istutor = false;
 	$isteacher = false;
 	if (isset($tutorid)) { $istutor = true;}
@@ -15,8 +15,7 @@
     $gbItem = (int) trim($_GET['gbitem']);
 	if ($istutor) {
 		$isok = false;
-
-		if (!empty($gbItem)) {
+		if (is_numeric($gbItem)) {
 			//DB $query = "SELECT tutoredit FROM imas_gbitems WHERE id='{$_GET['gbitem']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_result($result,0,0)==1) {
@@ -97,9 +96,10 @@
 			}
 		}
 		$outcomes = implode(',',$outcomes);
+		$post_points = (float) trim($_POST['points']);
 		if ($_GET['gbitem']=='new') {
 			//DB $query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit,rubric,outcomes) VALUES ";
-			//DB $query .= "('$cid','{$_POST['name']}','{$_POST['points']}',$showdate,'{$_POST['gbcat']}','{$_POST['cntingb']}',$tutoredit,$rubric,'$outcomes') ";
+			//DB $query .= "('$cid','{$_POST['name']}','{$post_points}',$showdate,'{$_POST['gbcat']}','{$_POST['cntingb']}',$tutoredit,$rubric,'$outcomes') ";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $_GET['gbitem'] = mysql_insert_id();
 			$query = "INSERT INTO imas_gbitems (courseid,name,points,showdate,gbcategory,cntingb,tutoredit,rubric,outcomes) VALUES ";
@@ -110,13 +110,13 @@
 			$_GET['gbitem'] = $DBH->lastInsertId();
 			$isnewitem = true;
 		} else {
-			//DB $query = "UPDATE imas_gbitems SET name='{$_POST['name']}',points='{$_POST['points']}',showdate=$showdate,gbcategory='{$_POST['gbcat']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit,rubric=$rubric,outcomes='$outcomes' ";
+			//DB $query = "UPDATE imas_gbitems SET name='{$_POST['name']}',points='{$post_points}',showdate=$showdate,gbcategory='{$_POST['gbcat']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit,rubric=$rubric,outcomes='$outcomes' ";
 			//DB $query .= "WHERE id='{$_GET['gbitem']}'";
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$query = "UPDATE imas_gbitems SET name=:name,points=:points,showdate=:showdate,gbcategory=:gbcategory,cntingb=:cntingb,";
 			$query .= "tutoredit=:tutoredit,rubric=:rubric,outcomes=:outcomes WHERE id=:id";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':name'=>$_POST['name'], ':points'=>$_POST['points'], ':showdate'=>$showdate, ':gbcategory'=>$_POST['gbcat'],
+			$stm->execute(array(':name'=>$_POST['name'], ':points'=>$post_points, ':showdate'=>$showdate, ':gbcategory'=>$_POST['gbcat'],
 				':cntingb'=>$_POST['cntingb'], ':tutoredit'=>$tutoredit, ':rubric'=>$rubric, ':outcomes'=>$outcomes, ':id'=>$_GET['gbitem']));
 			$isnewitem = false;
 		}
@@ -142,16 +142,16 @@
 
 		}
 	}
-    $assessmentSnapId = (int) trim($_POST['assesssnapaid']);
-	if (isset($assessmentSnapId)) {
-	    $assessSnapAtt = (float) trim($_POST['assesssnapatt']);
-        $assessSnapPts = (float) trim($_POST['assesssnappts']);
+    $assesssnap = (string) trim($_POST['assesssnap']);
+	if (!empty($assesssnap)) {
+	    $assesssnapaid = (int) trim($_POST['assesssnapaid']);
+
 		//doing assessment snapshot
 		//DB $query = "SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid='{$_POST['assesssnapaid']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB while($row = mysql_fetch_row($result)) {
 		$stm = $DBH->prepare("SELECT userid,bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
-		$stm->execute(array(':assessmentid'=>$assessmentSnapId));
+		$stm->execute(array(':assessmentid'=>$assesssnapaid));
 		while($row = $stm->fetch(PDO::FETCH_NUM)) {
 			$sp = explode(';',$row[1]);
 			$sc = explode(',',$sp[0]);
@@ -163,12 +163,16 @@
 				}
 				$tot += getpts($v);
 			}
-			if ($_POST['assesssnaptype']==0) {
+            $assesssnaptype = (int) trim($_POST['assesssnaptype']);
+            $assesssnapatt = (float) trim($_POST['assesssnapatt']);
+            $assesssnappts = (float) trim($_POST['assesssnappts']);
+
+			if ($assesssnaptype==0) {
 				$score = $tot;
 			} else {
 				$attper = $att/count($sc);
-				if ($attper>=$assessSnapAtt/100-.001 && $tot>=$assessSnapPts -.00001) {
-					$score = $_POST['points'];
+				if ($attper>=$assesssnapatt/100-.001 && $tot>=$assesssnappts-.00001) {
+					$score = $post_points;
 				} else {
 					$score = 0;
 				}
