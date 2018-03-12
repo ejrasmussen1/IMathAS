@@ -3,6 +3,7 @@
 //(c) 2007 David Lippman
 
 require_once("../includes/exceptionfuncs.php");
+
 if ($GLOBALS['canviewall']) {
 	$GLOBALS['exceptionfuncs'] = new ExceptionFuncs($userid, $cid, false);
 } else {
@@ -102,7 +103,7 @@ row[1][0][0] = "Name"
 row[1][1] scores (all types - type is determined from header row)
 row[1][1][0] first score - assessment
 row[1][1][0][0] = score
-row[1][1][0][1] = 0 no comment, 1 has comment - is comment in stu view
+row[1][1][0][1] = 0 no comment, 1 has comment - is comment in includecomments
 row[1][1][0][2] = show gbviewasid link: 0 no, 1 yes,
 row[1][1][0][3] = other info: 0 none, 1 NC, 2 IP, 3 OT, 4 PT  + 10 if still active
 row[1][1][0][4] = asid, or 'new'
@@ -253,11 +254,11 @@ function gbtable() {
 		}
 	}
 
-
+/* --ptsposs--
 	//pre-pull questions data
 	$questionpointdata = array();
 	$query = "SELECT iq.points,iq.id FROM imas_questions AS iq JOIN imas_assessments AS ia ON iq.assessmentid=ia.id ";
-	$query .= "WHERE ia.courseid=:courseid AND iq.points<9999 AND ia.avail>0 ";
+	$query .= "WHERE ia.courseid=:courseid AND iq.points<9999 AND ia.avail>0 AND ia.date_by_lti<>1 ";
 	if (!$canviewall) {
 		$query .= "AND ia.cntingb>0 ";
 	}
@@ -276,19 +277,19 @@ function gbtable() {
 	while ($line=$stm->fetch(PDO::FETCH_ASSOC)) {
 		$questionpointdata[$line['id']] = $line['points'];
 	}
-
+*/
 
 	//Pull Assessment Info
 	$now = time();
 	//DB $query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate FROM imas_assessments WHERE courseid='$cid' AND avail>0 ";
-	$query = "SELECT id,name,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate";
+	$query = "SELECT id,name,ptsposs,defpoints,deffeedback,timelimit,minscore,startdate,enddate,itemorder,gbcategory,cntingb,avail,groupsetid,allowlate";
 	if ($limuser>0) {
-		$query .= ',reqscoreaid,reqscore';
+		$query .= ',reqscoreaid,reqscore,reqscoretype';
 	}
 	if (isset($includeendmsg) && $includeendmsg) {
 		$query .= ',endmsg';
 	}
-	$query .= " FROM imas_assessments WHERE courseid=:courseid AND avail>0 ";
+	$query .= " FROM imas_assessments WHERE courseid=:courseid AND avail>0 AND date_by_lti<>1 ";
 
 	if (!$canviewall) {
 		$query .= "AND cntingb>0 ";
@@ -371,17 +372,17 @@ function gbtable() {
 		if ($deffeedback[0]=='Practice') { //set practice as no count in gb
 			$cntingb[$kcnt] = 3;
 		}
-		$aitems = explode(',',$line['itemorder']);
 		$allowlate[$kcnt] = $line['allowlate'];
 
 		if (isset($line['endmsg']) && $line['endmsg']!='') {
 			$endmsgs[$kcnt] = unserialize($line['endmsg']);
 		}
 		if ($limuser>0) {
-			$reqscores[$kcnt] = array('aid'=>$line['reqscoreaid'], 'score'=>abs($line['reqscore']));
+			$reqscores[$kcnt] = array('aid'=>$line['reqscoreaid'], 'score'=>abs($line['reqscore']), 'calctype'=>($line['reqscoretype']&2));
 		}
 		$k = 0;
-		$atofind = array();
+/* --ptsposs--
+		$aitems = explode(',',$line['itemorder']);
 		$totalpossible = 0;
 		foreach ($aitems as $v) {
 			if (strpos($v,'~')!==FALSE) {
@@ -402,8 +403,12 @@ function gbtable() {
 				$totalpossible += (isset($questionpointdata[$v]))?$questionpointdata[$v]:$line['defpoints'];
 			}
 		}
-
-		$possible[$kcnt] = $totalpossible;
+*/
+		if ($line['ptsposs']==-1) {
+			require_once("../includes/updateptsposs.php");
+			$line['ptsposs'] = updatePointsPossible($line['id'], $line['itemorder'], $line['defpoints']);
+		}
+		$possible[$kcnt] = $line['ptsposs'];
 		$kcnt++;
 	}
 
@@ -1173,9 +1178,23 @@ function gbtable() {
 				$cattotfutureec[$row][$category[$i]][$col] = $pts;
 			}
 		}
-		if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
-			$gb[$row][1][$col][1] = $l['feedback']; //the feedback
-		} else if ($limuser==0 && $l['feedback']!='') {
+		if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
+			$fbarr = json_decode($l['feedback'], true);
+			if ($fbarr === null) {
+				$gb[$row][1][$col][1] = $l['feedback']; //the feedback
+			} else {
+				$fbtxt = '';
+				foreach ($fbarr as $k=>$v) {
+					if ($k=='Z') {
+						$fbtxt .= 'Overall feedback: '.$v.'.<br>';
+					} else {
+						$q = substr($k,1);
+						$fbtxt .= 'Feedback on Question '.($q+1).': '.$v.'.<br>';
+					}
+				}
+				$gb[$row][1][$col][1] = $fbtxt;
+			}
+		} else if ($l['feedback']!='') {
 			$gb[$row][1][$col][1] = 1; //has comment
 		} else {
 			$gb[$row][1][$col][1] = 0; //no comment
@@ -1228,9 +1247,9 @@ function gbtable() {
 				if ($l['score']!=null) {
 					$gb[$row][1][$col][0] = 1*$l['score'];
 				}
-				if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
+				if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 					$gb[$row][1][$col][1] =  $l['feedback']; //the feedback (for students)
-				} else if ($limuser==0 && $l['feedback']!='') { //feedback
+				} else if ($l['feedback']!='') { //feedback
 					$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
 				} else {
 					$gb[$row][1][$col][1] = 0; //no feedback
@@ -1280,18 +1299,18 @@ function gbtable() {
 						$gb[$row][1][$col][0] = 1*$l['score'];
 					}
 				}
-				if ($limuser==0 && !isset($gb[$row][1][$col][1])) {
+				if (!isset($gb[$row][1][$col][1])) {
 					$gb[$row][1][$col][1] = 0; //no feedback
 				}
 				if (trim($l['feedback'])!='') {
-					if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
+					if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 						if (isset($gb[$row][1][$col][1])) {
 							$gb[$row][1][$col][1] .= "<br/>".$l['feedback'];
 						} else {
 							$gb[$row][1][$col][1] = $l['feedback'];
 						}
 						//the feedback (for students)
-					} else if ($limuser==0) { //feedback
+					} else { //feedback
 						$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
 					}
 				}
@@ -1328,9 +1347,9 @@ function gbtable() {
 				if ($l['score']!=null) {
 					$gb[$row][1][$col][0] = 1*$l['score'];
 				}
-				if ($limuser>0 || (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments'])) {
+				if (isset($GLOBALS['includecomments']) && $GLOBALS['includecomments']) {
 					$gb[$row][1][$col][1] =  $l['feedback']; //the feedback (for students)
-				} else if ($limuser==0 && $l['feedback']!='') { //feedback
+				} else if ($l['feedback']!='') { //feedback
 					$gb[$row][1][$col][1] = 1; //yes it has it (for teachers)
 				} else {
 					$gb[$row][1][$col][1] = 0; //no feedback
@@ -2250,7 +2269,9 @@ function gbtable() {
 				$gb[1][1][$col][13] = 1;
 				if (isset($reqscores[$k]) && $reqscores[$k]['aid']>0) {
 					$colofprereq = $assesscol[$reqscores[$k]['aid']];
-					if (!isset($gb[1][1][$colofprereq][0]) || $gb[1][1][$colofprereq][0] < $reqscores[$k]['score']) {
+					if (!isset($gb[1][1][$colofprereq][0]) || 
+					   ($reqscores[$k]['calctype']==0 && $gb[1][1][$colofprereq][0] < $reqscores[$k]['score']) ||
+					   ($reqscores[$k]['calctype']==2 && 100*$gb[1][1][$colofprereq][0]/$gb[0][1][$colofprereq][2]+1e-4 < $reqscores[$k]['score'])) {
 						$gb[1][1][$col][13] = 0;
 					}
 				}

@@ -10,6 +10,7 @@ class ExceptionFuncs {
 	private $latepasses = 0;
 	private $latepasshrs = 24;
 	private $isstu = true;
+	private $courseenddate = 2000000000;
 
 	function __construct($uid, $cid, $isstu, $latepasses=0, $latepasshrs=24) {
 		$this->uid = $uid;
@@ -17,6 +18,7 @@ class ExceptionFuncs {
 		$this->latepasses = $latepasses;
 		$this->latepasshrs = $latepasshrs;
 		$this->isstu = $isstu;  // !isset($sessiondata['stuview']) && !$actas
+		$this->courseenddate = $GLOBALS['courseenddate'];
 	}
 	public function setLatepasses($lp) {
 		$this->latepasses = $lp;
@@ -84,7 +86,7 @@ class ExceptionFuncs {
 	}
 
 	//$exception should be from imas_exceptions, and be null, or
-	//   array(startdate,enddate,islatepass)
+	//   array(startdate,enddate,islatepass,is_lti)
 	//$adata should be associative array from imas_assessments including
 	//   startdate, enddate, allowlate, id
 	//returns array(useexception, canundolatepass, canuselatepass)
@@ -94,8 +96,12 @@ class ExceptionFuncs {
 		$canundolatepass = false;
 
 		$useexception = ($exception!==null && $exception!==false); //use by default
-		if ($exception!==null && $exception[2]>0 && $adata['enddate']>$exception[1]) {
+		if ($exception!==null && $exception!==false && !empty($exception[3])) {
+			//is LTI-set - use the exception
+			
+		} else if ($exception!==null && $exception[2]>0 && ($adata['enddate']>$exception[1] || $exception[1]>$this->courseenddate)) {
 			//if latepass and assessment enddate is later than exception enddate, skip exception
+			//or, if latepass and exception would put it past the course end date, skip exception
 			$useexception = false;
 		} else if ($exception!==null && $exception!==false && $exception[2]==0 && $exception[0]>=$adata['startdate'] && $adata['enddate']>$exception[1]) {
 			//if manual exception and start of exception is equal or after original startdate and asessment enddate is later than exception enddate, skip exception
@@ -110,7 +116,12 @@ class ExceptionFuncs {
 				//this logic counts "latepasses used" based on date of exception past original enddate
 				//regardless of whether exception is manual or latepass
 				//prevents using latepasses on top of a manual extension
-				$latepasscnt = max(0,round(($exception[1] - $adata['enddate'])/($this->latepasshrs*3600)));
+				if (!empty($exception[3])) {
+					//with LTI one, base latepasscnt only on the value in the exception
+					$latepasscnt = $exception[2];
+				} else {
+					$latepasscnt = max(0,round(($exception[1] - $adata['enddate'])/($this->latepasshrs*3600)));
+				}
 				//use exception due date for determining canuselatepass
 				$adata['enddate'] = $exception[1];
 			} else {
@@ -152,10 +163,11 @@ class ExceptionFuncs {
 		removed from below:
 			 && !in_array($adata['id'],$this->timelimitup)
 		*/
+
 		if (($adata['allowlate']%10==1 || $adata['allowlate']%10-1>$latepasscnt) && !in_array($adata['id'],$this->viewedassess) && $this->latepasses>0 && $this->isstu) {
-			if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate'])<$this->latepasshrs*3600) {
+			if ($now>$adata['enddate'] && $adata['allowlate']>10 && ($now - $adata['enddate']) < $this->latepasshrs*3600 && $adata['enddate'] < $this->courseenddate) {
 				$canuselatepass = true;
-			} else if ($now<$adata['enddate']) {
+			} else if ($now<$adata['enddate'] && $adata['enddate'] < $this->courseenddate) {
 				$canuselatepass = true;
 			}
 		}
