@@ -148,7 +148,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if (!empty($_POST['curfile'])) {
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				///if (!file_exists($uploaddir . $_POST['curfile'])) {
-				if (!doesfileexist('cfile',$_POST['curfile'])) {
+			  if (!doesfileexist('cfile',stripslashes(str_replace('/', '', $_POST['curfile'])))) {
 					$processingerror = true;
 				} else {
 					$_POST['text'] = "file:".$_POST['curfile'];
