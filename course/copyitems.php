@@ -143,7 +143,7 @@ if (!(isset($teacherid))) {
 				$stm = $DBH->prepare($query);
 				$stm->execute($qarr);
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if (isset($_GET['action']) && $_GET['action']=="copy") {
 			if ($_POST['whattocopy']=='all') {
@@ -503,7 +503,7 @@ if (!(isset($teacherid))) {
 					$calitems[] = $row;
 				}
 			} else {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+			  header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 
 				exit;
 			}

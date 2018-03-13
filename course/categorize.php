@@ -25,7 +25,7 @@
 				$upd_stm->execute(array(':category'=>$upd_category, ':id'=>$row[0]));
 			}
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	}
