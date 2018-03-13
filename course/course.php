@@ -177,7 +177,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($inst
 
 	if ($_GET['folder']!='0') {
 		$now = time();
-		$blocktree = explode('-',$_GET['folder']);
+		$blocktree = array_map('intval', explode('-',$_GET['folder']));
 		$backtrack = array();
 		for ($i=1;$i<count($blocktree);$i++) {
 			$backtrack[] = array($items[$blocktree[$i]-1]['name'],implode('-',array_slice($blocktree,0,$i+1)));

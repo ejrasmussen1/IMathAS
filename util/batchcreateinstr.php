@@ -18,21 +18,14 @@ if ($myrights < 100 && ($myspecialrights&16)!=16 && ($myspecialrights&32)!=32) {
 }
 $curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase <a href=\"admin2.php\">Admin</a> &gt; Batch Create Instructors</div>\n";
 
-$uploadedcsv = $_FILES['uploadedfile'];
-
-if (isset($_POST['groupid']) && is_uploaded_file($uploadedcsv['tmp_name'])) {
+if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_name'])) {
   if ($myrights == 100 || ($myspecialrights&32)==32) {
-      if (iscsv($uploadedcsv)){
   	  if ($_POST['groupid']<1) {
   	  	  echo "Invalid group selection";
   	  	  exit;
   	  } else {
   	  	  $newusergroupid = $_POST['groupid'];
   	  }
-      } else {
-          echo "Not a CSV";
-          exit;
-      }
   } else {
   	  $newusergroupid = $groupid;
   }
@@ -45,7 +38,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($uploadedcsv['tmp_name'])) {
     $homelayout = '|0,1,2||0,1';
   }
   $now = time();
-  $handle = fopen_utf8($uploadedcsv['tmp_name'],'r');
+  $handle = fopen_utf8($_FILES['uploadedfile']['tmp_name'],'r');
   while (($data = fgetcsv($handle,2096))!==false) {
     if (trim($data[0])=='') {continue;}
     if (count($data)<5) {
@@ -157,7 +150,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($uploadedcsv['tmp_name'])) {
         $replacebyarr[$row[0]] = $row[1];
       }
 
-      if ($outcomesarr!='') {
+      if ($outcomesarr!='' && $outcomesarr!='b:0;') {
         $stm = $DBH->prepare("SELECT id,name,ancestors FROM imas_outcomes WHERE courseid=:courseid");
         $stm->execute(array(':courseid'=>$sourcecid));
         $out_ins_stm = null;
@@ -244,6 +237,8 @@ if (isset($_POST['groupid']) && is_uploaded_file($uploadedcsv['tmp_name'])) {
 			echo '<option value="'.Sanitize::onlyInt($row[0]).'">'.Sanitize::encodeStringForDisplay($row[1]).'</option>';
 		}
 	  echo '</select><br/>';
+  } else {
+  	  echo '<input type=hidden name=groupid value="'.Sanitize::onlyInt($groupid).'" />';
   }
   echo 'CSV file: <input type=file name=uploadedfile /><br/>';
   echo '<input type="submit" value="Go"/>';
@@ -270,23 +265,4 @@ function fopen_utf8 ($filename, $mode) {
         rewind($file);
     }
     return $file;
-}
-//Whitelist to confirm the uploaded file is a CSV
-function iscsv($filename){
-    $csv_mimetypes = array(
-        'text/csv',
-        'text/plain',
-        'application/csv',
-        'text/comma-separated-values',
-        'application/excel',
-        'application/vnd.ms-excel',
-        'application/vnd.msexcel',
-        'text/anytext',
-        'application/octet-stream',
-        'application/txt',
-    );
-
-    if (in_array($filename['type'], $csv_mimetypes)) {
-        return true;
-    }
 }
