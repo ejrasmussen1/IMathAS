@@ -269,7 +269,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare("INSERT INTO imas_forum_subscriptions (forumid,userid) VALUES (:forumid, :userid)");
 			$stm->execute(array(':forumid'=>$newforumid, ':userid'=>$userid));
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) ."r=" .Sanitize::randomQueryStringParam());
 
 		exit;
 	} else { //INITIAL LOAD DATA PROCESS

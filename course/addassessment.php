@@ -69,7 +69,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$assessmentId));
-			header(sprintf('Location: %s/course/addassessment.php?cid=%s&id=%d', $GLOBALS['basesiteurl'],
+			header(sprintf('Location: %s/course/addassessment.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'],
                     $cid, $assessmentId));
 			exit;
 		} else {
@@ -357,13 +357,13 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 			if ($from=='gb') {
-				header(sprintf('Location: %s/course/gradebook.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
+				header(sprintf('Location: %s/course/gradebook.php?cid=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'], $cid));
 			} else if ($from=='mcd') {
-				header(sprintf('Location: %s/course/masschgdates.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
+				header(sprintf('Location: %s/course/masschgdates.php?cid=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'], $cid));
 			} else if ($from=='lti') {
-				header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
+				header(sprintf('Location: %s/ltihome.php?showhome=true&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl']));
 			} else {
-				header(sprintf('Location: %s/course/course.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
+				header(sprintf('Location: %s/course/course.php?cid=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'], $cid));
 			}
 			exit;
 		} else { //add new

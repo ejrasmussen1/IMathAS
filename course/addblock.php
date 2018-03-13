@@ -176,7 +176,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
 	$stm->execute(array(':itemorder'=>$itemorder, ':blockcnt'=>$blockcnt, ':id'=>$cid));
-	header(sprintf('Location: %s/course/course.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
+	header(sprintf('Location: %s/course/course.php?cid=%s&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'], $cid));
 
 	exit;
 } else { //it is a teacher but the form has not been posted

@@ -47,11 +47,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	if (isset($teacherid) && isset($_GET['addset'])) {
 		if (!isset($_POST['nchecked']) && !isset($_POST['qsetids'])) {
 			$overwriteBody = 1;
-			$body = "No questions selected.  <a href=\"addquestions.php?cid=$cid&aid=$aid\">Go back</a>\n";
+			$body = "No questions selected.  <a href=\"addquestions.php?cid=$cid&aid=$aid&r=\" .Sanitize::randomQueryStringParam()>Go back</a>\n";
 		} else if (isset($_POST['add'])) {
 			include("modquestiongrid.php");
 			if (isset($_GET['process'])) {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 				exit;
 			}
 		} else {
@@ -117,7 +117,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		} else {
 			include("modquestiongrid.php");
 			if (isset($_GET['process'])) {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 				exit;
 			}
 		}
@@ -138,7 +138,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
 			$stm->execute(array(':assessmentid'=>$aid));
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 		} else {
 			$overwriteBody = 1;
@@ -346,7 +346,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$stm2->execute(array(':bestscores'=>$slist, ':id'=>$row[0]));
 			}
 
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" .Sanitize::randomQueryStringParam());
 			exit;
 
 		} else {

@@ -303,7 +303,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm->execute(array(':fileorder'=>$fileorder, ':id'=>$_GET['id']));
 	}
 	if ($_POST['submitbtn']=='Submit') {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) ."r=" .Sanitize::randomQueryStringParam());
 		exit;
 	}
 
