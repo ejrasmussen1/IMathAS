@@ -6,7 +6,6 @@ ini_set("upload_max_filesize", "10485760");
 ini_set("post_max_size", "10485760");
 
 require_once("includes/sanitize.php");
-
 	if (isset($_GET['greybox'])) {
 		$isgb = true;
 		$gb = '&greybox=true';
@@ -250,13 +249,14 @@ require_once("includes/sanitize.php");
 	} else if ($_GET['action']=="resetpw") {
 		require_once("init_without_validate.php");
 		if (isset($_POST['username'])) {
+			$username = (string) trim($_POST['username']);
 			//DB $query = "SELECT id,email,rights FROM imas_users WHERE SID='{$_POST['username']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
 
 			$query = "SELECT id,email,rights FROM imas_users WHERE SID=:sid";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':sid'=>$_POST['username']));
+			$stm->execute(array(':sid'=>$username));
 			if ($stm->rowCount()>0) {
 				list($id,$email,$rights) = $stm->fetch(PDO::FETCH_NUM);
 				//DB mysql_fetch_row($result);
@@ -394,13 +394,14 @@ require_once("includes/sanitize.php");
 			exit;
 		}
 	} else if ($_GET['action']=="checkusername") {
+		$getUsername = (string) trim($_GET['SID']);
 		require_once("init_without_validate.php");
-		if (isset($_GET['originalSID']) && $_GET['originalSID']==$_GET['SID']) {
+		if (isset($_GET['originalSID']) && $_GET['originalSID']==$getUsername) {
 			echo "true";
 			exit;
 		}
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-		$stm->execute(array(':SID'=>$_GET['SID']));
+		$stm->execute(array(':SID'=>$getUsername));
 		if ($stm->rowCount()>0) {
 			echo "false";
 		} else {
@@ -442,8 +443,8 @@ require_once("includes/sanitize.php");
 			exit;
 		}
 
-	} else if ($_GET['action']=="enroll") {$courseId = Sanitize::courseId($_POST['courseid']);
-
+	} else if ($_GET['action']=="enroll") {
+		$courseId = Sanitize::courseId($_POST['courseid']);
 		if ($myrights < 6) {
 			echo "<html><body>\nError: Guests can't enroll in courses</body></html>";
 			exit;
@@ -452,7 +453,6 @@ require_once("includes/sanitize.php");
 			$_POST['cid'] = $_POST['courseselect'];
 			$cid = Sanitize::courseId($_POST['cid']);
 			$eKey = '';
-            print_r($cid);
 		}
 		$pagetopper = '';
 		if ($gb == '') {

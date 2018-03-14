@@ -86,7 +86,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$stm->execute(array(':ownerid'=>$userid, ':name'=>$_POST['rubname'], ':rubrictype'=>$_POST['rubtype'], ':groupid'=>$rubgrp, ':rubric'=>$rubricstring));
 		}
 		$fromstr = str_replace('&amp;','&',$fromstr);
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addrubric.php?cid=$cid$fromstr");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addrubric.php?cid=$cid$fromstr&r=" .Sanitize::randomQueryStringParam());
 
 
 

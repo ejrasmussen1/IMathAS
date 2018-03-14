@@ -54,7 +54,7 @@
 				$stm->execute(array(':gradetypeid'=>$delItem));
 			}
 
-			header(sprintf('Location: %s/course/gradebook.php?stu=%s&cid=%s', $GLOBALS['basesiteurl'],
+			header(sprintf('Location: %s/course/gradebook.php?stu=%s&cid=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
 				Sanitize::encodeUrlParam($_GET['stu']), $cid));
 			exit;
 		} else {
@@ -240,10 +240,10 @@
 	}
 	if (isset($_POST['score']) || isset($_POST['newscore']) || isset($_POST['name'])) {
 		if ($isnewitem && isset($_POST['doupload'])) {
-			header(sprintf('Location: %s/course/uploadgrades.php?gbmode=%s&cid=%s&gbitem=%s', $GLOBALS['basesiteurl'],
+			header(sprintf('Location: %s/course/uploadgrades.php?gbmode=%s&cid=%s&gbitem=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
                 Sanitize::encodeUrlParam($_GET['gbmode']), $cid, Sanitize::encodeUrlParam($_GET['gbitem'])));
 		} else {
-			header(sprintf('Location: %s/course/gradebook.php?stu=%s&gbmode=%s&cid=%s', $GLOBALS['basesiteurl'],
+			header(sprintf('Location: %s/course/gradebook.php?stu=%s&gbmode=%s&cid=%s&r=' .Sanitize::randomQueryStringParam(), $GLOBALS['basesiteurl'],
                 Sanitize::encodeUrlParam($_GET['stu']), Sanitize::encodeUrlParam($_GET['gbmode']), $cid));
 		}
 		exit;
