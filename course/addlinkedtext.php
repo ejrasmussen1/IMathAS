@@ -22,7 +22,7 @@ $body = "";
 $useeditor = "text,summary";
 
 $cid = Sanitize::courseId($_GET['cid']);
-$gid = Sanitize::onlyInt($_GET['id'])
+$gid = Sanitize::onlyInt($_GET['id']);
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if (!empty($gid)) {
 	$curBreadcrumb .= "&gt; Modify Link\n";
@@ -319,7 +319,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$selectedtool = 0;
 		$filename = '';
 		$webaddr = '';
-		if (!empty($gid) {
+		if (!empty($gid)) {
 			//DB $query = "SELECT * FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
