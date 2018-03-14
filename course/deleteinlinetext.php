@@ -96,7 +96,7 @@ if (!(isset($teacherid))) {
 			}
 		}
 		$DBH->commit();
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else {
 		//DB $query = "SELECT title FROM imas_inlinetext WHERE id='{$_GET['id']}'";

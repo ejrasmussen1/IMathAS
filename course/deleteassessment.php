@@ -88,7 +88,7 @@ if (!(isset($teacherid))) {
 			}
 		}
 		$DBH->commit();
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	} else {

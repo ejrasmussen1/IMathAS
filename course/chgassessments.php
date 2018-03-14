@@ -381,7 +381,7 @@ if (!(isset($teacherid))) {
 		if (isset($_POST['chgendmsg'])) {
 			include("assessendmsg.php");
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($_GET['cid']));
+		  header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=" . Sanitize::courseId($_GET['cid']) . "&r=" . Sanitize::randomQueryStringParam());
 		}
 		exit;
 

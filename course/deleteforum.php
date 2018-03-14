@@ -108,7 +108,7 @@ if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missin
 			$stm->execute(array(':forumid'=>$forumid));
 		}
 		$DBH->commit();
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid);
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid . "&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	} else {
