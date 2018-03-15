@@ -311,7 +311,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "\">Try Again</a></p>\n";
 			echo "<html><body>$body</body></html>";
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid ."r=" .Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid ."&r=" .Sanitize::randomQueryStringParam());
 		}
 		exit;
 	} else {
