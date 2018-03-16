@@ -12,8 +12,8 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Diagnostic Setup";
-$diagId = (int) trim($_POST['id']);
-$courseId = (int) trim($_POST['cid']);
+$diagId = Sanitize::onlyInt(trim($_POST['id']));
+$courseId = Sanitize::onlyInt(trim($_POST['cid']));
 $curBreadcrumb = "<div class=breadcrumb>$breadcrumbbase ";
 if (!empty($_GET['from'])) {
 	$from = Sanitize::simpleString($_GET['from']);
