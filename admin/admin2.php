@@ -80,7 +80,8 @@ if ($myrights < 75) {
 
   } else if (!empty($_GET['findgroup'])) {
     $hasp1 = false;
-    $words = preg_split('/\s+/', trim(preg_replace('/[^\w\s]/','',$_GET['findgroup'])));
+      $findGroup = Sanitize::encodeStringForDisplay($_GET['findgroup']);
+    $words = preg_split('/\s+/', trim(preg_replace('/[^\w\s]/','',$findGroup)));
     $likearr = array();
     foreach ($words as $v) {
       $likearr[] = '%'.$v.'%';

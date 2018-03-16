@@ -149,9 +149,9 @@ require_once("includes/sanitize.php");
 			echo "<p>Your account with username <b>" . Sanitize::encodeStringForDisplay($_POST['SID']) . "</b> has been created.  If you forget your password, you can ask your ";
 			echo "instructor to reset your password or use the forgotten password link on the login page.</p>\n";
 			$courseId = Sanitize::courseId($_POST['courseid']);
-			$eKey = (string) trim($_POST['ekey']);
-			$uidp = (int) $_POST['id']; //user id $_POST
-			$uidg = (int) $_GET['id']; //user id $_GET
+			$eKey = Sanitize::encodeStringForDisplay($_POST['ekey']);
+			$uidp = Sanitize::onlyInt($_POST['id']); //user id $_POST
+			$uidg = Sanitize::onlyInt($_GET['id']); //user id $_GET
 
 
 			if (!empty($courseId)) {
@@ -166,7 +166,7 @@ require_once("includes/sanitize.php");
 
 					$query = "SELECT enrollkey,allowunenroll,deflatepass,msgset FROM imas_courses WHERE id=:cid AND (available=0 OR available=2)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':cid'=> $_POST['courseid']));
+					$stm->execute(array(':cid'=> $courseId));
 					$line = $stm->fetch(PDO::FETCH_ASSOC);
 
 					if ($line==null) {
@@ -249,7 +249,7 @@ require_once("includes/sanitize.php");
 	} else if ($_GET['action']=="resetpw") {
 		require_once("init_without_validate.php");
 		if (isset($_POST['username'])) {
-			$username = (string) trim($_POST['username']);
+			$username = Sanitize::encodeStringForDisplay($_POST['username']);
 			//DB $query = "SELECT id,email,rights FROM imas_users WHERE SID='{$_POST['username']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
@@ -394,7 +394,7 @@ require_once("includes/sanitize.php");
 			exit;
 		}
 	} else if ($_GET['action']=="checkusername") {
-		$getUsername = (string) trim($_GET['SID']);
+		$getUsername = Sanitize::encodeStringForDisplay($_GET['SID']);
 		require_once("init_without_validate.php");
 		if (isset($_GET['originalSID']) && $_GET['originalSID']==$getUsername) {
 			echo "true";

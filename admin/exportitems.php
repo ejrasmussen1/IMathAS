@@ -65,9 +65,6 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	header("Content-Disposition: attachment; filename=\"imasitemexport.imas\"");
 
 	$checked = $_POST['checked'];
-    echo "<pre>";
-    print_r($_POST);
-    echo "</pre>";
 	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->prepare("SELECT itemorder,ownerid FROM imas_courses WHERE id=:id");
