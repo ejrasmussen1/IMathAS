@@ -18,7 +18,7 @@ if ($type=='teach') {
 	$type = 'take';
 }
 $actionuserid = $userid;
-$userIdInt = (int) trim($_GET['user']);
+$userIdInt = Sanitize::onlyInt(trim($_GET['user']));
  if ($myrights==100 && !empty($userIdInt)) {
 	$actionuserid = $userIdInt;
 } else if ($myrights>=75 && !empty($userIdInt)) {
