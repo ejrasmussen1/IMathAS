@@ -681,7 +681,7 @@ if (!(isset($teacherid))) {
 		list ($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid) = parsefile($filename);
 
 		$userights = $_POST['userights'];
-		$newlibs = explode(",",$_POST['libs']);
+		$newlibs = explode(",",array_map('intval',$_POST['libs']));
 		//DB $item = array_map('addslashes_deep', $item);
 		//DB $questions = array_map('addslashes_deep', $questions);
 		//DB $qset = array_map('addslashes_deep', $qset);
