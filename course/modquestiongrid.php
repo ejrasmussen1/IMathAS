@@ -119,11 +119,11 @@
 			}
 
 			foreach(explode(',',$_POST['qids']) as $qid) {
-				$points = trim($_POST['points'.$qid]);
-				$attempts = trim($_POST['attempts'.$qid]);
+				$points = (int) trim($_POST['points'.$qid]);
+				$attempts = (int) trim($_POST['attempts'.$qid]);
 				$showhints = intval($_POST['showhints'.$qid]);
-				if ($points=='') { $points = 9999;}
-				if ($attempts=='') {$attempts = 9999;}
+				if (empty($points)) { $points = 9999;}
+				if (empty($attemps)) {$attempts = 9999;}
 				//DB $query = "UPDATE imas_questions SET points='$points',attempts='$attempts',showhints=$showhints WHERE id='$qid'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_questions SET points=:points,attempts=:attempts,showhints=:showhints WHERE id=:id");

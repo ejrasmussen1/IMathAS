@@ -39,7 +39,7 @@ function httpPost($url, $data)
 }
 
 //build assessment javascript min file
-$g = minify(file_get_contents("../javascript/general.js"));
+$g = minify(file_get_contents("../javascript/general.js"));	
 $m = minify(file_get_contents("../javascript/mathjs.js"));
 $a = minify(file_get_contents("../javascript/AMhelpers.js"));
 $c = minify(file_get_contents("../javascript/confirmsubmit.js"));
