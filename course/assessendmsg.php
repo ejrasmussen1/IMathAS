@@ -17,7 +17,7 @@ require_once("../includes/htmLawed.php");
 
 	if (isset($_GET['record'])) {
 		$endmsg = array();
-		$endmsg['type'] = $_POST['type'];
+		$endmsg['type'] = (string) trim($_POST['type']);
 		//DB $endmsg['def'] = stripslashes($_POST['msg'][0]);
 		$endmsg['def'] = myhtmLawed($_POST['msg'][0]);
 		$i=1;

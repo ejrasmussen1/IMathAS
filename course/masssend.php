@@ -19,10 +19,11 @@
 		exit;
 	}
 
+	$posttolist = (string) trim($_POST['tolist']);
 	if (isset($_POST['message'])) {
 		$toignore = array();
 		if (intval($_POST['aidselect'])!=0) {
-			$limitaid = $_POST['aidselect'];
+			$limitaid = (string) trim($_POST['aidselect']);
 			$limittype = $_POST['limittype'];
 
 			if ($limittype=='comp') {
@@ -52,7 +53,7 @@
 		if ($_GET['masssend']=="Message") {
 			$now = time();
 			//DB $tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
-			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));
+			$tolist = implode(',', array_map('intval', explode(",", $posttolist)));
 			//DB $query = "SELECT FirstName,LastName,id,msgnotify,email FROM imas_users WHERE id IN ($tolist)";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->query("SELECT FirstName,LastName,id,msgnotify,email FROM imas_users WHERE id IN ($tolist)");
@@ -72,7 +73,7 @@
 				}
 			}
 
-			$tolist = explode(',',$_POST['tolist']);
+			$tolist = explode(',', $posttolist);
 
 			if (isset($_POST['savesent'])) {
 				$isread = 0;
@@ -102,7 +103,9 @@
 
 			foreach ($tolist as $msgto) {
 				if (!in_array($msgto,$toignore)) {
-					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]),$_POST['message']);
+					$postsubject = (string) trim($_POST['subject']);
+					$postmessage = (string) trim($_POST['message']);
+					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]), $postmessage);
 					//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 					//DB $query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,$isread,'$cid')";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -110,7 +113,7 @@
 					$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 					$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':title'=>$_POST['subject'], ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
+					$stm->execute(array(':title'=>$postsubject, ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
 						':senddate'=>$now, ':isread'=>$isread, ':courseid'=>$cid));
 					$msgid = $DBH->lastInsertId();
 					if (isset($emailaddys[$msgto])) {
@@ -156,11 +159,10 @@
 			}
 
 		} else {
-
 			//$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
 			//$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id";
 			//DB $tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
-			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));
+			$tolist = implode(',', array_map('intval', explode(",", $posttolist)));
 			//DB $query = "SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->query("SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)");
@@ -268,7 +270,7 @@
 		$stm->execute(array(':courseid'=>$_GET['cid']));
 		$hastutors = ($stm->fetchColumn(0)>0);
 
-		$sendtype = (isset($_POST['posted']))?$_POST['posted']:$_POST['submit']; //E-mail or Message
+		$sendtype = (string) trim((isset($_POST['posted']))?$_POST['posted']:$_POST['submit']); //E-mail or Message
 		$useeditor = "message";
 		$pagetitle = "Send Mass $sendtype";
 		require("../header.php");
