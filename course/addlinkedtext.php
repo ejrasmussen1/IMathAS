@@ -50,7 +50,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_formActionTag .= (!empty($gid)) ? "&id=" . $gid : "";
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
-	$caltag = (string) trim($_POST['caltag']);
+	$caltag = Sanitize::encodeStringForDisplay($_POST['caltag']);
 	$points = 0;
 
 	if ($_POST['title']!= null) { //if the form has been submitted
@@ -75,7 +75,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$startdate = parsedatetime($_POST['cdate'],"12:00 pm");
 				$oncal = 1;
-				$caltag = (string) trim($_POST['altcaltag']);
+				$caltag = Sanitize::encodeStringForDisplay($_POST['altcaltag']);
 			}
 			$enddate =  2000000000;
 		} else {
@@ -229,9 +229,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			if (!$processingerror) {
-				$title = (string) trim($_POST['title']);
-				$summary = (string) trim($_POST['summary']);
-				$text = (string) trim($_POST['summary']);
+				$title = Sanitize::encodeStringForDisplay($_POST['title']);
+				$summary = Sanitize::encodeStringForDisplay($_POST['summary']);
+				$text = Sanitize::encodeStringForDisplay($_POST['summary']);
 				$available = sanitize::onlyInt($_POST['avail']);
 				$target = Sanitize::onlyInt($_POST['target']);
 				//DB $query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}',outcomes='$outcomes',points=$points ";
