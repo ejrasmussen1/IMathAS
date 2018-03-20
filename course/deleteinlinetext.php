@@ -25,7 +25,7 @@ if (!(isset($teacherid))) {
 } elseif (isset($_REQUEST['remove'])) { // a valid delete request loaded the page
 	$cid = Sanitize::courseId($_GET['cid']);
 	$block = Sanitize::stripHtmlTags($_GET['block']);
-	$textid = (int) trim($_GET['id']);
+	$textid = Sanitize::onlyInt($_GET['id']);
 	if ($_POST['remove']=="really") {
 		require_once("../includes/filehandler.php");
 		$DBH->beginTransaction();

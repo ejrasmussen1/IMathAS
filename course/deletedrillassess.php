@@ -13,7 +13,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Delete Drill";
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=". Sanitize::courseId($_GET['cid']) ."\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Delete Drill";
-$daid = (int) trim($_GET['id']);
+$daid = Sanitize::onlyInt($_GET['id']);
 if (!(isset($_GET['cid'])) || !(isset($_GET['block']))) { //if the cid is missing go back to the index page
 	$overwriteBody = 1;
 	$body = "You need to access this page from the link on the course page";

@@ -17,8 +17,8 @@ require("../includes/htmlutil.php");
 $overwriteBody = 0;
 $body = "";
 $pagetitle = "Copy Course Items";
-$cidLookUp = (int) trim($_POST['cidlookup']);
-$ctc = (int) trim($_POST['ctc']);
+$cidLookUp = Sanitize::onlyInt($_POST['cidlookup']);
+$ctc = Sanitize::onlyInt($_POST['ctc']);
 
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=" .Sanitize::courseId($_GET['cid']). "\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; Copy Course Items";
 

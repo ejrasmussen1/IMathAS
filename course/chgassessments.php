@@ -44,7 +44,7 @@ if (!(isset($teacherid))) {
 			//DB $row = mysql_fetch_row($result);
 			//DB $tocopyarr = explode(',',$tocopy);
 			$stm = $DBH->prepare("SELECT $tocopy FROM imas_assessments WHERE id=:id");
-			$stm->execute(array(':id'=>intval($_POST['copyopt'])));
+			$stm->execute(array(':id'=>Sanitize::onlyInt($_POST['copyopt'])));
 			$qarr = $stm->fetch(PDO::FETCH_ASSOC);
 			$tocopyarr = explode(',',$tocopy);
 			foreach ($tocopyarr as $k=>$item) {
@@ -84,7 +84,8 @@ if (!(isset($teacherid))) {
 				}
 			}
 			if (isset($_POST['chgallowlate'])) {
-				$allowlate = intval($_POST['allowlate']);
+
+				$allowlate = Sanitize::onlyInt($_POST['allowlate']);
 				if (isset($_POST['latepassafterdue']) && $allowlate>0) {
 					$allowlate += 10;
 				}
@@ -97,15 +98,14 @@ if (!(isset($teacherid))) {
 				}
 			}
 
-
 			if ($_POST['skippenalty']==10) {
 				$_POST['defpenalty'] = 'L'.$_POST['defpenalty'];
 			} else if ($_POST['skippenalty']>0) {
 				$_POST['defpenalty'] = 'S'.$_POST['skippenalty'].$_POST['defpenalty'];
 			}
-			$feedback = (string) trim($_POST['deffeedback']);
+			$feedback = Sanitize::encodeStringForDisplay($_POST['deffeedback']);
 			if ($feedback=="Practice" || $feedback=="Homework") {
-				$showanswerprac = (string) trim($_POST['showansprac']);
+				$showanswerprac = Sanitize::encodeStringForDisplay($_POST['showansprac']);
 				$deffeedback = $feedback.'-'.$showanswerprac;
 				if (($turnoffshuffle&8)!=8) {
 					$turnoffshuffle += 8;
@@ -114,7 +114,7 @@ if (!(isset($teacherid))) {
 					$turnonshuffle -= 8;
 				}
 			} else {
-				$showanswer = (string) trim($_POST['showans']);
+				$showanswer = Sanitize::encodeStringForDisplay($_POST['showans']);
 				$deffeedback = $feedback.'-'.$showanswer;
 			}
 
@@ -136,7 +136,7 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['chgdisplaymethod'])) {
 				//DB $sets[] = "displaymethod='{$_POST['displaymethod']}'";
 				$sets[] = "displaymethod=:displaymethod";
-				$qarr[':displaymethod'] = (string) trim($_POST['displaymethod']);
+				$qarr[':displaymethod'] = Sanitize::encodeStringForDisplay($_POST['displaymethod']);
 			}
 			if (isset($_POST['chgdefpoints'])) {
 				//DB $sets[] = "defpoints='{$_POST['defpoints']}'";
@@ -176,7 +176,7 @@ if (!(isset($teacherid))) {
 			if (isset($_POST['chgpassword'])) {
 				//DB $sets[] = "password='{$_POST['assmpassword']}'";
 				$sets[] = "password=:password";
-				$qarr[':password'] = (string) trim($_POST['assmpassword']);
+				$qarr[':password'] = Sanitize::encodeStringForDisplay($_POST['assmpassword']);
 			}
 			if (isset($_POST['chghints'])) {
 				//DB $sets[] = "showhints='$showhints'";
@@ -228,11 +228,11 @@ if (!(isset($teacherid))) {
 			}
 
 			if (isset($_POST['chgcaltag'])) {
-				$caltag = (string) trim($_POST['caltagact']);
+				$caltag = Sanitize::encodeStringForDisplay($_POST['caltagact']);
 				//DB $sets[] = "caltag='$caltag'";
 				$sets[] = "caltag=:caltag";
 				$qarr[':caltag'] = $caltag;
-				$calrtag = (string) trim($_POST['caltagrev']);
+				$calrtag = Sanitize::encodeStringForDisplay($_POST['caltagrev']);
 				//DB $sets[] = "calrtag='$calrtag'";
 				$sets[] = "calrtag=:calrtag";
 				$qarr[':calrtag'] = $calrtag;
@@ -257,7 +257,7 @@ if (!(isset($teacherid))) {
 				if (isset($_POST['usedeffb'])) {
 					//DB $sets[] = "deffeedbacktext='{$_POST['deffb']}'";
 					$sets[] = "deffeedbacktext=:deffeedbacktext";
-					$qarr[':deffeedbacktext'] = (string) trim($_POST['deffb']);
+					$qarr[':deffeedbacktext'] = Sanitize::encodeStringForDisplay($_POST['deffb']);
 				} else {
 					$sets[] = "deffeedbacktext=''";
 				}
