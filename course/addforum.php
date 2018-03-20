@@ -102,11 +102,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['cntingb'] = 0;
 		}
 
-		$caltagpost = (string) trim($_POST['caltagpost']);
-		$caltagreply = (string) trim($_POST['caltagreply']);
+		$caltagpost = Sanitize::stripHtmlTags($_POST['caltagpost']);
+		$caltagreply = Sanitize::stripHtmlTags($_POST['caltagreply']);
 		$caltag = $caltagpost.'--'.$caltagreply;
 		if (isset($_POST['usetags'])) {
-			$taglist = (string) trim($_POST['taglist']);
+			$taglist = Sanitize::stripHtmlTags($_POST['taglist']);
 		} else {
 			$taglist = '';
 		}
@@ -157,10 +157,10 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['replyinstr'] = myhtmLawed($_POST['replyinstr']);
 		}
 
-		$forumname = (string) trim($_POST['name']);
-		$forumdesc = (string) trim($_POST['description']);
-		$postinstruction = (string) trim($_POST['postinstr']);
-		$replyinstruction = (string) trim($_POST['replyinstr']);
+		$forumname = Sanitize::stripHtmlTags($_POST['name']);
+		$forumdesc = Sanitize::stripHtmlTags($_POST['description']);
+		$postinstruction = Sanitize::stripHtmlTags($_POST['postinstr']);
+		$replyinstruction = Sanitize::stripHtmlTags($_POST['replyinstr']);
 		$defaultdisplay = Sanitize::onlyInt($_POST['defdisplay']);
 		$groupsetid = Sanitize::onlyInt($_POST['groupsetid']);
 		$points = Sanitize::onlyInt($_POST['points']);
@@ -169,7 +169,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$available = Sanitize::onlyInt($_POST['avail']);
 		$sortby = Sanitize::onlyInt($_POST['sortby']);
 		$forumtype = Sanitize::onlyInt($_POST['forumtype']);
-		$forumid = (int) $_GET['id'];
+		$forumid = Sanitize::onlyInt($_GET['id']);
 
 		if (!empty($forumid)) {  //already have id; update
 			//DB $query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";
