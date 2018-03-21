@@ -271,6 +271,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			//look up any refs to UIDs
 			//DB $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
 			//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
+
 			$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')");
 			$includedqs = array();
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -715,19 +716,20 @@ if (!(isset($teacherid))) {
 
 		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		$DBH->commit();
-
+        $rqp = Sanitize::randomQueryStringParam();
 		if (count($missingfiles)>0) {
 			echo "These files pointed to by inline text items were not found and will need to be reuploaded:<br/>";
 			foreach ($missingfiles as $file) {
 				echo "$file <br/>";
 			}
-			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
+
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid&r=$rqp\" >Done</a></p>";
 		} else if ($myrights==100) {
 			echo "<p>$updateqcnt questions updated, $newqcnt questions added.</p>";
-			$randomString = Sanitize::randomQueryStringParam();
-			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid&r=$randomString\" >Done</a></p>";
+
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid&r=$rqp\" >Done</a></p>";
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=$rqp");
 		}
 		exit;
 	} elseif ($_FILES['userfile']['name']!='') { //STEP 2 DATA MANIPULATION

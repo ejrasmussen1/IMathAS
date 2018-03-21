@@ -250,7 +250,7 @@ if ($isteacher) {
 		}
 	}
 	if (isset($_POST['usrcomments']) || isset($_POST['score']) || isset($_POST['newscore'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?".Sanitize::fullQueryString($_SERVER['QUERY_STRING']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?".Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	}
 }

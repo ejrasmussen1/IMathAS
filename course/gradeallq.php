@@ -185,7 +185,7 @@
 		} else if ($page == -1) {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-itemanalysis.php?"
 				. Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
-                    'asid' => 'average',)));
+                    'asid' => 'average', 'r' => Sanitize::randomQueryStringParam(),)));
 		} else {
 			$page++;
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq.php?"
@@ -231,7 +231,7 @@
 	$stm = $DBH->prepare($query);
 	$stm->execute(array(':id'=>$qid));
 	$qdatafordisplayq = $stm->fetch(PDO::FETCH_ASSOC);
-	$points = $qdatafordisplayq['points'];
+	$points = Sanitize::onlyFloat($qdatafordisplayq['points']);
 	$rubric = $qdatafordisplayq['rubric'];
 	$qsetid = $qdatafordisplayq['id'];
 	$qtype = $qdatafordisplayq['qtype'];

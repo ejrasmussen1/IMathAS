@@ -107,9 +107,9 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		$curBreadcrumb .= " &gt; <a href=\"listusers.php?cid=$cid\">Roster</a> &gt; Enroll Students\n";
 		$pagetitle = "Enroll an Existing User";
 		
-		$userName = (string) trim($_POST['username']);
-		$courseSection = (string) trim($_POST['section']);
-		$sectionCode = (string) trim($_POST['code']);		
+		$userName = Sanitize::encodeStringForDisplay($_POST['username']);
+		$courseSection = Sanitize::encodeStringForDisplay($_POST['section']);
+		$sectionCode = Sanitize::encodeStringForDisplay($_POST['code']);
 		
 		if (!empty($userName)) {
 			//DB $query = "SELECT id FROM imas_users WHERE SID='{$_POST['username']}'";
@@ -279,7 +279,7 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 		if (isset($_POST['firstname'])) {
 			$msgout = '';
 			if (checkFormatAgainstRegex($_POST['SID'], $loginformat)) {
-				$un = (string) trim($_POST['SID']);
+				$un = Sanitize::encodeStringForDisplay($_POST['SID']);
 				$updateusername = true;
 			} else {
 				$updateusername = false;

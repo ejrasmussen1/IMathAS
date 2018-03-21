@@ -47,8 +47,8 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		if ((isset($_POST['submit']) && $_POST['submit']=="Lock") || (isset($_POST['posted']) && $_POST['posted']=="Lock")) {
 			$_GET['uid'] = 'selected';
 		}
-        $courseid = (int) trim($_GET['cid']);
-        $userid = (int) trim($_GET['uid']);
+        $courseid = Sanitize::onlyInt($_GET['cid']);
+        $userid = Sanitize::onlyInt($_GET['uid']);
 
 		if ($_GET['uid']=="selected") {
 			if (count($_POST['checked'])>0) {

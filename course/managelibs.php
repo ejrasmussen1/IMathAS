@@ -134,7 +134,7 @@ if ($myrights<20) {
 				}
 				$DBH->commit();
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 
 			exit;
 		} else {
@@ -185,7 +185,7 @@ if ($myrights<20) {
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid&r=" .Sanitize::randomQueryStringParam());
 
 			exit;
 
@@ -243,7 +243,7 @@ if ($myrights<20) {
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 
 			exit;
 
@@ -259,7 +259,7 @@ if ($myrights<20) {
 		}
 
 	} else if (isset($_POST['transfer'])) {
-	    $newOwner = (int) trim($_POST['newowner']);
+	    $newOwner = Sanitize::onlyInt($_POST['newowner']);
 		if (!empty($newOwner)) {
 			if ($_POST['transfer']!='') {
 				//DB $translist = "'".implode("','",explode(',',$_POST['transfer']))."'";
@@ -291,7 +291,7 @@ if ($myrights<20) {
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 
 			exit;
 		} else {
@@ -344,7 +344,7 @@ if ($myrights<20) {
 					  //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 				}
 			}
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 
 			exit;
 		} else {
@@ -388,7 +388,7 @@ if ($myrights<20) {
 		      $stm = $DBH->prepare($query);
 		      $stm->execute($qarr);
 		      //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else {
 			$pagetitle = "Transfer Library";
@@ -408,7 +408,7 @@ if ($myrights<20) {
 		}
 
 	} else if (isset($_GET['modify'])) {
-		$libModify = (string) trim($_GET['modify']);
+		$libModify = Sanitize::stripHtmlTags($_GET['modify']);
 		if (isset($_POST['name']) && trim($_POST['name'])!='') {
 			if ($libModify=="new") {
 				$_POST['name'] = str_replace(array(',','\\"','\\\'','~'),"",$_POST['name']);
@@ -433,7 +433,7 @@ if ($myrights<20) {
 					$stm->execute(array(':uniqueid'=>$uqid, ':adddate'=>$now, ':lastmoddate'=>$now, ':name'=>$_POST['name'], ':ownerid'=>$userid,
 						':userights'=>$_POST['rights'], ':sortorder'=>$_POST['sortorder'], ':parent'=>$_POST['libs'], ':groupid'=>$groupid,
             ':fedlevel'=>($isadmin?$_POST['fedlevel']:0)));
-					header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
+					header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 					exit;
 				}
 			} else {
@@ -468,7 +468,7 @@ if ($myrights<20) {
 				$stm->execute($qarr);
 				//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid");
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managelibs.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 				exit;
 			}
 		} else {
