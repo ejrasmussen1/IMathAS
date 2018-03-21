@@ -868,7 +868,7 @@ function chkgrp(frm, arr, mark) {
 				echo "onClick=\"chkgrp(this.form, '".Sanitize::encodeStringForJavascript($ids[$i])."', this.checked);\" ";
 				echo '/>';
 			} else {
-				echo "<input type=checkbox name='checked[]' value='".Sanitize::encodeStringForDisplay($ids[$i])."' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
+				echo "<input type=checkbox name='checked[]' value='".Sanitize::encodeStringForDisplay($ids[$i])."' id='{$parents[$i]}.{'" . Sanitize::encodeStringForDisplay($ids[$i]). "'}' checked=checked ";
 				echo '/>';
 			}
 ?>
