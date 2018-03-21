@@ -92,7 +92,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$tutoredit = 0;
 			$_POST['gbcat'] = 0;
 		} else {
-			$tutoredit = intval($_POST['tutoredit']);
+			$tutoredit = Sanitize::onlyInt($_POST['tutoredit']);
 			if ($_POST['cntingb']==4) {
 				$_POST['cntingb'] = 0;
 			}
@@ -111,7 +111,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$taglist = '';
 		}
 		if (isset($_POST['rubric'])) {
-			$rubric = intval($_POST['rubric']);
+			$rubric = Sanitize::onlyInt($_POST['rubric']);
 		} else {
 			$rubric = 0;
 		}
@@ -176,7 +176,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $oldgroupsetid = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT groupsetid FROM imas_forums WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
+			$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['id'])));
 			$oldgroupsetid = $stm->fetchColumn(0);
 			if ($oldgroupsetid!=$_POST['groupsetid']) {
 				//change of groupset; zero out stugroupid
@@ -287,7 +287,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT * FROM imas_forums WHERE id=:id");
-			$stm->execute(array(':id'=>$_GET['id']));
+			$stm->execute(array(':id'=>Sanitize::onlyInt($_GET['id'])));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			$startdate = $line['startdate'];
 			$enddate = $line['enddate'];

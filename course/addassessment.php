@@ -197,10 +197,11 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 $msgtoinstr = 0;
             }
             $defpenalty = Sanitize::onlyFloat($_POST['defpenalty']);
-            if ($_POST['skippenalty']==10) {
+            $skippenalty_post = Sanitize::onlyInt($_POST['skippenalty']);
+            if ($skippenalty_post==10) {
                 $defpenalty = 'L'.$defpenalty;
-            } else if ($_POST['skippenalty']>0) {
-                $defpenalty = 'S'.$_POST['skippenalty'].$defpenalty;
+            } else if ($skippenalty_post>0) {
+                $defpenalty = 'S'.$skippenalty_post.$defpenalty;
             }
             $defattempts = Sanitize::onlyFloat($_POST['defattempts']);
             $copyFromId = Sanitize::onlyInt($_POST['copyfrom']);
@@ -235,7 +236,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
                 }
             }
             if ($deffeedback=="Practice") {
-                $cntingb_int = $_POST['pcntingb'];
+                $cntingb_int = Sanitize::onlyInt($_POST['pcntingb']);
             }
             if (isset($ltisecret)) {
                 $ltisecret = trim($ltisecret);
@@ -430,19 +431,20 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					}
 				}
 			}
-
+            $rqp = Sanitize::randomQueryStringParam();
 			if ($from=='gb') {
-				header(sprintf('Location: %s/course/gradebook.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
+				header(sprintf('Location: %s/course/gradebook.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, $rqp));
 			} else if ($from=='mcd') {
-				header(sprintf('Location: %s/course/masschgdates.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
+				header(sprintf('Location: %s/course/masschgdates.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, $rqp));
 			} else if ($from=='lti') {
 				header(sprintf('Location: %s/ltihome.php?showhome=true', $GLOBALS['basesiteurl']));
 			} else {
-				header(sprintf('Location: %s/course/course.php?cid=%s', $GLOBALS['basesiteurl'], $cid));
+				header(sprintf('Location: %s/course/course.php?cid=%s&r=%s', $GLOBALS['basesiteurl'], $cid, $rqp));
 			}
 			exit;
 		} else { //add new
-			if (!isset($_POST['copyendmsg'])) {$endmsg = '';}
+		    $copyendmsg = Sanitize::onlyInt($_POST['copyendmsg']);
+			if (empty($copyendmsg)) {$endmsg = '';}
 			if ($dates_by_lti>0) {
 				$datebylti = 1;
 			} else {

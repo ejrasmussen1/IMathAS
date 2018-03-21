@@ -18,7 +18,7 @@
 		$stm = $DBH->prepare("SELECT id,category FROM imas_questions WHERE assessmentid=:assessmentid");
 		$stm->execute(array(':assessmentid'=>$aid));
 		while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-			$upd_category = (string) trim($_POST[$row[0]]);
+			$upd_category = Sanitize::stripHtmlTags($_POST[$row[0]]);
 			if ($row[1] != $_POST[$row[0]]) {
 				//DB $query = "UPDATE imas_questions SET category='{$_POST[$row[0]]}' WHERE id='{$row[0]}'";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());

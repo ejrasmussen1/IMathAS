@@ -16,7 +16,6 @@ $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=".Sanitize::courseId(
 $curBreadcrumb .= "&gt; Delete Link\n";
 $pagetitle = "Delete Link";
 
-var_dump($_GET);
 
 if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$overwriteBody=1;
@@ -27,7 +26,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
 	$cid = (int) Sanitize::courseId($_GET['cid']);
 	$block = (string) Sanitize::stripHtmlTags($_GET['block']);
-	$textid = (int) trim($_GET['id']);
+	$textid = Sanitize::onlyInt($_GET['id']);
 
 	if ($_POST['remove']=="really") {
 		require_once("../includes/filehandler.php");		
