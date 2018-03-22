@@ -45,7 +45,7 @@
 		} else {
 			//redirect to post page
 			$param .= '&target=new';
-			header('Location: ' . $GLOBALS['basesiteurl'] . '/filter/basiclti/post.php?'.$param);
+			header('Location: ' . $GLOBALS['basesiteurl'] . '/filter/basiclti/post.php?'. $param . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else if ((substr($text,0,4)=="http") && (strpos(trim($text)," ")===false)) { //is a web link

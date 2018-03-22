@@ -34,7 +34,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm = $DBH->prepare("INSERT INTO imas_stugroups (groupsetid,name) VALUES (:groupsetid, :name)");
 		$stm->execute(array(':groupsetid'=>$grpsetid, ':name'=>$_POST['grpname']));
 		if (!isset($_POST['stutoadd'])) { //if not adding students also
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($_GET['grpsetid']));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($_GET['grpsetid']) . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
 			//DB $_POST['addtogrpid'] = mysql_insert_id();
@@ -53,7 +53,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_stugroupset (name,courseid) VALUES (:name, :courseid)");
 			$stm->execute(array(':name'=>$_POST['grpsetname'], ':courseid'=>$cid));
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Add Group Set";
@@ -83,8 +83,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $query = "UPDATE imas_stugroupset SET name='{$_POST['grpsetname']}' WHERE id='{$_GET['rengrpset']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_stugroupset SET name=:name WHERE id=:id");
-			$stm->execute(array(':name'=>$_POST['grpsetname'], ':id'=>$renameGrpSet));
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
+			$stm->execute(array(':name'=>$_POST['grpsetname'], ':id'=>$_GET['rengrpset']));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
 			//DB $query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['rengrpset']}'";
@@ -145,7 +145,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$ins_grpmem_stm->execute($toaddval);
 			}
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit();
 	} else if (isset($_GET['addstutogrp']) && !empty($_POST['stutoadd'])) {
 		//submitting list of students to add to a group
@@ -331,7 +331,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:time, :log)");
 					$stm->execute(array(':time'=>$now, ':log'=>$loginfo));
 				}
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($_GET['grpsetid']));
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($_GET['grpsetid']) . "&r=" . Sanitize::randomQueryStringParam());
 			}
 			exit();
 		}
@@ -350,7 +350,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		if (isset($_GET['confirm']) && isset($_POST['delposts'])) {
 			//if name is set
 			deletegroup($_GET['delgrp'], $_POST['delposts']==1);
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
 			//DB $query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['delgrp']}'";
@@ -376,8 +376,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $query = "UPDATE imas_stugroups SET name='{$_POST['grpname']}' WHERE id='{$_GET['rengrp']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("UPDATE imas_stugroups SET name=:name WHERE id=:id");
-			$stm->execute(array(':name'=>$_POST['grpname'], ':id'=>$renGrp));
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			$stm->execute(array(':name'=>$_POST['grpname'], ':id'=>$_GET['rengrp']));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
 			//DB $query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['rengrp']}'";
@@ -399,8 +399,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$removeall = (int) trim($_GET['removeall']);
 		if (isset($_POST['confirm'])) {
 			//if name is set
-			removeallgroupmembers($removeall);
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			removeallgroupmembers($_GET['removeall']);
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
 			//DB $query = "SELECT name FROM imas_stugroups WHERE id='{$_GET['removeall']}'";
@@ -424,8 +424,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$remove = (int) trim($_GET['remove']);
 		if (isset($_POST['confirm'])) {
 			//if name is set
-			removegroupmember($removegrpid,$remove);
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid");
+			removegroupmember($_GET['grpid'],$_GET['remove']);
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid&grpsetid=$grpsetid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
 			//DB $query = "SELECT LastName, FirstName FROM imas_users WHERE id='{$_GET['remove']}'";
@@ -593,7 +593,7 @@ if ($overwriteBody==1) {
 		echo "<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='managestugrps.php?cid=$cid'\" /></p>";
 		echo '</form>';
 	} else if (isset($_GET['delgrpset'])) {
-		
+
 		echo '<h4>Delete student group set</h4>';
 		echo "<p>Are you SURE you want to delete the set of student groups <b>" . Sanitize::encodeStringForDisplay($page_grpsetname) . "</b> and all the groups contained within it? ";
 		$used = '';

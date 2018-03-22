@@ -73,7 +73,7 @@ if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) { //loaded by 
 		$sessiondata['reportsettings-weeklylab'.$cid]['breakpercent'] = intval($_POST['breakpercent']);
 		writesessiondata();
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/report-weeklylab.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/report-weeklylab.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	}
 

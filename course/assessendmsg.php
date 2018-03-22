@@ -50,7 +50,7 @@ require_once("../includes/htmLawed.php");
 			$stm->execute(array(':endmsg'=>$msgstr));
 
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 
 		exit;
 	}

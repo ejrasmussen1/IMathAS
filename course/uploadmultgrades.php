@@ -147,7 +147,7 @@ if (!(isset($teacherid))) {
 			}
 		}
 		unlink($dir.$filename);
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/chgoffline.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/chgoffline.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else if (isset($_FILES['userfile']['name']) && $_FILES['userfile']['name']!='') {
 		//upload file
