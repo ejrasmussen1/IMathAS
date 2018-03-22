@@ -44,15 +44,16 @@ if (!empty($_GET['from'])) {
 }
 
 //process transfer
-if (isset($_POST['newowner']) && intval($_POST['newowner'])>0) {
+$ownerid = intval($_POST['newowner']);
+if (!empty($ownerid)) {
 	$stm = $DBH->prepare("UPDATE imas_courses SET ownerid=:ownerid WHERE id=:id");
-	$stm->execute(array(':ownerid'=>$_POST['newowner'], ':id'=>$cid));
+	$stm->execute(array(':ownerid'=>$ownerid, ':id'=>$cid));
 	if ($stm->rowCount()>0) {
 		$stm = $DBH->prepare("SELECT id FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
-		$stm->execute(array(':courseid'=>$cid, ':userid'=>$_POST['newowner']));
+		$stm->execute(array(':courseid'=>$cid, ':userid'=>$ownerid));
 		if ($stm->rowCount()==0) {
 			$stm = $DBH->prepare("INSERT INTO imas_teachers (userid,courseid) VALUES (:userid, :courseid)");
-			$stm->execute(array(':userid'=>$_POST['newowner'], ':courseid'=>$cid));
+			$stm->execute(array(':userid'=>$ownerid, ':courseid'=>$cid));
 		}
 		if (isset($_POST['removeasteacher'])) {
 			$stm = $DBH->prepare("DELETE FROM imas_teachers WHERE courseid=:courseid AND userid=:userid");
@@ -75,7 +76,8 @@ if (isset($_POST['loadgroup'])) {
 	exit;
 } else if (isset($_POST['search'])) {
 	require("../includes/userutils.php");
-	$possible_teachers = searchForUser($_POST['search'], true, true);
+	$search = (string) trim($_POST['search']);
+	$possible_teachers = searchForUser($search, true, true);
 	$out = array();
 	foreach ($possible_teachers as $row) {
 		if ($row['id']==$courseownerid) { continue; }

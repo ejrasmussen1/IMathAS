@@ -180,7 +180,7 @@ if (isset($sessiondata['drill']) && empty($_GET['id'])) {
 		echo "<a href=\"" . $GLOBALS['basesiteurl'] . "/course/quickdrill.php$public\">Start</a>";
 		echo '</body></html>';
 	} else {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/quickdrill.php$public");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/quickdrill.php$public" . "&r=" . Sanitize::randomQueryStringParam());
 	}
 	exit;
 }
