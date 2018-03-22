@@ -152,12 +152,12 @@
 		} else if ($page == -1) {
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-itemanalysis.php?"
 				. Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
-                    'asid' => 'average',)));
+                    'asid' => 'average',)) . "&r=" . Sanitize::randomQueryStringParam());
 		} else {
 			$page++;
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq.php?"
 				. Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
-					'qid' => $qid, 'page' => $page,)));
+					'qid' => $qid, 'page' => $page,)) . "&r=" . Sanitize::randomQueryStringParam());
 		}
 		exit;
 	}

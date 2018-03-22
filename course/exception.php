@@ -167,7 +167,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		}
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?cid=$cid&asid=" . Sanitize::onlyInt($asid) . "&uid=" . Sanitize::onlyInt($uid) . "&stu=" . Sanitize::onlyInt($stu) . "&from=" . Sanitize::encodeUrlParam($from));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?cid=$cid&asid=" . Sanitize::onlyInt($asid) . "&uid=" . Sanitize::onlyInt($uid) . "&stu=" . Sanitize::onlyInt($stu) . "&from=" . Sanitize::encodeUrlParam($from) . "&r=" . Sanitize::randomQueryStringParam());
 
 	} else if (isset($_GET['clear'])) {
 		//DB $query = "DELETE FROM imas_exceptions WHERE id='{$_GET['clear']}'";
@@ -176,7 +176,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm->execute(array(':id'=>$_GET['clear']));
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?"
 			. Sanitize::generateQueryStringFromMap(array('cid' => $cid, 'asid' => $asid, 'uid' => $uid,
-				'stu' => $stu, 'from' => $from,)));
+				'stu' => $stu, 'from' => $from,)) . "&r=" . Sanitize::randomQueryStringParam());
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
 		//DB $query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$_GET['uid']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());

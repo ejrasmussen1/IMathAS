@@ -178,9 +178,9 @@
 			}
 		}
 		if ($from=='forum') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::onlyInt($fid));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/thread.php?cid=".Sanitize::courseId($cid)."&forum=".Sanitize::onlyInt($fid) . "&r=" . Sanitize::randomQueryStringParam());
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($cid));
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($cid) . "&r=" . Sanitize::randomQueryStringParam());
 		}
 
 	} else {
