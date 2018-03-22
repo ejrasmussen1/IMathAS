@@ -42,7 +42,7 @@ if (!(isset($teacherid))) {
 			$points = Sanitize::onlyInt($_POST['points']);
 			$attempts = Sanitize::onlyInt($_POST['attempts']);
 			$penalty = Sanitize::onlyInt($_POST['penalty']);
-			$fixedseeds = (string) trim($_POST['fixedseeds']);
+			$fixedseeds = Sanitize::encodeStringForDisplay($_POST['fixedseeds']);
 			
 			empty($points)?$points = 9999 : $points;
 			empty($attempts)?$attempts = 9999 : $attempts;
@@ -61,11 +61,11 @@ if (!(isset($teacherid))) {
 				}
 			}
 
-			$regen_post = (int) trim($_POST['regen']);
+			$regen_post = Sanitize::onlyInt($_POST['regen']);
 			$regen = $regen_post + 3*$_POST['allowregen'];
-			$showans = (string) trim($_POST['showans']);
-			$rubric = intval($_POST['rubric']);
-			$showhints = intval($_POST['showhints']);
+			$showans = Sanitize::encodeStringForDisplay($_POST['showans']);
+			$rubric = Sanitize::onlyInt($_POST['rubric']);
+			$showhints = Sanitize::onlyInt($_POST['showhints']);
 		}
 		if (isset($question_id)) { //already have id - updating
 			if (isset($_POST['replacementid']) && $_POST['replacementid']!='' && intval($_POST['replacementid'])!=0) {

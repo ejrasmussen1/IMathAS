@@ -19,11 +19,11 @@
 		exit;
 	}
 
-	$posttolist = (string) trim($_POST['tolist']);
+	$posttolist = Sanitize::encodeStringForDisplay($_POST['tolist']);
 	if (isset($_POST['message'])) {
 		$toignore = array();
 		if (intval($_POST['aidselect'])!=0) {
-			$limitaid = (string) trim($_POST['aidselect']);
+			$limitaid = Sanitize::encodeStringForDisplay($_POST['aidselect']);
 			$limittype = $_POST['limittype'];
 
 			if ($limittype=='comp') {
@@ -103,8 +103,8 @@
 
 			foreach ($tolist as $msgto) {
 				if (!in_array($msgto,$toignore)) {
-					$postsubject = (string) trim($_POST['subject']);
-					$postmessage = (string) trim($_POST['message']);
+					$postsubject = Sanitize::encodeStringForDisplay($_POST['subject']);
+					$postmessage = Sanitize::encodeStringForDisplay($_POST['message']);
 					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]), $postmessage);
 					//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 					//DB $query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,$isread,'$cid')";
@@ -270,7 +270,7 @@
 		$stm->execute(array(':courseid'=>$_GET['cid']));
 		$hastutors = ($stm->fetchColumn(0)>0);
 
-		$sendtype = (string) trim((isset($_POST['posted']))?$_POST['posted']:$_POST['submit']); //E-mail or Message
+		$sendtype = Sanitize::encodeStringForDisplay((isset($_POST['posted']))?$_POST['posted']:$_POST['submit']); //E-mail or Message
 		$useeditor = "message";
 		$pagetitle = "Send Mass $sendtype";
 		require("../header.php");
