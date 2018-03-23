@@ -246,24 +246,7 @@ class Sanitize
 		return $safeUrl;
 	}
 
-	/**
-	 * Generate a random number/alpha characters to add to end of URL query string
-	 * This is to prevent cross-site history manipulation.
-	 * Added 2/7/2018
-	 * 
-	 * 
-	 * @return The random characters
-	 * 
-	 */
 
-	 public static function randomQueryStringParam(){
-		 	
-			$bytes = mt_rand(10,100);
-			$rndmBytes =  openssl_random_pseudo_bytes($bytes);
-			$hex   = bin2hex($rndmBytes);
-			$randomString = strval($hex);
-			return $randomString;
-	 }
 
 	/**
 	 * Generate a safe query string from a map of query arguments.
