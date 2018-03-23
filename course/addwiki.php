@@ -71,7 +71,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$revisedate = parsedatetime($_POST['rdate'],$_POST['rtime']);
 		}
 
-		$settings = intval($_POST['settings']);
+		$settings = Sanitize::onlyInt($_POST['settings']);
 
 		//DB $_POST['name'] = addslashes(htmlentities(stripslashes($_POST['name'])));
 		$_POST['name'] = htmlentities($_POST['name']);
@@ -84,8 +84,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['description'] = myhtmLawed($_POST['description']);
 		}
 		if (isset($_GET['id'])) {  //already have id - update
-			$wikiname = Sanitize::encodeStringForDisplay($_POST['name']);
-			$description = Sanitize::encodeStringForDisplay($_POST['description']);
+			$wikiname = Sanitize::stripHtmlTags($_POST['name']);
+			$description = Sanitize::stripHtmlTags($_POST['description']);
 			$availiable = Sanitize::onlyInt($_POST['avail']);
 			$groupsetid = Sanitize::onlyInt($_POST['groupsetid']);
 			$wiki_id = Sanitize::onlyInt($_GET['id']);

@@ -35,7 +35,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$aid = Sanitize::onlyInt($_GET['aid']);
 	if (isset($_GET['grp'])) { $sessiondata['groupopt'.$aid] = Sanitize::onlyInt($_GET['grp']); writesessiondata();}
 	if (isset($_GET['selfrom'])) {
-		$sessiondata['selfrom'.$aid] = Sanitize::encodeStringForDisplay($_GET['selfrom']);
+		$sessiondata['selfrom'.$aid] = Sanitize::stripHtmlTags($_GET['selfrom']);
 		writesessiondata();
 	} else {
 		if (!isset($sessiondata['selfrom'.$aid])) {
