@@ -165,7 +165,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				} else if ($_POST['filedescr-'.$row[0]]!=$row[1]) {
 					//DB $query = "UPDATE imas_instr_files SET description='{$_POST['filedescr-'.$row[0]]}' WHERE id='{$row[0]}'";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
-					$upd_descr_stm->execute(array(':description'=>Sanitize::simpleString($_POST['filedescr-'.$row[0]]), ':id'=>$row[0]));
+					$upd_descr_stm->execute(array(':description'=>Sanitize::stripHtmlTags($_POST['filedescr-'.$row[0]]), ':id'=>$row[0]));
 				}
 			}
 			$newtextid = $gid;

@@ -170,7 +170,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 					$points = 0;
 				} else {
 					$_POST['text'] .= '~~'.$_POST['gbcat'].'~~'.$_POST['cntingb'].'~~'.$_POST['tutoredit'].'~~'.$_POST['gradesecret'];
-					$points = intval($_POST['points']);
+					$points = Sanitize::onlyInt($_POST['points']);
 				}
 			}
 		}

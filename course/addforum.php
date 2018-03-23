@@ -183,7 +183,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				//DB $query = "UPDATE imas_forum_threads SET stugroupid=0 WHERE forumid='{$_GET['id']}';";
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				$stm = $DBH->prepare("UPDATE imas_forum_threads SET stugroupid=0 WHERE forumid=:forumid");
-				$stm->execute(array(':forumid'=>$_GET['id']));
+				$stm->execute(array(':forumid'=>$forumid));
 			}
 			//DB $query = "UPDATE imas_forums SET name='{$_POST['name']}',description='{$_POST['description']}',postinstr='{$_POST['postinstr']}',replyinstr='{$_POST['replyinstr']}',startdate=$startdate,enddate=$enddate,settings=$fsets,caltag='$caltag',";
 			//DB $query .= "defdisplay='{$_POST['defdisplay']}',replyby=$replyby,postby=$postby,groupsetid='{$_POST['groupsetid']}',points='{$_POST['points']}',cntingb='{$_POST['cntingb']}',tutoredit=$tutoredit,";
