@@ -28,12 +28,15 @@ if (!($myrights==100 || ($myrights>=75 && $coursegroupid==$groupid) || $courseow
 function getTeachers($cid) {
 	global $DBH;
 	
-	$query = "SELECT iu.id,iu.LastName,iu.FirstName,ig.name FROM imas_users AS iu JOIN imas_groups AS ig ON iu.groupid=ig.id ";
+	$query = "SELECT iu.id,iu.LastName,iu.FirstName,ig.name FROM imas_users AS iu LEFT JOIN imas_groups AS ig ON iu.groupid=ig.id ";
 	$query .= "JOIN imas_teachers AS it ON it.userid=iu.id WHERE it.courseid=? ORDER BY LastName, FirstName";
 	$stm = $DBH->prepare($query);
 	$stm->execute(array($cid));
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($row['name']==null) {
+			$row['name'] = _('Default');
+		}
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')');
 	}
 	return $out;
@@ -71,11 +74,12 @@ if (isset($_POST['remove'])) {
 	$existing = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 	
 	$ph = Sanitize::generateQueryPlaceholders($existing);
-	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id NOT IN ($ph) AND groupid=? ORDER BY LastName,FirstName");
+	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id NOT IN ($ph) AND groupid=? AND rights>11 ORDER BY LastName,FirstName");
 	$existing[] = $coursegroupid;
 	$stm->execute($existing);
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($row['rights']==76 || $row['rights']==77) {continue;}
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName']);
 	}
 	echo json_encode($out);
@@ -86,7 +90,7 @@ if (isset($_POST['remove'])) {
 	$existing = $stm->fetchAll(PDO::FETCH_COLUMN, 0);
 	
 	require("../includes/userutils.php");
-	$possible_teachers = searchForUser($_POST['search'], true, true);
+	$possible_teachers = searchForUser(Sanitize::encodeStringForDisplay($_POST['search']), true, true);
 	$out = array();
 	foreach ($possible_teachers as $row) {
 		if (in_array($row['id'], $existing)) { continue; }

@@ -57,6 +57,8 @@ if ($myrights<20) {
 	$rawscores = array();
 	$qn = 27;  //question number to use during testing
 	$lastanswers[$qn] = '';
+	$rawscores[$qn] = -1;
+	$scores[$qn] = -1;
 
 	if (isset($_POST['seed'])) {
 		list($score,$rawscores[$qn]) = scoreq($qn,$_GET['qsetid'],$_POST['seed'],$_POST['qn'.$qn],$attempt-1);
@@ -65,8 +67,6 @@ if ($myrights<20) {
 		$page_scoreMsg =  "<p>Score on last answer: ".Sanitize::encodeStringForDisplay($score)."/1</p>\n";
 	} else {
 		$page_scoreMsg = "";
-		$scores = array(-1);
-		$rawscores = array(-1);
 		$_SESSION['choicemap'] = array();
 	}
   $cid = Sanitize::courseId($_GET['cid']);
@@ -166,6 +166,12 @@ if ($overwriteBody==1) {
 			document.getElementById("brokenmsgok").style.display = (tagged==1)?"none":"block";
 			if (tagged==1) {alert("Make sure you also contact the question author or support so they know why you marked the question as broken");}
 		}
+		
+		$(window).on('beforeunload', function() { 
+			if (window.opener && !window.opener.closed) {
+				window.opener.sethighlightrow(-1);
+			}
+		});
 	</script>
 	<?php
 	if (isset($_GET['formn']) && isset($_GET['loc'])) {
@@ -173,6 +179,7 @@ if ($overwriteBody==1) {
 		echo "<script type=\"text/javascript\">";
 		echo "var numchked = -1;";
 		echo "if (window.opener && !window.opener.closed) {";
+		echo " window.opener.sethighlightrow(\"$loc\"); ";
 		echo $page_onlyChkMsg;
 		echo " if (prevnext[0][1]>0){
 				  document.write('<a href=\"testquestion.php?cid=$cid$chk&formn=$formn&onlychk=$onlychk&loc='+prevnext[0][0]+'&qsetid='+prevnext[0][1]+'\">Prev</a> ');
@@ -251,7 +258,7 @@ if ($overwriteBody==1) {
 	echo $page_scoreMsg;
 	echo '<script type="text/javascript"> function whiteout() { e=document.getElementsByTagName("div");';
 	echo 'for (i=0;i<e.length;i++) { if (e[i].className=="question") {e[i].style.backgroundColor="#fff";}}}</script>';
-	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit()\">\n";
+	echo "<form method=post enctype=\"multipart/form-data\" action=\"$page_formAction\" onsubmit=\"doonsubmit(this,true,true)\">\n";
 	echo "<input type=hidden name=seed value=\"$seed\">\n";
 	echo "<input type=hidden name=attempt value=\"" . Sanitize::onlyInt($attempt) . "\">\n";
 

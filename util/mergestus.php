@@ -6,8 +6,8 @@ if ($myrights<100 || empty($_GET['from']) || empty($_GET['to'])) {
 	exit;
 }
 
-$from = $_GET['from'];
-$to = $_GET['to'];
+$from = Sanitize::onlyInt($_GET['from']);
+$to = Sanitize::onlyInt($_GET['to']);
 
 $ids = array();
 //DB $query = "SELECT assessmentid FROM imas_assessment_sessions WHERE userid='$to'";

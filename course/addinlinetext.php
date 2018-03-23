@@ -62,7 +62,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_formActionTag = "addinlinetext.php?" . Sanitize::generateQueryStringFromMap(array('block' => $block,
             'cid' => $cid, 'folder' => $_GET['folder']));
 	$page_formActionTag .= "&tb=$totb";
-	$caltag = (string) trim($_POST['caltag']);
+	$caltag = Sanitize::stripHtmlTags($_POST['caltag']);
 	if ($_POST['title']!= null || $_POST['text']!=null || $_POST['sdate']!=null) { //if the form has been submitted
 		if ($_POST['avail']==1) {
 			if ($_POST['sdatetype']=='0') {
@@ -83,7 +83,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$startdate = parsedatetime($_POST['cdate'],"12:00 pm");
 				$oncal = 1;
-				$caltag = (string) trim($_POST['altcaltag']);
+				$caltag = Sanitize::stripHtmlTags($_POST['altcaltag']);
 			}
 			$enddate =  2000000000;
 		}else {
@@ -120,8 +120,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$filestoremove = array();
 		if (isset($_GET['id'])) {  //already have id; update
-			$posttitle = (string) trim($_POST['title']);
-			$posttext = (string) trim($_POST['text']);
+			$posttitle = Sanitize::stripHtmlTags($_POST['title']);
+			$posttext = Sanitize::stripHtmlTags($_POST['text']);
 			$available = Sanitize::onlyInt($_POST['avail']);
 			$gid = Sanitize::onlyInt($_GET['id']);
 			//DB $query = "UPDATE imas_inlinetext SET title='{$_POST['title']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',";
@@ -304,7 +304,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$stm->execute(array(':fileorder'=>$fileorder, ':id'=>$gid));
 	}
 	if ($_POST['submitbtn']=='Submit') {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) ."r=" .Sanitize::randomQueryStringParam());
 		exit;
 	}
 
@@ -374,7 +374,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 
 	if (isset($_GET['id'])) {
-		$gid = (int) trim($_GET['id']);		
+		$gid = Sanitize::onlyInt($_GET['id']);
 		//DB $query = "SELECT id,description,filename FROM imas_instr_files WHERE itemid='{$_GET['id']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("SELECT id,description,filename FROM imas_instr_files WHERE itemid=:itemid");
@@ -442,7 +442,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	}
 	flattenarr($outcomearr);
 
-$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::onlyInt($_GET['id']) : "";
+$page_formActionTag .= (isset($gid)) ? "&id=" . $gid : "";
 }
 
 
@@ -457,7 +457,7 @@ if ($overwriteBody==1) {
 <script type="text/javascript">
 function movefile(from) {
 	var to = document.getElementById('ms-'+from).value;
-	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . Sanitize::onlyInt($_GET['id']) ?>";
+	var address = "<?php echo $GLOBALS['basesiteurl'] . "/course/addinlinetext.php?cid=$cid&block=$block&id=" . $gid ?>";
 
 	if (to != from) {
  	var toopen = address + '&movefile=' + from + '&movefileto=' + to;
@@ -510,7 +510,7 @@ $(function() { chghidetitle(); });
 	<span class=wideformright>
 
 <?php
-	if (isset($_GET['id'])) {
+	if (isset($gid)) {
 		foreach ($page_FileLinks as $k=>$arr) {
 			echo generatemoveselect($page_fileorderCount,$k);
 ?>

@@ -9,7 +9,7 @@ if (isset($_GET['skipn'])) {
 } else {
 	$offset = 0;
 }
-
+$uid = Sanitize::onlyInt($_POST['id']);
 if (isset($_GET['go'])) {
 	if (isset($_POST['skip'])) {
 		$offset++;
@@ -17,15 +17,15 @@ if (isset($_GET['go'])) {
 		//DB $query = "UPDATE imas_users SET rights=10 WHERE id='{$_POST['id']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=10 WHERE id=:id");
-		$stm->execute(array(':id'=>$_POST['id']));
+		$stm->execute(array(':id'=>$uid));
 		if (isset($CFG['GEN']['enrollonnewinstructor'])) {
 			require("../includes/unenroll.php");
 			foreach ($CFG['GEN']['enrollonnewinstructor'] as $rcid) {
-				unenrollstu($rcid, array(intval($_POST['id'])));
+				unenrollstu($rcid, $uid);
 			}
 		}
 		$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=10 WHERE userid=:id");
-		$stm->execute(array(':id'=>$_POST['id']));
+		$stm->execute(array(':id'=>$uid));
 	} else 	if (isset($_POST['approve'])) {
 		if ($_POST['group']>-1) {
 			$group = intval($_POST['group']);
@@ -42,16 +42,16 @@ if (isset($_GET['go'])) {
 		//DB $query = "UPDATE imas_users SET rights=40,groupid=$group WHERE id='{$_POST['id']}'";
 		//DB mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=40,groupid=:groupid WHERE id=:id");
-		$stm->execute(array(':groupid'=>$group, ':id'=>$_POST['id']));
+		$stm->execute(array(':groupid'=>$group, ':id'=>$uid));
 
 		$stm = $DBH->prepare("UPDATE imas_instr_acct_reqs SET status=11 WHERE userid=:id");
-		$stm->execute(array(':id'=>$_POST['id']));
+		$stm->execute(array(':id'=>$uid));
 		
 		//DB $query = "SELECT FirstName,SID,email FROM imas_users WHERE id='{$_POST['id']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $row = mysql_fetch_row($result);
 		$stm = $DBH->prepare("SELECT FirstName,SID,email FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$_POST['id']));
+		$stm->execute(array(':id'=>$uid));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 
 		$headers  = 'MIME-Version: 1.0' . "\r\n";

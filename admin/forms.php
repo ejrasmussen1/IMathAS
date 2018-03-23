@@ -3,6 +3,7 @@
 //(c) 2006 David Lippman
 require("../init.php");
 $placeinhead = '<script type="text/javascript" src="'.$imasroot.'/javascript/jquery.validate.min.js?v=122917"></script>';
+$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/DatePicker.js\"></script>";
 require("../header.php");
 require("../includes/htmlutil.php");
 
@@ -296,11 +297,14 @@ switch($_GET['action']) {
 			$deflatepass = $line['deflatepass'];
 			$deftime = $line['deftime'];
 			$jsondata = json_decode($line['jsondata'], true);
+			$dates_by_lti = $line['dates_by_lti']; 
 			if ($jsondata===null || !isset($jsondata['browser'])) {
 				$browser = array();
 			} else {
 				$browser = $jsondata['browser'];
 			}
+			$startdate = $line['startdate'];
+			$enddate = $line['enddate'];
 		} else {
 			$courseid = _("Will be assigned when the course is created");
 			$name = "Enter course name here";
@@ -325,6 +329,9 @@ switch($_GET['action']) {
 			$deflatepass = isset($CFG['CPS']['deflatepass'])?$CFG['CPS']['deflatepass'][0]:0;
 			$ltisecret = "";
 			$browser = array();
+			$dates_by_lti = 0;
+			$startdate = 0;
+			$enddate = 2000000000;
 		}
 		$defetime = $deftime%10000;
 		$hr = floor($defetime/60)%12;
@@ -417,7 +424,26 @@ switch($_GET['action']) {
 			}
 			echo '</select></span><br class="form"/>';
 		}
-
+		echo '<span class=form>Course start/end dates:<br/><span class=small>Blank for no limit</span></span>';
+		echo '<span class=formright>';
+		if ($startdate==0) {
+			$sdate = '';
+		} else {
+			$sdate = tzdate("m/d/Y",$startdate);
+		}
+		if ($enddate==2000000000) {
+			$edate = '';
+		} else {
+			$edate = tzdate("m/d/Y",$enddate);
+		}
+		echo 'Start: <input type=text size=10 name="sdate" value="'.$sdate.'">
+			<a href="#" onClick="displayDatePicker(\'sdate\', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></a> ';
+		echo 'End: <input type=text size=10 name="edate" value="'.$edate.'">
+			<a href="#" onClick="displayDatePicker(\'edate\', this); return false">
+			<img src="../img/cal.gif" alt="Calendar"/></a> ';
+		echo '</span><br class=form />';
+		
 		if (!isset($CFG['CPS']['deftime']) || $CFG['CPS']['deftime'][1]==1) {
 			echo "<span class=form>Default start/end time for new items:</span><span class=formright>";
 			echo 'Start: <input name="defstime" type="text" size="8" value="'.Sanitize::encodeStringForDisplay($defstimedisp).'"/>, ';
@@ -545,6 +571,11 @@ switch($_GET['action']) {
 				echo 'Course ID not yet set.';
 			}
 			echo '</span></span><br class="form" />';
+			echo '<span class="form">Allow the LMS to set assessment due dates?<br/><span class="small">(Only supported by Canvas)</span></span>';
+			echo '<span class="formright"><input type="checkbox" name="setdatesbylti" value="1" ';
+			if ($dates_by_lti>0) { echo 'checked="checked"';}
+			echo '/> </span><br class="form" />';
+			
 		}
 
 		if (($myspecialrights&1)==1 || ($myspecialrights&2)==2 || $myrights==100) {
@@ -1115,15 +1146,33 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>Find Student</h2></div>';
 		echo '<form method="post" action="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=findstudent">';
 		echo '<p>Enter all or part of the name, email, or username: ';
-		echo '<input type=text size=20 name=userinfo /></p>';
+		echo '<input type=text size=20 name=userinfo value="'.Sanitize::encodeStringForDisplay($_POST['userinfo']).'"/></p>';
 		echo '<input type="submit">';
 		echo '</form>';
 		if (!empty($_POST['userinfo'])) {
 			$words = preg_split('/\s+/', str_replace(',',' ',trim($_POST['userinfo'])));
-			$query = "SELECT iu.id,LastName,iu.FirstName,iu.SID,ic.name,ic.id AS cid FROM imas_users AS iu JOIN ";
+			$query = "SELECT iu.id,iu.LastName,iu.FirstName,iu.SID,ic.name,ic.id AS cid";
+			if ($from!='home' && $myrights>=75) {
+				$query .= ",iut.LastName AS teacherfirst,iut.FirstName AS teacherlast";
+			}
+			$query .= " FROM imas_users AS iu JOIN ";
 			$query .= "imas_students AS i_s ON iu.id=i_s.userid JOIN imas_courses AS ic ON ic.id=i_s.courseid ";
-			$query .= "JOIN imas_teachers AS i_t ON ic.id=i_t.courseid WHERE i_t.userid=? AND ";
-			$qarr = array($userid);
+			$myrights = 75;
+			if ($from=='home' || $myrights<75) {
+				$query .= "JOIN imas_teachers AS i_t ON ic.id=i_t.courseid ";
+				$query .= "WHERE i_t.userid=? AND ";
+				$qarr = array($userid);
+			} else { 
+				$query .= "JOIN imas_teachers AS i_t ON ic.id=i_t.courseid ";
+				$query .= "JOIN imas_users AS iut ON i_t.userid=iut.id ";
+				if ($myrights<100) {
+					$query .= "WHERE iut.groupid=? AND ";
+					$qarr = array($groupid);
+				} else {
+					$query .= "WHERE ";	
+					$qarr = array();
+				}
+			}
 			if (count($words)==1 && strpos($words[0],'@')!==false) {
 				$query .= "(iu.email=? OR iu.SID=?)";
 				array_push($qarr, $words[0], $words[0]);
@@ -1134,19 +1183,31 @@ switch($_GET['action']) {
 				$query .= "((iu.LastName LIKE ? AND iu.FirstName Like ?) OR (iu.LastName LIKE ? AND iu.FirstName Like ?))";
 				array_push($qarr, $words[0].'%', $words[1].'%', $words[1].'%', $words[0].'%');
 			}
+			$query .= " ORDER BY LastName, FirstName LIMIT 200";
 			$stm = $DBH->prepare($query);
 			$stm->execute($qarr);
 			if ($stm->rowCount()==0) {
 				echo '<p>No matches <a href="forms.php?from='.Sanitize::encodeUrlParam($from).'&action=findstudent">Try again</a></p>';
 			} else {
-				echo '<ul>';
-				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
-					echo '<li>';
-					echo '<a href="../course/gradebook.php?cid='.Sanitize::onlyInt($row['cid']).'&stu='.Sanitize::onlyInt($row['id']).'">';
-					echo Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName'].' ('.$row['SID'].'): '.$row['name']);
-					echo '</a></li>';
+				echo '<table class="gb"><thead><th>Student</th><th>Username</th><th>Course</th>';
+				if ($from!='home' && $myrights>=75) {
+					echo '<th>Instructor</th>';
 				}
-				echo '</ul>';
+				echo '</thead><tbody>';
+				$i = 0;
+				while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+					echo ($i==0)?'<tr class=even>':'<tr class=odd>'; $i = 1-$i;
+					echo '<td>';
+					echo '<a href="../course/gradebook.php?cid='.Sanitize::onlyInt($row['cid']).'&stu='.Sanitize::onlyInt($row['id']).'">';
+					echo Sanitize::encodeStringForDisplay($row['LastName'].', '.$row['FirstName']).'</td>';
+					echo '</a><td>'.Sanitize::encodeStringForDisplay($row['SID']).'</td>'; 
+					echo '<td>'.Sanitize::encodeStringForDisplay($row['name']).'</td>';
+					if ($from!='home' && $myrights>=75) {
+						echo '<td>'.Sanitize::encodeStringForDisplay($row['teacherlast'].', '.$row['teacherfirst']).'</td>';
+					}
+					echo '</td></tr>';
+				}
+				echo '</tbody></table>';
 			}		
 		} 
 		

@@ -1165,6 +1165,16 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			array_push($randkeys,count($questions)-1);
 		} else if ($noshuffle == "all") {
 			$randkeys = array_keys($questions);
+		} else if (strlen($noshuffle)>4 && substr($noshuffle,0,4)=="last") {
+			$n = intval(substr($noshuffle,4));
+			if ($n>count($questions)) {
+				$n = count($questions);
+			}
+			$randkeys = $RND->array_rand(array_slice($questions,0,count($questions)-$n),count($questions)-$n);
+			$RND->shuffle($randkeys);
+			for ($i=count($questions)-$n;$i<count($questions);$i++) {
+				array_push($randkeys,$i);
+			}
 		} else {
 			$randkeys = $RND->array_rand($questions,count($questions));
 			$RND->shuffle($randkeys);
@@ -1539,7 +1549,7 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$akey = array_search($randqkeys[$i],$randakeys);
 			}
 			if ($displayformat == "select") {
-				$sa .= $answers[$randakeys[$akey]].' ';
+				$sa .= '<br/>'.$answers[$randakeys[$akey]];
 			} else {
 				$sa .= chr($akey+97)." ";
 			}
@@ -3495,13 +3505,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($score<0) { $score = 0; }
 		if ($score==0 && isset($partialcredit) && !$islist && is_numeric($givenans)) {
 			foreach ($altanswers as $i=>$anans) {
+				/*  disabled until we can support array $reqsigfigs
 				if (isset($reqsigfigs)) {
 					if (checksigfigs($givenans, $anans, $reqsigfigs, $exactsigfig, $reqsigfigoffset, $sigfigscoretype)) {
 						$score = $altweights[$i]; break;
 					} else {
 						continue;
 					}
-				} else if (isset($abstolerance)) {
+				} else
+				*/
+				if (isset($abstolerance)) {
 					if (abs($anans-$givenans) < $abstolerance + (($anans==0||abs($anans)>1)?1E-12:(abs($anans)*1E-12))) {$score = $altweights[$i]; break;}
 				} else {
 					if ($anans==0) {
@@ -3542,6 +3555,16 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			array_push($randkeys,count($questions)-1);
 		} else if ($noshuffle == "all") {
 			$randkeys = array_keys($questions);
+		} else if (strlen($noshuffle)>4 && substr($noshuffle,0,4)=="last") {
+			$n = intval(substr($noshuffle,4));
+			if ($n>count($questions)) {
+				$n = count($questions);
+			}
+			$randkeys = $RND->array_rand(array_slice($questions,0,count($questions)-$n),count($questions)-$n);
+			$RND->shuffle($randkeys);
+			for ($i=count($questions)-$n;$i<count($questions);$i++) {
+				array_push($randkeys,$i);
+			}
 		} else {
 			$randkeys = $RND->array_rand($questions,count($questions));
 			$RND->shuffle($randkeys);
@@ -3858,6 +3881,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 		if ($multi>0) { $qn = $multi*1000+$qn;}
 		if (!isset($answerformat)) { $answerformat = '';}
 		$givenans = normalizemathunicode($givenans);
+
 		$ansformats = array_map('trim',explode(',',$answerformat));
 		$answer = str_replace(' ','',$answer);
 
@@ -7424,6 +7448,8 @@ function normalizemathunicode($str) {
 	$str = str_replace(array('‒','–','—','―','−'),'-',$str);
 	$str = str_replace(array('⁄','∕','⁄ ','÷'),'/',$str);
 	$str = str_replace(array('（','）','∞','∪','≤','≥','⋅'), array('(',')','oo','U','<=','>=','*'), $str);
+	//these are the slim vector unicodes: u2329 and u232a
+	$str = str_replace(array('⟨','⟩'), array('<','>'), $str);
 	$str = str_replace(array('²','³','₀','₁','₂','₃'), array('^2','^3','_0','_1','_2','_3'), $str);
 	$str = preg_replace('/\bOO\b/i','oo', $str);
 	return $str;

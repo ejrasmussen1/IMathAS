@@ -20,8 +20,8 @@ function stddev($array){
   return sqrt($variance);
 }
 
-$cid = intval($_GET['cid']);
-$daid = intval($_GET['daid']);
+$cid = Sanitize::onlyInt($_GET['cid']);
+$daid = Sanitize::onlyInt($_GET['daid']);
 
 if (!isset($teacherid)) {
 	echo 'You are not authorized to view this page';

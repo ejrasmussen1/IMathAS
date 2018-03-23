@@ -361,8 +361,8 @@ if ($myrights < 100) {
 		//DB $unique = array_map('addslashes_deep', $unique);
 		//DB $lastmoddate = array_map('addslashes_deep', $lastmoddate);
 
-		$root = (int) trim($_POST['parent']);
-        $librights = (int) trim($_POST['librights']);
+		$root = Sanitize::onlyInt(trim($_POST['parent']));
+        $librights = Sanitize::onlyInt(trim($_POST['librights']));
 		$qrights = $_POST['qrights'];
 		$touse = '';
 		//write libraries
@@ -487,7 +487,7 @@ if ($myrights < 100) {
 				$includedbackref = array();
 				$toundel = array();
 				if (count($includedqs)>0) {
-					$includedlist = implode(',', $includedqs);  //known decimal values from above
+					$includedlist = implode(',', array_map('floatval', $includedqs));  //known decimal values from above
 					//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
 					//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
 					//DB while ($row = mysql_fetch_row($result)) {

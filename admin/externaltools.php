@@ -132,7 +132,7 @@ if (isset($_POST['tname'])) {
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $name = mysql_result($result,0,0);
 		$stm = $DBH->prepare("SELECT name FROM imas_external_tools WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['id']));
+		$stm->execute(array(':id'=>$id));
 		$name = $stm->fetchColumn(0);
 
 		echo '<p>Are you SURE you want to delete the tool <b>' . Sanitize::encodeStringForDisplay($name) . '</b>?  Doing so will break ALL placements of this tool.</p>';
@@ -152,7 +152,7 @@ if (isset($_POST['tname'])) {
 			if ($isadmin) {
         //DB $query = "SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools WHERE id='{$_GET['id']}'";
         $stm = $DBH->prepare($qsel."WHERE id=:id");
-        $stm->execute(array(':id'=>$_GET['id']));
+        $stm->execute(array(':id'=>$id));
       } else if ($isteacher) {
 				//DB $query = "SELECT name,url,ltikey,secret,custom,privacy,groupid FROM imas_external_tools WHERE id='{$_GET['id']}' AND courseid='$cid'";
 				$stm = $DBH->prepare($qsel."WHERE id=:id AND courseid=:courseid");

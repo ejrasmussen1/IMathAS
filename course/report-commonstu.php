@@ -14,7 +14,7 @@ if (!isset($teacherid)) {
 if (isset($_POST['runset'])) {
 	if (isset($_POST['rulesets'])) {
 		$rulesets = json_decode($_POST['rulesets'], true);
-		setCourseRuleSets($cid, $rulesets);
+		setCourseRuleSets(Sanitize::courseId($cid), $rulesets);
 	} else {
 		$rulesets = getCourseRuleSets($cid);
 	}

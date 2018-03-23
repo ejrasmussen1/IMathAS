@@ -1,78 +1,96 @@
 <?php
-//IMathAS:  show items function for main course page
-//(c) 2007 David Lippman
+// IMathAS: show items function for main course page
+// (c) 2007 David Lippman
+require_once ('../includes/loaditemshowdata.php');
+require_once ("../includes/exceptionfuncs.php");
 
-require_once('../includes/loaditemshowdata.php');
-require_once("../includes/exceptionfuncs.php");
-
-if (isset($studentid) && !isset($sessiondata['stuview'])) {
-	$exceptionfuncs = new ExceptionFuncs($userid, $cid, true, $studentinfo['latepasses'], $latepasshrs);
+if (isset ( $studentid ) && ! isset ( $sessiondata ['stuview'] )) {
+	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, true, $studentinfo ['latepasses'], $latepasshrs );
 } else {
-	$exceptionfuncs = new ExceptionFuncs($userid, $cid, false);
+	$exceptionfuncs = new ExceptionFuncs ( $userid, $cid, false );
 }
-function beginitem($canedit,$aname='') {
-	 if ($aname != '') {
-		 echo "<div class=\"item\" id=\"$aname\">\n";
-	 } else {
-	 	 echo "<div class=\"item\">\n";
-	 }
+function beginitem($canedit, $aname = '') {
+	if ($aname != '') {
+		echo "<div class=\"item\" id=\"$aname\">\n";
+	} else {
+		echo "<div class=\"item\">\n";
+	}
 }
 function enditem($canedit) {
 	echo '<div class="clear"></div>';
 	echo "</div>\n";
 }
 
-if (!isset($CFG['CPS']['itemicons'])) {
-  $itemicons = array('folder'=>'folder2.gif', 'foldertree'=>'folder_tree.png', 'assess'=>'assess.png',
-	'inline'=>'inline.png',	'web'=>'web.png', 'doc'=>'doc.png', 'wiki'=>'wiki.png',
-	'drill'=>'drill.png','html'=>'html.png', 'forum'=>'forum.png', 'pdf'=>'pdf.png',
-	'ppt'=>'ppt.png', 'zip'=>'zip.png', 'png'=>'image.png', 'xls'=>'xls.png',
-	'gif'=>'image.png', 'jpg'=>'image.png', 'bmp'=>'image.png',
-	'mp3'=>'sound.png', 'wav'=>'sound.png', 'wma'=>'sound.png',
-	'swf'=>'video.png', 'avi'=>'video.png', 'mpg'=>'video.png',
-	'nb'=>'mathnb.png', 'mws'=>'maple.png', 'mw'=>'maple.png');
+if (! isset ( $CFG ['CPS'] ['itemicons'] )) {
+	$itemicons = array (
+			'folder' => 'folder2.gif',
+			'foldertree' => 'folder_tree.png',
+			'assess' => 'assess.png',
+			'inline' => 'inline.png',
+			'web' => 'web.png',
+			'doc' => 'doc.png',
+			'wiki' => 'wiki.png',
+			'drill' => 'drill.png',
+			'html' => 'html.png',
+			'forum' => 'forum.png',
+			'pdf' => 'pdf.png',
+			'ppt' => 'ppt.png',
+			'zip' => 'zip.png',
+			'png' => 'image.png',
+			'xls' => 'xls.png',
+			'gif' => 'image.png',
+			'jpg' => 'image.png',
+			'bmp' => 'image.png',
+			'mp3' => 'sound.png',
+			'wav' => 'sound.png',
+			'wma' => 'sound.png',
+			'swf' => 'video.png',
+			'avi' => 'video.png',
+			'mpg' => 'video.png',
+			'nb' => 'mathnb.png',
+			'mws' => 'maple.png',
+			'mw' => 'maple.png' 
+	);
 } else {
-   $itemicons = $CFG['CPS']['itemicons'];
+	$itemicons = $CFG ['CPS'] ['itemicons'];
 }
 
 /*
-echo '<div class="itemhdr">';
-
-echo '<div class="itemhdricon">';
-echo '</div>';
-
-
-echo '</div>'; //itemhdr
-
-*/
-
-function getItemIcon($type, $alt, $faded=false) {
-	global $imasroot,$itemicons;
+ * echo '<div class="itemhdr">';
+ *
+ * echo '<div class="itemhdricon">';
+ * echo '</div>';
+ *
+ *
+ * echo '</div>'; //itemhdr
+ *
+ */
+function getItemIcon($type, $alt, $faded = false) {
+	global $imasroot, $itemicons;
 	$out = '<div class="itemhdricon">';
 	if ($faded) {
 		$class = 'class="faded"';
 	}
-	$out .= '<img alt="'.$alt.'" '.$class.' src="'.$imasroot.'/img/'.$itemicons[$type].'"/>';
+	$out .= '<img alt="' . $alt . '" ' . $class . ' src="' . $imasroot . '/img/' . $itemicons [$type] . '"/>';
 	$out .= '</div>';
 	return $out;
 }
-
 function getBlockDD($blocktype, $i, $parent, $bnum, $blockid) {
 	global $cid;
 	$out = '<div class="itemhdrdd dropdown">';
-	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu'.$i.'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
+	$out .= '<a tabindex=0 class="dropdown-toggle" id="dropdownMenu' . $i . '" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">';
 	$out .= ' <img src="../img/gearsdd.png" alt="Options" class="mida"/>';
 	$out .= '</a>';
-	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu'.$i.'">';
-	if ($blocktype=='T') {
-		$out .= " <li><a href=\"course.php?cid=$cid&folder=$parent-$bnum\">" . _('Edit Contents') . "</a></li>";
-	} else if ($blocktype=='E') {
-		$out .= " <li><a href=\"course.php?cid=$cid&folder=$parent-$bnum\">" . _('Isolate') . "</a></li>";
+	$out .= '<ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="dropdownMenu' . $i . '">';
+	if ($blocktype == 'T') {
+		$out .= " <li><a href=\"course.php?cid=$cid&folder=$parent-$bnum\">" . _ ( 'Edit Contents' ) . "</a></li>";
+	} else if ($blocktype == 'E') {
+		$out .= " <li><a href=\"course.php?cid=$cid&folder=$parent-$bnum\">" . _ ( 'Isolate' ) . "</a></li>";
 	}
-	$out .= " <li><a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">" . _('Modify') . "</a></li>";
-	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','B{$blockid}');\">" . _('Move') . '</a></li>';
-	$out .= " <li><a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">" . _('Delete') . "</a></li>";
-	$out .=  " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">" . _('Copy') . "</a></li>";
+	$out .= " <li><a href=\"addblock.php?cid=$cid&id=$parent-$bnum\">" . _ ( 'Modify' ) . "</a></li>";
+	$out .= " <li><a href=\"#\" onclick=\"return moveDialog('$parent','B{$blockid}');\">" . _ ( 'Move' ) . '</a></li>';
+	$out .= " <li><a href=\"deleteblock.php?cid=$cid&id=$parent-$bnum&remove=ask\">" . _ ( 'Delete' ) . "</a></li>";
+	$out .= " <li><a href=\"copyoneitem.php?cid=$cid&copyid=$parent-$bnum\">" . _('Copy') . "</a></li>";
 	$out .= " <li><a href=\"course.php?cid=$cid&togglenewflag=$parent-$bnum\">" . _('Toggle NewFlag') . "</a></li>";
 	$out .= '</ul>';
 	$out .= '</div>';
@@ -146,7 +164,7 @@ function getWikiDD($i, $typeid, $parent, $itemid) {
 
 $itemshowdata = null;
 function showitems($items,$parent,$inpublic=false) {
-	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$myrights;
+	   global $DBH,$teacherid,$tutorid,$studentid,$cid,$imasroot,$userid,$openblocks,$firstload,$sessiondata,$myrights,$courseenddate;
 	   global $itemicons,$exceptions,$latepasses,$ispublic,$studentinfo,$newpostcnts,$CFG,$latepasshrs,$toolset,$readlinkeditems;
 	   global $itemshowdata, $exceptionfuncs;
 
@@ -644,16 +662,24 @@ function showitems($items,$parent,$inpublic=false) {
 			   //check for exception
 			   $canundolatepass = false;
 			   $canuselatepass = false;
+			   $duedatewords = _('Due');
 			   if (isset($exceptions[$items[$i]])) {
 			   	   list($useexception, $canundolatepass, $canuselatepass) = $exceptionfuncs->getCanUseAssessException($exceptions[$items[$i]], $line);
 			   	   if ($useexception) {
 			   	   	   $line['startdate'] = $exceptions[$items[$i]][0];
 			   	   	   $line['enddate'] = $exceptions[$items[$i]][1];
+			   	   	   if ($exceptions[$items[$i]][2]==1) {
+			   	   	   	$duedatewords = _('With LatePass, due');
+			   	   	   } else if (empty($exceptions[$items[$i]][3])) { //is_lti !isset or is 0
+			   	   	   	$duedatewords = _('With extension, due');   
+			   	   	   }
 			   	   }
 			   } else {
 			   	   $canuselatepass = $exceptionfuncs->getCanUseAssessLatePass($line);
 			   }
-
+			   if ($line['enddate']==2000000000 && $courseenddate<2000000000) {
+			   	   $line['enddate'] = $courseenddate;
+			   }
 			   if ($line['startdate']==0) {
 				   $startdate = _('Always');
 			   } else {
@@ -672,7 +698,7 @@ function showitems($items,$parent,$inpublic=false) {
 			   $nothidden = true;  $showgreyedout = false;
 			   if (abs($line['reqscore'])>0 && $line['reqscoreaid']>0 && !$viewall && $line['enddate']>$now
 			   	   && (!isset($exceptions[$items[$i]]) || $exceptions[$items[$i]][3]==0)) {
-			   	   if ($line['reqscore']<0) {
+			   	   if ($line['reqscore']<0 || $line['reqscoretype']&1) {
 			   	   	   $showgreyedout = true;
 			   	   }
 				   //DB $query = "SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid='{$line['reqscoreaid']}' AND userid='$userid'";
@@ -685,13 +711,19 @@ function showitems($items,$parent,$inpublic=false) {
 				   } else {
 					   //DB $scores = explode(';',mysql_result($result,0,0));
 					   $scores = explode(';',$stm->fetchColumn(0));
-					   if (round(getpts($scores[0]),1)+.02<abs($line['reqscore'])) {
-					   	   $nothidden = false;
+					   if ($line['reqscoretype']&2) { //using percent-based
+					   	   if (round(100*getpts($scores[0])/$line['reqscoreptsposs'],1)+.02<abs($line['reqscore'])) {
+							   $nothidden = false;
+						   }
+					   } else { //points based
+						   if (round(getpts($scores[0]),1)+.02<abs($line['reqscore'])) {
+							   $nothidden = false;
+						   }
 					   }
 				   }
 			   }
 
-			   if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
+			   if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['startdate']<$now && $line['enddate']>$now && $nothidden) { //regular show
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 
 				   echo '<div class="itemhdr">';
@@ -701,7 +733,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   if (substr($line['deffeedback'],0,8)=='Practice') {
 					   $endname = _('Available until');
 				   } else {
-					   $endname = _('Due');
+					   $endname = $duedatewords;
 				   }
 				   $line['timelimit'] = abs($line['timelimit']);
 				   if ($line['timelimit']>0) {
@@ -771,7 +803,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
 
-			   } else if ($line['avail']==1 && $line['enddate']<$now && $line['reviewdate']>$now) { //review show // && $nothidden
+			   } else if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['enddate']<$now && $line['reviewdate']>$now) { //review show // && $nothidden
 				   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 				   echo '<div class="itemhdr">';
 
@@ -804,7 +836,7 @@ function showitems($items,$parent,$inpublic=false) {
 				   echo '</div>'; //itemhdr
 				   echo filter("<div class=itemsum>{$line['summary']}</div>\n");
 				   enditem($canedit); //echo "</div>\n";
-			   } else if ($line['avail']==1 && $line['enddate']<$now && $canuselatepass) {
+			   } else if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['enddate']<$now && $canuselatepass) {
 					 //not available but can use latepass - show greyed w latepass link
 					  beginitem($canedit,$items[$i]);
 						echo '<div class="itemhdr">';
@@ -819,7 +851,7 @@ function showitems($items,$parent,$inpublic=false) {
  				   	echo '</div>'; //itemhdr
  				   	echo filter("<div class=\"itemsum grey\">{$line['summary']}</div>\n");
  				 		enditem($canedit);
-				 } else if ($line['avail']==1 && $line['startdate']<$now && $line['enddate']>$now && $showgreyedout) {  //greyedout view for conditional items
+				 } else if ($line['avail']==1 && $line['date_by_lti']!=1 && $line['startdate']<$now && $line['enddate']>$now && $showgreyedout) {  //greyedout view for conditional items
 			   	   beginitem($canedit,$items[$i]); //echo "<div class=item>\n";
 			   	   echo '<div class="itemhdr">';
 
@@ -828,11 +860,13 @@ function showitems($items,$parent,$inpublic=false) {
 				   if (substr($line['deffeedback'],0,8)=='Practice') {
 					   $endname = _('Available until');
 				   } else {
-					   $endname = _('Due');
+					   $endname = $duedatewords;
 				   }
 
 				   echo "<div class=\"title grey\"><b><i>".Sanitize::encodeStringForDisplay($line['name'])."</i></b>";
-				   echo '<br/><span class="small">'._('The requirements for beginning this item have not been met yet').'</span>';
+				   //echo '<br/><span class="small">'._('The requirements for beginning this item have not been met yet').'</span>';
+				   echo '<br/><span class="small">'._('Prerequisite: ').abs($line['reqscore']).(($line['reqscoretype']&2)?'%':' points');
+				   echo _(' on ').Sanitize::encodeStringForDisplay($line['reqscorename']).'</span>';
 
 				   if ($line['enddate']!=2000000000) {
 					   echo "<br/> $endname $enddate \n";
@@ -847,7 +881,9 @@ function showitems($items,$parent,$inpublic=false) {
 
 			   } else if ($viewall) { //not avail to stu
 				   if ($line['avail']==0) {
-					   $show = _('Hidden');
+				   	$show = _('Hidden');
+				   } else if ($line['date_by_lti']==1) {
+				   	$show = _('Waiting for date to be set via LTI');
 				   } else {
 					   $show = sprintf(_('Available %1$s until %2$s'), $startdate, $enddate);
 					   if ($line['reviewdate']>0 && $line['enddate']!=2000000000) {
@@ -1537,6 +1573,7 @@ function showitems($items,$parent,$inpublic=false) {
 
    function generateadditem($blk,$tb) {
    	global $cid, $CFG,$imasroot;
+   	
    	if (isset($CFG['CPS']['additemtype']) && $CFG['CPS']['additemtype'][0]=='links') {
    		if ($tb=='BB' || $tb=='LB') {$tb = 'b';}
    		if ($tb=='t' && $blk=='0') {
@@ -1546,7 +1583,7 @@ function showitems($items,$parent,$inpublic=false) {
    		} else {
    			$html = '<div class="additembox"><span><b>' . _('Add here:') . '</b> ';
    		}
-
+		
    		$blkUrlParam = Sanitize::encodeUrlParam($blk);
    		$tbUrlParam = Sanitize::encodeUrlParam($tb);
 
@@ -1843,7 +1880,7 @@ function showitems($items,$parent,$inpublic=false) {
 			}
 			if (count($items[$i]['items'])>0) {
 				echo '<ul class=qview '.$qviewstyle.'>';
-				quickview($items[$i]['items'],$parent.'-'.$bnum,$showdats,$showlinks);
+				quickview($items[$i]['items'],$parent.'-'.$bnum,$showdates,$showlinks);
 				echo '</ul>';
 			}
 			echo '</li>';

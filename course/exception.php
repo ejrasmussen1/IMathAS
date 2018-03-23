@@ -15,9 +15,9 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Make Exception";
 $cid = Sanitize::courseId($_GET['cid']);
-$asid = $_GET['asid'];
+$asid = Sanitize::onlyInt($_GET['asid']);
 $aid = Sanitize::onlyInt($_GET['aid']);
-$uid = $_GET['uid'];
+$uid = Sanitize::onlyInt($_GET['uid']);
 if (isset($_GET['stu'])) {
 	$stu = $_GET['stu'];
 } else {
@@ -174,15 +174,16 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		//DB mysql_query($query) or die("Query failed :$query " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_exceptions WHERE id=:id");
 		$stm->execute(array(':id'=>$_GET['clear']));
+		$rpq =  Sanitize::randomQueryStringParam();
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gb-viewasid.php?"
 			. Sanitize::generateQueryStringFromMap(array('cid' => $cid, 'asid' => $asid, 'uid' => $uid,
-				'stu' => $stu, 'from' => $from,)) . "&r=" . Sanitize::randomQueryStringParam());
+				'stu' => $stu, 'from' => $from, 'r' => $rpq)));
 	} elseif (isset($_GET['aid']) && $_GET['aid']!='') {
 		//DB $query = "SELECT LastName,FirstName FROM imas_users WHERE id='{$_GET['uid']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $stuname = implode(', ', mysql_fetch_row($result));
 		$stm = $DBH->prepare("SELECT LastName,FirstName FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['uid']));
+		$stm->execute(array(':id'=>$uid));
 		$stuname = implode(', ', $stm->fetch(PDO::FETCH_NUM));
 
 		//DB $query = "SELECT startdate,enddate FROM imas_assessments WHERE id='{$_GET['aid']}'";

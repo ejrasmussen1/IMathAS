@@ -32,7 +32,7 @@
 
 	}
 
-	$qsetid = $_GET['id'];
+	$qsetid = (int) trim($_GET['id']);
 	//DB $query = "SELECT * FROM imas_questionset WHERE id='$qsetid'";
 	//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
 	//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -41,7 +41,7 @@
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
 
 	echo '<div id="headerviewsource" class="pagetitle"><h2>Question Source</h2></div>';
-	echo "<h4>Descr'ption</h4>\n";
+	echo "<h4>Description</h4>\n";
 	echo "<pre>".Sanitize::encodeStringForDisplay($line['description'])."</pre>\n";
 	echo "<h4>Author</h4>\n";
 	echo "<pre>".Sanitize::encodeStringForDisplay($line['author'])."</pre>\n";

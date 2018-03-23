@@ -39,7 +39,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->prepare("DELETE FROM imas_wiki_revisions WHERE wikiid=:wikiid");
 			$stm->execute(array(':wikiid'=>$id));
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addwiki.php?cid=$cid&id=$id");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addwiki.php?cid=$cid&id=$id&r=" .Sanitize::randomQueryStringParam());
 			exit;
 		} else {
 			$curBreadcrumb .= " &gt; <a href=\"addwiki.php?cid=$cid&id=$id\">Modify Wiki</a>";
@@ -84,12 +84,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$_POST['description'] = myhtmLawed($_POST['description']);
 		}
 		if (isset($_GET['id'])) {  //already have id - update
-			$wikiname = (string) trim($_POST['name']);
-			$description = (string) trim($_POST['description']);
+			$wikiname = Sanitize::encodeStringForDisplay($_POST['name']);
+			$description = Sanitize::encodeStringForDisplay($_POST['description']);
 			$availiable = Sanitize::onlyInt($_POST['avail']);
 			$groupsetid = Sanitize::onlyInt($_POST['groupsetid']);
-			$courseid = Sanitize::onlyInt($_GET['id']);
-			//DB $query = "UPDATE imas_wikis SET name='{$_POST['name']}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,";
+			$wiki_id = Sanitize::onlyInt($_GET['id']);
+			//DB $query = "UPDATE imas_wikis SET name='{$wikiname}',description='{$_POST['description']}',startdate=$startdate,enddate=$enddate,";
 			//DB $query .= "editbydate=$revisedate,avail='{$_POST['avail']}',groupsetid='{$_POST['groupsetid']}',settings=$settings ";
 			//DB $query .= "WHERE id='{$_GET['id']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -97,19 +97,19 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$query .= "editbydate=:editbydate,avail=:avail,groupsetid=:groupsetid,settings=:settings ";
 			$query .= "WHERE id=:id";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':name'=>$_POST['name'], ':description'=>$_POST['description'], ':startdate'=>$startdate, ':enddate'=>$enddate,
-				':editbydate'=>$revisedate, ':avail'=>$_POST['avail'], ':groupsetid'=>$_POST['groupsetid'], ':settings'=>$settings, ':id'=>$_GET['id']));
-			$newwikiid = $_GET['id'];
+			$stm->execute(array(':name'=>$wikiname, ':description'=>$description, ':startdate'=>$startdate, ':enddate'=>$enddate,
+				':editbydate'=>$revisedate, ':avail'=>$availiable, ':groupsetid'=>$groupsetid, ':settings'=>$settings, ':id'=>$wiki_id));
+			$newwikiid = $wiki_id;
 		} else { //add new
 			//DB $query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings,groupsetid) VALUES ";
-			//DB $query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$revisedate,'{$_POST['avail']}',$settings,'{$_POST['groupsetid']}');";
+			//DB $query .= "('$cid','{$_POST['name']}','{$_POST['description']}',$startdate,$enddate,$revisedate,'{$availiable}',$settings,'{$_POST['groupsetid']}');";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $newwikiid = mysql_insert_id();
 			$query = "INSERT INTO imas_wikis (courseid,name,description,startdate,enddate,editbydate,avail,settings,groupsetid) VALUES ";
 			$query .= "(:courseid, :name, :description, :startdate, :enddate, :editbydate, :avail, :settings, :groupsetid);";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':courseid'=>$cid, ':name'=>$_POST['name'], ':description'=>$_POST['description'], ':startdate'=>$startdate,
-				':enddate'=>$enddate, ':editbydate'=>$revisedate, ':avail'=>$_POST['avail'], ':settings'=>$settings, ':groupsetid'=>$_POST['groupsetid']));
+			$stm->execute(array(':courseid'=>$cid, ':name'=>$wikiname, ':description'=>$description, ':startdate'=>$startdate,
+				':enddate'=>$enddate, ':editbydate'=>$revisedate, ':avail'=>$availiable, ':settings'=>$settings, ':groupsetid'=>$groupsetid));
 			$newwikiid = $DBH->lastInsertId();
 
 			//DB $query = "INSERT INTO imas_items (courseid,itemtype,typeid) VALUES ";
@@ -149,12 +149,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_GET['cid']) . "&r=" .Sanitize::randomQueryStringParam());
 
 		exit;
 	} else { //INITIAL LOAD DATA PROCESS
 
-		if (isset($_GET['id'])) {
+		if (isset($wiki_id)) {
 			$curBreadcrumb .= "&gt; Modify Wiki\n";
 			$pagetitle = "Modify Wiki";
 		} else {
@@ -163,8 +163,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 
-		if (isset($_GET['id'])) { //MODIFY MODE
-			$wikiid = intval($_GET['id']);
+		if (isset($wiki_id)) { //MODIFY MODE
+			$wikiid = $wiki_id;
 			//DB $query = "SELECT * FROM imas_wikis WHERE id='{$_GET['id']}';";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
@@ -175,7 +175,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$enddate = $line['enddate'];
 			$revisedate = $line['editbydate'];
 			$settings = $line['settings'];
-			//DB $query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='{$_GET['id']}';";
+			//DB $query = "SELECT id FROM imas_wiki_revisions WHERE wikiid='{$wiki_id}';";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB if (mysql_num_rows($result)>0) {
 			$stm = $DBH->prepare("SELECT id FROM imas_wiki_revisions WHERE wikiid=:wikiid");
@@ -203,7 +203,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 
 		$page_formActionTag = "?block=".Sanitize::encodeUrlParam($block)."&cid=$cid&folder=" . Sanitize::encodeUrlParam($_GET['folder']);
-		$page_formActionTag .= (isset($_GET['id'])) ? "&id=" . Sanitize::encodeUrlParam($_GET['id']) : "";
+		$page_formActionTag .= (isset($wiki_id)) ? "&id=" . Sanitize::encodeUrlParam($wiki_id) : "";
 		$page_formActionTag .= "&tb=".Sanitize::encodeUrlParam($totb);
 
 		$hr = floor($coursedeftime/60)%12;
@@ -237,7 +237,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$rtime = $deftime; //tzdate("g:i a",time()+7*24*60*60);
 		}
 
-		if (!isset($_GET['id'])) {
+		if (!isset($wiki_id)) {
 			$stime = $defstime;
 			$etime = $deftime;
 			$rtime = $deftime;

@@ -22,7 +22,7 @@ $body = "";
 $useeditor = "text,summary";
 
 $cid = Sanitize::courseId($_GET['cid']);
-$gid = Sanitize::onlyInt($_GET['id'])
+$gid = Sanitize::onlyInt($_GET['id']);
 $curBreadcrumb = "$breadcrumbbase <a href=\"course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> ";
 if (!empty($gid)) {
 	$curBreadcrumb .= "&gt; Modify Link\n";
@@ -50,7 +50,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 	$page_formActionTag .= (!empty($gid)) ? "&id=" . $gid : "";
 	$page_formActionTag .= "&tb=$totb";
 	$uploaderror = false;
-	$caltag = (string) trim($_POST['caltag']);
+	$caltag = Sanitize::encodeStringForDisplay($_POST['caltag']);
 	$points = 0;
 
 	if ($_POST['title']!= null) { //if the form has been submitted
@@ -75,7 +75,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else {
 				$startdate = parsedatetime($_POST['cdate'],"12:00 pm");
 				$oncal = 1;
-				$caltag = (string) trim($_POST['altcaltag']);
+				$caltag = Sanitize::encodeStringForDisplay($_POST['altcaltag']);
 			}
 			$enddate =  2000000000;
 		} else {
@@ -148,7 +148,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			} else if (!empty($_POST['curfile'])) {
 				//$uploaddir = rtrim(dirname(__FILE__), '/\\') .'/files/';
 				///if (!file_exists($uploaddir . $_POST['curfile'])) {
-				if (!doesfileexist('cfile',$_POST['curfile'])) {
+			  if (!doesfileexist('cfile',stripslashes(str_replace('/', '', $_POST['curfile'])))) {
 					$processingerror = true;
 				} else {
 					$_POST['text'] = "file:".$_POST['curfile'];
@@ -208,7 +208,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $text = trim(mysql_result($result,0,0));
 			$stm = $DBH->prepare("SELECT text FROM imas_linkedtext WHERE id=:id");
-			$stm->execute(array(':id'=>$gid);
+			$stm->execute(array(':id'=>$gid));
 			$text = trim($stm->fetchColumn(0));
 			if (substr($text,0,5)=='file:') { //has file
 				//DB $safetext = addslashes($text);
@@ -229,9 +229,9 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				}
 			}
 			if (!$processingerror) {
-				$title = (string) trim($_POST['title']);
-				$summary = (string) trim($_POST['summary']);
-				$text = (string) trim($_POST['summary']);
+				$title = Sanitize::encodeStringForDisplay($_POST['title']);
+				$summary = Sanitize::encodeStringForDisplay($_POST['summary']);
+				$text = Sanitize::encodeStringForDisplay($_POST['summary']);
 				$available = sanitize::onlyInt($_POST['avail']);
 				$target = Sanitize::onlyInt($_POST['target']);
 				//DB $query = "UPDATE imas_linkedtext SET title='{$_POST['title']}',summary='{$_POST['summary']}',text='{$_POST['text']}',startdate=$startdate,enddate=$enddate,avail='{$_POST['avail']}',oncal='$oncal',caltag='$caltag',target='{$_POST['target']}',outcomes='$outcomes',points=$points ";
@@ -311,7 +311,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 			$body .= "\">Try Again</a></p>\n";
 			echo "<html><body>$body</body></html>";
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid);
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".$cid ."&r=" .Sanitize::randomQueryStringParam());
 		}
 		exit;
 	} else {
@@ -319,7 +319,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$selectedtool = 0;
 		$filename = '';
 		$webaddr = '';
-		if (!empty($gid) {
+		if (!empty($gid)) {
 			//DB $query = "SELECT * FROM imas_linkedtext WHERE id='{$_GET['id']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);

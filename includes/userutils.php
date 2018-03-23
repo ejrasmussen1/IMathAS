@@ -1,5 +1,5 @@
 <?php
-// User search utilities
+// User search and other utilities
 // IMathAS (c) 2018 David Lippman
 
 function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
@@ -20,6 +20,7 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
       $stm->execute(array($words[0], $words[0]));
       while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
         if ($row['rights']==11 || $row['rights']==76 || $row['rights']==77) {continue;} //skip LTI creds
+        if ($row['name']==null) {$row['name'] = _('Default');}
         $possible_users[] = $row;
       }
     } else if (count($words)==1) {
@@ -40,6 +41,7 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
         } else {
           $row['priority'] = 0;
         }
+        if ($row['name']==null) {$row['name'] = _('Default');}
         $possible_users[] = $row;
       }
     } else if (count($words)==2) {
@@ -65,6 +67,7 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
           $hasp1 = true;
           $row['priority'] += 1;
         }
+        if ($row['name']==null) {$row['name'] = _('Default');}
         $possible_users[] = $row;
       }
     }
@@ -78,4 +81,17 @@ function searchForUser($searchterm, $limitToTeacher=true, $basicsort=false) {
       }
     });
     return $possible_users;
+}
+
+function logout() {
+	global $DBH;
+	
+	$sessionid = session_id();
+	$stm = $DBH->prepare("DELETE FROM imas_sessions WHERE sessionid=?");
+	$stm->execute(array($sessionid));
+	$_SESSION = array();
+	if (isset($_COOKIE[session_name()])) {
+		setcookie(session_name(), '', time()-42000, '/');
+	}
+	session_destroy();
 }

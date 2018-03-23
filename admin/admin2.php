@@ -80,7 +80,8 @@ if ($myrights < 75) {
 
   } else if (!empty($_GET['findgroup'])) {
     $hasp1 = false;
-    $words = preg_split('/\s+/', trim(preg_replace('/[^\w\s]/','',$_GET['findgroup'])));
+      $findGroup = Sanitize::encodeStringForDisplay($_GET['findgroup']);
+    $words = preg_split('/\s+/', trim(preg_replace('/[^\w\s]/','',$findGroup)));
     $likearr = array();
     foreach ($words as $v) {
       $likearr[] = '%'.$v.'%';
@@ -173,6 +174,9 @@ if ($overwriteBody==1) {
       if (($myspecialrights&16)==16 || ($myspecialrights&32)==32) {
       	      echo '<br/><a href="../util/batchcreateinstr.php?from=admin">'._('Batch Add Instructors').'</a>';    
       }
+      echo '</span>';
+      echo '<span class="column">';
+      echo '<a href="forms.php?action=findstudent">',_('Find Student'),'</a>';
       echo '</span>';
 
       echo '<div class=clear></div></div>';

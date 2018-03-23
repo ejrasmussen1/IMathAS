@@ -4,8 +4,8 @@ require("../init.php");
 
 if ($myrights<100 && ($myspecialrights&64)!=64) {exit;}
 
-$newStatus = (int) trim($_POST['newstatus']);
-$instId = (int) trim($_POST['userid']);
+$newStatus = Sanitize::onlyInt($_POST['newstatus']);
+$instId = Sanitize::onlyInt($_POST['userid']);
 //handle ajax postback
 if (!empty($newStatus)) {
 	$stm = $DBH->prepare("SELECT reqdata FROM imas_instr_acct_reqs WHERE userid=?");
@@ -34,10 +34,10 @@ if (!empty($newStatus)) {
 		}
 	} else if ($newStatus==11) { //approve
 		if ($_POST['group']>-1) {
-			$group = intval($_POST['group']);
+			$group = Sanitize::onlyInt($_POST['group']);
 		} else if (trim($_POST['newgroup'])!='') {
 			$stm = $DBH->prepare("SELECT id FROM imas_groups WHERE name REGEXP ?");
-			$stm->execute(array('^[[:space:]]*'.str_replace('.','[.]',preg_replace('/\s+/', '[[:space:]]+', trim($_POST['newgroup']))).'[[:space:]]*$'));
+			$stm->execute(array('^[[:space:]]*'.str_replace('.','[.]',preg_replace('/\s+/', '[[:space:]]+', Sanitize::encodeStringForDisplay(trim($_POST['newgroup'])))).'[[:space:]]*$'));
 			$group = $stm->fetchColumn(0);
 			if ($group === false) {
 				$stm = $DBH->prepare("INSERT INTO imas_groups (name) VALUES (:name)");
@@ -49,10 +49,10 @@ if (!empty($newStatus)) {
 		}
 		
 		$stm = $DBH->prepare("UPDATE imas_users SET rights=40,groupid=:groupid WHERE id=:id");
-		$stm->execute(array(':groupid'=>$group, ':id'=>$_POST['userid']));
+		$stm->execute(array(':groupid'=>$group, ':id'=>$instId));
 		
 		$stm = $DBH->prepare("SELECT FirstName,SID,email FROM imas_users WHERE id=:id");
-		$stm->execute(array(':id'=>$_POST['userid']));
+		$stm->execute(array(':id'=>$instId));
 		$row = $stm->fetch(PDO::FETCH_NUM);
 		
 		$headers  = 'MIME-Version: 1.0' . "\r\n";

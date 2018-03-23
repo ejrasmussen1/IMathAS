@@ -28,18 +28,18 @@ $from = 'admin2';
 if (!empty($_GET['from'])) {
 	if ($_GET['from']=='home') {
 		$from = 'home';
-		$backloc = '/index.php';
+		$backloc = '/index.php?r=' . Sanitize::randomQueryStringParam();
 	} else if ($_GET['from']=='admin2') {
 		$from = 'admin2';
 		$backloc = '/admin/admin2.php';
 	} else if (substr($_GET['from'],0,2)=='ud') {
 		$userdetailsuid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'ud'.$userdetailsuid;
-		$backloc = '/admin/userdetails.php?id='.Sanitize::encodeUrlParam($userdetailsuid);
+		$backloc = '/admin/userdetails.php?id='.Sanitize::encodeUrlParam($userdetailsuid) .'&r=' . Sanitize::randomQueryStringParam();
 	} else if (substr($_GET['from'],0,2)=='gd') {
 		$groupdetailsgid = Sanitize::onlyInt(substr($_GET['from'],2));
 		$from = 'gd'.$groupdetailsgid;
-		$backloc = '/admin/admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid);
+		$backloc = '/admin/admin2.php?groupdetails='.Sanitize::encodeUrlParam($groupdetailsgid).'&r=' . Sanitize::randomQueryStringParam();
 	}
 }
 
@@ -60,16 +60,17 @@ if (!empty($ownerid)) {
 			$stm->execute(array(':courseid'=>$cid, ':userid'=>$courseownerid));
 		}
 	}
-	header('Location: ' . $GLOBALS['basesiteurl'] . $backloc);
+	header('Location: ' . $GLOBALS['basesiteurl'] . $backloc );
 	exit;
 }
 
 //process AJAX post-backs
 if (isset($_POST['loadgroup'])) {
-	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id<>? AND groupid=? ORDER BY LastName,FirstName");
+	$stm = $DBH->prepare("SELECT id,LastName,FirstName FROM imas_users WHERE id<>? AND groupid=? AND rights>11 ORDER BY LastName,FirstName");
 	$stm->execute(array($courseownerid, $coursegroupid));
 	$out = array();
 	while ($row = $stm->fetch(PDO::FETCH_ASSOC)) {
+		if ($row['rights']==76 || $row['rights']==77) {continue;}
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName']);
 	}
 	echo json_encode($out);
