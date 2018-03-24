@@ -1,8 +1,9 @@
 <?php
 
-function deletegroupset($grpsetid) {
+function deletegroupset($grpsetid, $gpcourseid) {
 	global $DBH;
 	$grpsetid = intval($grpsetid);
+        $gpcourseid = intval($gpcourseid);
 	$query = "SELECT id FROM imas_stugroups WHERE groupsetid=$grpsetid";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->query($query); //sanitized above - no need for prepared
@@ -10,7 +11,7 @@ function deletegroupset($grpsetid) {
 	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 		deletegroup($row[0]);
 	}
-	$query = "DELETE FROM imas_stugroupset WHERE id=$grpsetid";
+	$query = "DELETE FROM imas_stugroupset WHERE id=$grpsetid AND courseid=$gpcourseid";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	$stm = $DBH->query($query); //sanitized above - no need for prepared
 
