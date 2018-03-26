@@ -122,7 +122,7 @@ require_once("../includes/htmLawed.php");
 	echo '</tbody></table>';
 	echo '<p>After the score-specific message, display this text to everyone:</p>';
 	echo '<div class=editor><textarea cols="50" rows="10" name="commonmsg" id="commonmsg" style="width: 100%">';
-	echo Sanitize::encodeStringForDisplay($endmsg['commonmsg']);
+	echo $endmsg['commonmsg'];
 	echo '</textarea></div>';
 	echo '<div class="submit"><input type="submit" value="'._('Save').'" /></div>';
 	echo '</form>';
