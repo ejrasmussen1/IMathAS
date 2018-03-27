@@ -363,7 +363,7 @@ div.vidsegblock {
 </style>
 
 <?php
-echo '<script type="text/javascript">var curnumseg = '.Sanitize::onlyInt($n).';</script>';
+echo '<script type="text/javascript">var curnumseg = '.$n.';</script>';
 ?>
 
 <h2>Video Navigation and Question Cues</h2>
@@ -430,8 +430,8 @@ for ($i=0;$i<$n;$i++) {
 		echo '<input type="button" value="grab" onclick="grabcurvidtime('.$i.',0);"/> <a href="#" onclick="return deleteseg(this);">[Delete]</a></div>';
 	}
 }
-echo '<div class="insblock" id="insat' . Sanitize::onlyInt($n) . '">';
-echo '<a href="#" onclick="addsegat(' . Sanitize::onlyInt($n) . '); return false;">Add video segment break</a></div>';
+echo '<div class="insblock" id="insat' . $n . '">';
+echo '<a href="#" onclick="addsegat(' . $n . '); return false;">Add video segment break</a></div>';
 
 echo '<div class="vidsegblock">';
 echo 'Remainder of video segment title (if any): <input type="text" size="20" name="finalseg" value="' . Sanitize::encodeStringForDisplay($finalsegtitle) . '"/></div>';
