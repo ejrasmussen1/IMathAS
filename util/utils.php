@@ -10,8 +10,8 @@ if (isset($sessiondata['emulateuseroriginaluser']) && isset($_GET['unemulateuser
 	exit;
 }
 
-$emu_id = (int) trim($_GET['emulateuser']);
-if ($myrights >= 75 && !empty($emu_id)) {
+if ($myrights >= 75 && isset($_GET['emulateuser'])) {
+    $emu_id = Sanitize::onlyInt($_GET['emulateuser']);
 	if ($myrights<100) {
 		$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=?");
 		$stm->execute(array($emu_id));
@@ -60,7 +60,7 @@ if (isset($_POST['action']) && $_POST['action']=='jumptoitem') {
 	if (!empty($_POST['cid'])) {
 		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=".Sanitize::courseId($_POST['cid'])."&r=".Sanitize::randomQueryStringParam());
 	} else if (!empty($_POST['aid'])) {
-		$aid = (int) trim($_GET['aid']);
+		$aid = Sanitize::onlyInt($_GET['aid']);
 		$stm = $DBH->prepare("SELECT courseid FROM imas_assessments WHERE id=?");
 		$stm->execute(array($aid));
 		$destcid = $stm->fetchColumn(0);
