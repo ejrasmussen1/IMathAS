@@ -58,12 +58,12 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		}
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Add Group Set";
 	} else if (isset($_GET['delgrpset'])) {
-		$deleteGroupSet = (int) trim($_GET['delgrpset']);
+		$deleteGroupSet = Sanitize::onlyInt($_GET['delgrpset']);
 		//deleting groupset
 		if (isset($_POST['confirm'])) {
 			//if name is set
 			deletegroupset($deleteGroupSet);
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/managestugrps.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 			exit();
 		} else {
 			//DB $query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['delgrpset']}'";
@@ -76,7 +76,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Delete Group Set";
 	} else if (isset($_GET['rengrpset'])) {
-		$renameGrpSet = (int) trim($_GET['rengrpset']);
+	  $renameGrpSet = Sanitize::onlyInt($_GET['rengrpset']);
 		//renaming groupset
 		if (isset($_POST['grpsetname'])) {
 			//if name is set
@@ -97,7 +97,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; Rename Group Set";
 	} else if (isset($_GET['copygrpset'])) {
 		//copying groupset
-		$copygrpset = (int) trim($_GET['copygrpset']);
+	  $copygrpset = Sanitize::onlyInt($_GET['copygrpset']);
 		//DB $query = "SELECT name FROM imas_stugroupset WHERE id='{$_GET['copygrpset']}'";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		//DB $grpsetname = addslashes(mysql_result($result,0,0)) . ' (copy)';
@@ -346,7 +346,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Add Group";
 	} else if (isset($_GET['delgrp'])) {
 		//deleting groupset
-		$delgrp = (int) trim($_GET['delgrp']);
+	  $delgrp = Sanitize::onlyInt($_GET['delgrp']);
 		if (isset($_GET['confirm']) && isset($_POST['delposts'])) {
 			//if name is set
 			deletegroup($_GET['delgrp'], $_POST['delposts']==1);
@@ -370,7 +370,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Delete Group";
 	} else if (isset($_GET['rengrp'])) {
 		//renaming groupset
-		$renGrp = (int) trim($_GET['rengrp']);
+	  $renGrp = Sanitize::onlyInt($_GET['rengrp']);
 		if (isset($_POST['grpname'])) {
 			//if name is set
 			//DB $query = "UPDATE imas_stugroups SET name='{$_POST['grpname']}' WHERE id='{$_GET['rengrp']}'";
@@ -396,7 +396,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$curBreadcrumb .= " &gt; <a href=\"managestugrps.php?cid=$cid\">Manage Student Groups</a> &gt; <a href=\"managestugrps.php?cid=$cid&grpsetid=$grpsetid\">".Sanitize::encodeStringForDisplay($page_grpsetname)."</a> &gt; Rename Group";
 	} else if (isset($_GET['removeall'])) {
 		//removing all group members
-		$removeall = (int) trim($_GET['removeall']);
+	  $removeall = Sanitize::onlyInt($_GET['removeall']);
 		if (isset($_POST['confirm'])) {
 			//if name is set
 			removeallgroupmembers($_GET['removeall']);
@@ -420,8 +420,8 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 
 	} else if (isset($_GET['remove']) && isset($_GET['grpid'])) {
 		//removing one group member
-		$removegrpid = (int) trim($_GET['grpid']);
-		$remove = (int) trim($_GET['remove']);
+	  $removegrpid = Sanitize::onlyInt($_GET['grpid']);
+	  $remove = Sanitize::onlyInt($_GET['remove']);
 		if (isset($_POST['confirm'])) {
 			//if name is set
 			removegroupmember($_GET['grpid'],$_GET['remove']);

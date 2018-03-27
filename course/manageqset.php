@@ -772,11 +772,10 @@ if ($myrights<20) {
 		}
 
 		if (isset($_POST['libs'])) {
-			$postLibs = (int) trim($_POST['libs']);
-			if ($postLibs=='') {
-				$postLibs = $userdeflib;
-			}
-			$searchlibs = $postLibs;
+		  if ($_POST['libs']=='') {
+		    $_POST['libs'] = $userdeflib;
+		  }
+		  $searchlibs = $_POST['libs'];
 			//$sessiondata['lastsearchlibs'] = implode(",",$searchlibs);
 			$sessiondata['lastsearchlibs'.$cid] = $searchlibs;
 			writesessiondata();
@@ -1373,7 +1372,7 @@ function getnextprev(formn,loc) {
 				echo '<td>'.$page_questionTable[$qid]['action'].'</td>';
 				echo '<td>'.Sanitize::encodeStringForDisplay($page_questionTable[$qid]['type']).'</td>';
 				echo '<td class="c">'.Sanitize::encodeStringForDisplay($page_questionTable[$qid]['times']).'</td>';
-				echo '<td>'.Sanitize::encodeStringForDisplay($page_questionTable[$qid]['lastmod']).'</td>';
+				echo '<td>'.$page_questionTable[$qid]['lastmod'].'</td>';
 				echo '<td class="c">'.$page_questionTable[$qid]['mine'].'</td>';
 				if ($searchall==1) {
 					echo '<td>'.$page_questionTable[$qid]['lib'].'</td>';
