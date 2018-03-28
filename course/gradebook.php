@@ -63,7 +63,7 @@ if ($canviewall) {
 		$stm = $DBH->prepare("SELECT colorize FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$colorize = $stm->fetchColumn(0);
-		setcookie("colorize-$cid",$colorize, null, null, null, null, true);
+		setcookie("colorize-$cid",$colorize, 0, null, null, false, true);
 	}
 	if (isset($_GET['catfilter'])) {
 		$catfilter = $_GET['catfilter'];
