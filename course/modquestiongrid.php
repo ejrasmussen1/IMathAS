@@ -119,8 +119,8 @@
 			}
 
 			foreach(explode(',',$_POST['qids']) as $qid) {
-				$points = (int) trim($_POST['points'.$qid]);
-				$attempts = (int) trim($_POST['attempts'.$qid]);
+				$points = Sanitze::onlyInt($_POST['points'.$qid]);
+				$attempts = Sanitize::onlyInt($_POST['attempts'.$qid]);
 				$showhints = intval($_POST['showhints'.$qid]);
 				if (empty($points)) { $points = 9999;}
 				if (empty($attemps)) {$attempts = 9999;}

@@ -2,7 +2,7 @@
 //IMathAS:  Displays a linked text item
 //(c) 2006 David Lippman
 	require("../init.php");
-	$linkedtextid = (int) trim($_GET['id']);
+	$linkedtextid = Sanitize::onlyInt($_GET['id']);
 	$cid = Sanitize::courseId($_GET['cid']);
 	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid) && !isset($instrPreviewId)) {
 		require("../header.php");

@@ -11,7 +11,7 @@
 	 echo "Cannot access this page directly";
 	 exit;
  }
- var_dump($_GET);
+
  $cid = Sanitize::courseId($_GET['cid']);
  $order = strval($_POST['order']);
 

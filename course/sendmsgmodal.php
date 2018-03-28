@@ -89,7 +89,7 @@ if (isset($_POST['message'])) {
 	}
 
 	if (isset($_GET['quoteq'])) {
-        $quoteq = Sanitize::encodeStringForDisplay($_GET['quoteq']);
+        $quoteq = Sanitize::stripHtmlTags($_GET['quoteq']);
 		require("../assessment/displayq2.php");
 		$parts = explode('-',$quoteq);
 		$GLOBALS['assessver'] = $parts[4];
