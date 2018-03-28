@@ -115,7 +115,7 @@ if (isset($_GET['showscored'])) {
 	$pts = getpts($after);
 
 	$params = array('action'=>'updatescore', 'id'=>$qsetid, 'score'=>$pts, 'redisplay'=>"$seed;$rawafter;{$lastanswers[0]}");
-	$postAuth = (string) trim($_POST['auth']);
+	$postAuth = Sanitize::stripHtmlTags($_POST['auth']);
 	if (!empty($postAuth)) {
 		//DB $query = "SELECT password FROM imas_users WHERE SID='".$_POST['auth']."'";
 		//DB $result = mysql_query($query) or die("Query failed: $query: " . mysql_error());

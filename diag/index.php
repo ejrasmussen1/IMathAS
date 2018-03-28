@@ -282,7 +282,7 @@
 			} else {
 				$tzname = '';
 			}
-			$tzoffset = (int) $_POST['tzoffset'];
+			$tzoffset =  $_POST['tzoffset'];
 			//DB $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$tzname','$enc')";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :tzname, :sessiondata)");
@@ -311,7 +311,7 @@
 			//}
 		}
 
-		$teacher = (string) trim($_POST['teachers']);
+		$teacher = $_POST['teachers'];
 		$eclass = $sel1[$_POST['course']] . '@' . $teacher;
 
 		//DB $query = "INSERT INTO imas_users (SID, password, rights, FirstName, LastName, email, lastaccess) ";
@@ -334,8 +334,8 @@
 		$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,section,timelimitmult) VALUES (:userid, :courseid, :section, :timelimitmult);");
 		$stm->execute(array(':userid'=>$userid, ':courseid'=>$pcid, ':section'=>$_POST['teachers'], ':timelimitmult'=>$_POST['timelimitmult']));
 
-		$sessiondata['mathdisp'] = (int) $_POST['mathdisp'];//1;
-		$sessiondata['graphdisp'] = (int) $_POST['graphdisp'];//1;
+		$sessiondata['mathdisp'] =  $_POST['mathdisp'];//1;
+		$sessiondata['graphdisp'] =  $_POST['graphdisp'];//1;
 		$sessiondata['useed'] = 1;
 		$sessiondata['isdiag'] = $diagid;
 		$enc = base64_encode(serialize($sessiondata));
@@ -344,7 +344,7 @@
 		} else {
 			$tzname = '';
 		}
-		$tzoffset = (int) $_POST['tzoffset'];
+		$tzoffset =  $_POST['tzoffset'];
 		//DB $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$tzname','$enc')";
 		//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 		$stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :tzname, :sessiondata)");

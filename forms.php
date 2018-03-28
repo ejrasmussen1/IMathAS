@@ -368,7 +368,7 @@ switch($_GET['action']) {
 		echo '<div id="headerforms" class="pagetitle"><h2>Reset Password</h2></div>';
 		echo "<form id=\"pageform\" class=limitaftervalidate method=post action=\"actions.php?action=resetpw$gb\">\n";
 		if (isset($_GET['code'])) {
-			$userId = (int) trim($_GET['id']);
+			$userId = Sanitize::onlyInt($_GET['id']);
 			$stm = $DBH->prepare("SELECT remoteaccess FROM imas_users WHERE id=:id");
 			$stm->execute(array(':id'=>$userId));
 			$row = $stm->fetch(PDO::FETCH_ASSOC);
