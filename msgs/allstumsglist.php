@@ -46,8 +46,9 @@
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 	}
-	$removeId = (int) trim($_GET['removeid']);
-	if (!empty($removeId)) {
+
+	if (isset($_GET['removeid'])) {
+        $removeId = Sanitize::onlyInt($_GET['removeid']);
 		//DB $query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}'";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id");

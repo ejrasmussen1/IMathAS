@@ -233,9 +233,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
 				sendFCM($FCMtokenTo,"Msg from: $userfullname".Sanitize::encodeStringForDisplay($_POST['subject']),$url);
 			}
 			if ($type=='new') {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&" .Sanitize::randomQueryStringParam());
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&r=" .Sanitize::randomQueryStringParam());
 			} else {
-				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid&" .Sanitize::randomQueryStringParam());
+				header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid&r=" .Sanitize::randomQueryStringParam());
 			}
 			exit;
 		} else {
@@ -617,9 +617,9 @@ If (isread&2)==2 && (isread&4)==4  then should be deleted
       //DB mysql_query($query) or die("Query failed : $query " . mysql_error());
       $DBH->query($query);
   		if ($type=='new') {
-  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&" .Sanitize::randomQueryStringParam());
+  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/newmsglist.php?cid=$cid&r=" .Sanitize::randomQueryStringParam());
   		} else {
-  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid&" .Sanitize::randomQueryStringParam());
+  			header('Location: ' . $GLOBALS['basesiteurl'] . "/msgs/msglist.php?page=$page&cid=$cid&filtercid=$filtercid&r=" .Sanitize::randomQueryStringParam());
   		}
   		exit;
   	}

@@ -26,7 +26,8 @@ return array(
 	"cookieConfig" => array(
 		"path" => ($GLOBALS['imasroot']==''?'/':$GLOBALS['imasroot']),
 		"domain" => '',
-		"secure" => false
+		"secure" => false,
+        "cookieExpiryTime" => 1800,
 	),
 	"disabledJavascriptMessage" => "This site requires JavaScript.",
 	"verifyGetFor" => array()
