@@ -118,8 +118,13 @@ if ($stm->rowCount() > 0) {
         $stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:now,:log)");
         $stm->execute(array(':now' => $now, ':log' => "$userid login from IP:{$_SERVER['REMOTE_ADDR']}"));
 
+        if (!empty($querys)){
+            $rqp = "&r=" .Sanitize::randomQueryStringParam();
+        } else {
+            $rqp = "?r=" .Sanitize::randomQueryStringParam();
+        }
 
-        header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . $querys . '&r=' . Sanitize::randomQueryStringParam());
+        header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . $querys . $rqp);
         exit;
     }
 
@@ -294,8 +299,13 @@ if ($haslogin && !$hasusername) {
         //$now = time();
         //DB //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
         //DB //mysql_query($query) or die("Query failed : " . mysql_error());
+        if (!empty($querys)){
+            $rqp = "&r=" .Sanitize::randomQueryStringParam();
+        } else {
+            $rqp = "?r=" .Sanitize::randomQueryStringParam();
+        }
 
-        header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . $querys . "&r=" . Sanitize::randomQueryStringParam());
+        header('Location: ' . $GLOBALS['basesiteurl'] . substr($_SERVER['SCRIPT_NAME'], strlen($imasroot)) . $querys . $rqp);
     } else {
         if (empty($_SESSION['challenge'])) {
             $badsession = true;
