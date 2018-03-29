@@ -1,333 +1,316 @@
 <?php
 require("../init.php");
 require("../includes/htmlutil.php");
-
-
 if ($myrights<20) {
-	require("../header.php");
-	echo "You need to log in as a teacher to access this page";
-	require("../footer.php");
-	exit;
+  require("../header.php");
+  echo "You need to log in as a teacher to access this page";
+  require("../footer.php");
+  exit;
 }
-
 function stripsmartquotes($text) {
-		$text = str_replace(
-			array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6"),
-			array("'", "'", '"', '"', '-', '--', '...'),
-			$text);
-		// Next, replace their Windows-1252 equivalents.
-		$text = str_replace(
-			array(chr(145), chr(146), chr(147), chr(148), chr(150), chr(151), chr(133)),
-			array("'", "'", '"', '"', '-', '--', '...'),
-			$text);
-		return $text;
- 	}
-
+  $text = str_replace(
+      array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\x9c", "\xe2\x80\x9d", "\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\xa6"),
+      array("'", "'", '"', '"', '-', '--', '...'),
+      $text);
+  // Next, replace their Windows-1252 equivalents.
+  $text = str_replace(
+      array(chr(145), chr(146), chr(147), chr(148), chr(150), chr(151), chr(133)),
+      array("'", "'", '"', '"', '-', '--', '...'),
+      $text);
+  return $text;
+}
 $isadmin = false;
 $isgrpadmin = false;
 if (!isset($_GET['aid'])) {
-	if ($_GET['cid']=="admin") {
-		if ($myrights == 100) {
-			$isadmin = true;
-			$cid = 'admin';
-		} else if ($myrights==75) {
-			$isgrpadmin = true;
-		}
-	}
+  if ($_GET['cid']=="admin") {
+    if ($myrights == 100) {
+      $isadmin = true;
+      $cid = 'admin';
+    } else if ($myrights==75) {
+      $isgrpadmin = true;
+    }
+  }
 }
 $now = time();
 $editmsg = '';
 if (isset($_POST['text'])) {
-	if (!isset($_GET['id'])) {
-		$id = 'new';
-	} else {
-		$id = Sanitize::onlyInt($_GET['id']);
-	}
-	//DB $_POST = stripslashes_deep($_POST);
-	$qtext = Sanitize::encodeStringForDisplay(stripsmartquotes($_POST['text']));
-	$nparts = Sanitize::onlyInt($_POST['nparts']);
-	$qtypes = array();
-	$qparts = array();
-	$questions = array();
-	$feedback = array();
-	$feedbacktxtdef = array();
-	$feedbacktxtessay = array();
-	$answerboxsize = array();
-	$variables = array();
-	$scoremethod = array();
-	$useeditor = array();
-	$answer = array();
-	$partial = array();
-	$qtol = array();
-	for ($n=0;$n<$nparts;$n++) {
-		$qtypes[$n] = Sanitize::encodeStringForDisplay($_POST['qtype'.$n]);
-		$feedback[$n] = array();
-		if ($qtypes[$n] == 'choices') {
-			$questions[$n] = array();
-			$answer[$n] = Sanitize::encodeStringForDisplay($_POST['ans'.$n]);
-		} else if ($qtypes[$n] == 'number') {
-			$partialans[$n] = array();
-			$qtol[$n] = (((float) trim($_POST['qtol'.$n])=='abs')?'|':'') . (float) trim($_POST['tol'.$n]);
-			$feedbacktxtdef[$n] = Sanitize::encodeStringForDisplay($_POST['fb'.$n.'-def']);
-			$answer[$n] =  Sanitize::encodeStringForDisplay($_POST['txt'.$n.'-'.$_POST['ans'.$n]]);
-			$_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
-			$answerboxsize[$n] = intval($_POST['numboxsize'.$n]);
-		} else if ($qtypes[$n] == 'calculated') {
-			$partialans[$n] = array();
-            $qtol[$n] = (((float) trim($_POST['qtol'.$n])=='abs')?'|':'') . (float) trim($_POST['tol'.$n]);
-            $feedbacktxtdef[$n] = Sanitize::encodeStringForDisplay($_POST['fb'.$n.'-def']);
-			$answer[$n] = '"'.Sanitize::encodeStringForDisplay($_POST['txt'.$n.'-'.$_POST['ans'.$n]]).'"';
-			$_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
-			$answerboxsize[$n] = intval($_POST['numboxsize'.$n]);
-			$answerformat[$n] = Sanitize::encodeStringForDisplay($_POST['answerformat'.$n]).(string) (trim($_POST['answerformat'.$n])!=''?",":"")."noval";
-		} else if ($qtypes[$n] == 'numfunc') {
-			$partialans[$n] = array();
-			$qtol[$n] = (((float) trim((($_POST['funcqtol'.$n]=='abs')?'|':'') . $_POST['functol'.$n])));
-			$feedbacktxtdef[$n] = Sanitize::encodeStringForDisplay($_POST['fb'.$n.'-def']);
-			$answer[$n] = '"'.Sanitize::encodeStringForDisplay($_POST['txt'.$n.'-'.$_POST['ans'.$n]]).'"';
-			$_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
-			$answerboxsize[$n] = intval($_POST['funcboxsize'.$n]);
-			$variables[$n] = Sanitize::encodeStringForDisplay($_POST['variables'.$n]);
-		} else if ($qtypes[$n] == 'essay') {
-			$answer[$n] = '"'.str_replace('"','\\"',$_POST['essay'.$n.'-fb']).'"';
-			if (isset($_POST['useeditor'.$n])) {
-				$useeditor[$n] = true;
-			}
-			if (isset($_POST['takeanything'.$n])) {
-				$scoremethod[$n] = 'takeanything';
-			}
-			$answerboxsize[$n] = intval($_POST['essayrows'.$n]);
-		}
-		if ($qtypes[$n] == 'choices' || $qtypes[$n] == 'number' || $qtypes[$n] == 'calculated' || $qtypes[$n] == 'numfunc') {
-			$qparts[$n] = intval($_POST['qparts'.$n]);
-			$questions[$n] = array();
-			$partialans[$n] = array();
-			$feedbacktxt[$n] = array();
-			$partial[$n] = array();
-			for ($i=0;$i<$qparts[$n];$i++) {
-				if (trim($_POST['txt'.$n.'-'.$i])=='') {continue;}
-				if ($qtypes[$n] == 'choices') {
-					$questions[$n][] = Sanitize::encodeStringForDisplay($_POST['txt'.$n.'-'.$i]);
-				} else if ($qtypes[$n] == 'number' || $qtypes[$n] == 'calculated' || $qtypes[$n] == 'numfunc') {
-					$partialans[$n][] = $_POST['txt'.$n.'-'.$i];
-				}
-				$feedbacktxt[$n][] = Sanitize::encodeStringForDisplay($_POST['fb'.$n.'-'.$i]);
-				$partial[$n][] = floatval($_POST['pc'.$n.'-'.$i]);
-			}
-			$qparts[$n] = count($feedbacktxt[$n]);
-		} else if ($qtypes[$n] == 'essay') {
-			$qparts[$n] = 0;
-			$feedbacktxtessay[$n] = Sanitize::encodeStringForDisplay($_POST['essay'.$n.'-fb']);
-		}
-	}
-	$nhints = intval($_POST['nhints']);
-	$hinttext = array();
-	for ($n=0;$n<$nhints;$n++) {
-		if (!empty($_POST['hint'.$n])) {
-			$hinttext[] = Sanitize::encodeStringForDisplay($_POST['hint'.$n]);
-		}
-	}
-	$nhints = count($hinttext);
-
-	//generate question code
-	//this part stores the values in the question code, in form that makes
-	//them easy to recover later.
-	$code = "//start randomization code - Tutorial Style question\n\n";
-	$code .= Sanitize::encodeStringForDisplay($_POST['randvars']);
-	$code .= "\n\n//end randomization code - Tutorial Style question\n\n";
-	if ($nparts==1) {
-		$qtype = $qtypes[0];
-
-		$partialout = array();
-		for ($i=0;$i<$qparts[0];$i++) {
-			if ($qtypes[0]=='choices') {
-				$code .= '$questions['.$i.'] = "'.str_replace('"','\\"',$questions[0][$i]).'"'."\n";
-			}
-			$code .= '$feedbacktxt['.$i.'] = "'.str_replace('"','\\"',$feedbacktxt[0][$i]).'"'."\n";
-			if ($partial[0][$i]!=0 || $qtypes[0]=='number' || $qtypes[0] == 'numfunc' || $qtypes[0] == 'calculated') {
-				if ($qtypes[0]=='choices') {
-					$partialout[] = $i;
-				} else if ($qtypes[0]=='number') {
-					$partialout[] = $partialans[0][$i];
-				} else if ($qtypes[0] == 'numfunc' || $qtypes[0] == 'calculated') {
-					$partialout[] = '"'.$partialans[0][$i].'"';
-				}
-				$partialout[] = $partial[0][$i];
-			}
-		}
-		if (count($partialout)>0) {
-			$code .= '$partialcredit = array('.implode(',',$partialout).')'."\n";
-		}
-		if ($qtypes[0]=='choices') {
-			$code .= '$displayformat = "'.Sanitize::encodeStringForDisplay($_POST['qdisp0']).'"'."\n";
-			$code .= '$noshuffle = "'.Sanitize::encodeStringForDisplay($_POST['qshuffle0']).'"'."\n";
-		} else if ($qtypes[0]=='number' || $qtypes[0]=='calculated' || $qtypes[0] == 'numfunc') {
-			$code .= '$feedbacktxtdef = "'.str_replace('"','\\"',$feedbacktxtdef[0]).'"'."\n";
-			$code .= '$answerboxsize = '.$answerboxsize[0]."\n";
-			$code .= ((Sanitize::encodeStringForDisplay($_POST['qtol0'])=='abs')?'$abstolerance':'$reltolerance').' = '.Sanitize::encodeStringForDisplay($_POST['tol0'])."\n";
-			if ($qtypes[0] == 'numfunc') {
-				$code .= '$variables = "'.$variables[0].'"'."\n";
-				$code .= '$requiretimes = ""'."\n";
-				if (strpos($answer[0],'=')!==false) {//is an equation answer
-					$code .= '$answerformat = "equation"'."\n";
-				}
-			} else if ($qtypes[0] == 'calculated') {
-				$code .= '$requiretimes = ""'."\n";
-				$code .= '$answerformat = "'.$answerformat[0].'"'."\n";
-			}
-		} else if ($qtypes[0]=='essay') {
-			$code .= '$feedbacktxtessay = "'.str_replace('"','\\"',$feedbacktxtessay[0]).'"'."\n";
-			$code .= '$answerboxsize = '.$answerboxsize[0]."\n";
-			if (isset($useeditor[0])) {
-				$code .= '$displayformat = "editor"'."\n";
-			}
-			if (isset($scoremethod[0])) {
-				$code .= '$scoremethod = "'.$scoremethod[0].'"'."\n";
-			}
-		}
-		$code .= '$answer = '.$answer[0]."\n\n";
-	} else {
-		$qtype = 'multipart';
-		$code .= '$anstypes = "'.implode(',',$qtypes).'"'."\n\n";
-		for ($n=0;$n<$nparts;$n++) {
-			$partialout = array();
-			for ($i=0;$i<$qparts[$n];$i++) {
-				if ($qtypes[$n]=='choices') {
-					$code .= '$questions['.$n.']['.$i.'] = "'.str_replace('"','\\"',$questions[$n][$i]).'"'."\n";
-				}
-
-				$code .= '$feedbacktxt['.$n.']['.$i.'] = "'.str_replace('"','\\"',$feedbacktxt[$n][$i]).'"'."\n";
-				if ($partial[$n][$i]!=0 || $qtypes[$n]=='number' || $qtypes[$n] == 'numfunc' || $qtypes[$n] == 'calculated') {
-					if ($qtypes[$n]=='choices') {
-						$partialout[] = $i;
-					} else if ($qtypes[$n]=='number') {
-						$partialout[] = $partialans[$n][$i];
-					} else if ($qtypes[$n] == 'numfunc' || $qtypes[$n] == 'calculated') {
-						$partialout[] = '"'.$partialans[$n][$i].'"';
-					}
-					$partialout[] = $partial[$n][$i];
-				}
-			}
-			if (count($partialout)>0) {
-				$code .= '$partialcredit['.$n.'] = array('.implode(',',$partialout).')'."\n";
-			}
-			if ($qtypes[$n]=='choices') {
-				$code .= '$displayformat['.$n.'] = "'.Sanitize::encodeStringForDisplay($_POST['qdisp'.$n]).'"'."\n";
-				$code .= '$noshuffle['.$n.'] = "'.Sanitize::encodeStringForDisplay($_POST['qshuffle'.$n]).'"'."\n";
-			} else if ($qtypes[$n]=='number' || $qtypes[$n] == 'numfunc' || $qtypes[$n] == 'calculated') {
-				$code .= '$feedbacktxtdef['.$n.'] = "'.str_replace('"','\\"',$feedbacktxtdef[$n]).'"'."\n";
-				$code .= '$answerboxsize['.$n.'] = '.$answerboxsize[$n]."\n";
-				$code .= (((float) trim($_POST['qtol'.$n])=='abs')?'$abstolerance[':'$reltolerance[').$n.'] = '.(float) trim($_POST['tol'.$n])."\n";
-				if ($qtypes[$n] == 'numfunc') {
-					$code .= '$variables['.$n.'] = "'.$variables[$n].'"'."\n";
-					$code .= '$requiretimes['.$n.'] = ""'."\n";
-					if (strpos($answer[$n],'=')!==false) {//is an equation answer
-						$code .= '$answerformat['.$n.'] = "equation"'."\n";
-					}
-				} else if ($qtypes[$n] == 'calculated') {
-					$code .= '$requiretimes['.$n.'] = ""'."\n";
-					$code .= '$answerformat['.$n.'] = "'.$answerformat[$n].'"'."\n";
-				}
-			} else if ($qtypes[$n]=='essay') {
-				$code .= '$feedbacktxtessay['.$n.'] = "'.str_replace('"','\\"',$feedbacktxtessay[$n]).'"'."\n";
-				$code .= '$answerboxsize['.$n.'] = '.$answerboxsize[$n]."\n";
-				if (isset($useeditor[$n])) {
-					$code .= '$displayformat['.$n.'] = "editor"'."\n";
-				}
-				if (isset($scoremethod[$n])) {
-					$code .= '$scoremethod['.$n.'] = "'.$scoremethod[$n].'"'."\n";
-				}
-			}
-			$code .= '$answer['.$n.'] = '.$answer[$n]."\n\n";
-		}
-	}
-	for ($i=0;$i<$nhints;$i++) {
-		$code .= '$hinttext['.$i.'] = "'.str_replace('"','\\"',$hinttext[$i]).'"'."\n";
-	}
-
-	$code .= "\n//end stored values - Tutorial Style question\n\n";
-	$code .= Sanitize::encodeStringForDisplay($_POST['keepcode'])."\n";
-	$code .= "\n//end retained code - Tutorial Style question\n\n";
-	//$code .= '$noshuffle = "all"'."\n";
-
-	//now we convert as needed
-	$qtextpre = '';
-
-	//form hoverovers for hints
-	if ($nhints>0) {
-		$qtextpre .= '<p style="text-align: right">';
-		for ($i=0;$i<$nhints;$i++) {
-			$code .= '$hintlink['.$i.'] = formhoverover("Hint '.($i+1).'",$hinttext['.$i.'])'."\n";
-			$qtextpre .= '$hintlink['.$i.'] ';
-		}
-		$qtextpre .= '</p>';
-	}
-	$code .= "\n";
-
-	//form feedback text
-	if ($nparts==1) {
-		if ($qtypes[0]=='choices') {
-			$code .= '$feedback = getfeedbacktxt($stuanswers[$thisq], $feedbacktxt, $answer)'."\n";
-		} else if ($qtypes[0]=='number') {
-			$code .= '$feedback = getfeedbacktxtnumber($stuanswers[$thisq], $partialcredit, $feedbacktxt, $feedbacktxtdef, "'.$qtol[0].'")'."\n";
-		} else if ($qtypes[0]=='calculated') {
-			$code .= '$feedback = getfeedbacktxtcalculated($stuanswers[$thisq], $stuanswersval[$thisq], $partialcredit, $feedbacktxt, $feedbacktxtdef, $answerformat, $requiretimes, "'.$qtol[0].'")'."\n";
-		} else if ($qtypes[0]=='numfunc') {
-			$code .= '$feedback = getfeedbacktxtnumfunc($stuanswers[$thisq], $partialcredit, $feedbacktxt, $feedbacktxtdef, $variables, $requiretimes, "'.$qtol[0].'")'."\n";
-		} else if ($qtypes[0]=='essay') {
-			$code .= '$feedback = getfeedbacktxtessay($stuanswers[$thisq], $feedbacktxtessay)'."\n";
-		}
-	} else {
-		for ($n=0;$n<$nparts;$n++) {
-			if ($qtypes[$n]=='choices') {
-				$code .= '$feedback['.$n.'] = getfeedbacktxt($stuanswers[$thisq]['.$n.'], $feedbacktxt['.$n.'], $answer['.$n.'])'."\n";
-			} else if ($qtypes[$n]=='number') {
-				$code .= '$feedback['.$n.'] = getfeedbacktxtnumber($stuanswers[$thisq]['.$n.'], $partialcredit['.$n.'], $feedbacktxt['.$n.'], $feedbacktxtdef['.$n.'], "'.$qtol[$n].'")'."\n";
-			} else if ($qtypes[$n]=='calculated') {
-				$code .= '$feedback['.$n.'] = getfeedbacktxtcalculated($stuanswers[$thisq]['.$n.'], $stuanswersval[$thisq]['.$n.'], $partialcredit['.$n.'], $feedbacktxt['.$n.'], $feedbacktxtdef['.$n.'] , $answerformat['.$n.'] , $requiretimes['.$n.'], "'.$qtol[$n].'")'."\n";
-			} else if ($qtypes[$n]=='numfunc') {
-				$code .= '$feedback['.$n.'] = getfeedbacktxtnumfunc($stuanswers[$thisq]['.$n.'], $partialcredit['.$n.'], $feedbacktxt['.$n.'], $feedbacktxtdef['.$n.'], $variables['.$n.'], $requiretimes['.$n.'],"'.$qtol[$n].'")'."\n";
-			} else if ($qtypes[$n]=='essay') {
-				$code .= '$feedback['.$n.'] = getfeedbacktxtessay($stuanswers[$thisq]['.$n.'], $feedbacktxtessay['.$n.'])'."\n";
-			}
-		}
-	}
-	$qtext = $qtextpre . $qtext;
-	//DB $code = addslashes($code);
-	//DB $qtext = addslashes($qtext);
-
-	if ($id=='new') {
-		$mt = microtime();
-		$uqid = substr($mt,11).substr($mt,2,6);
-		$ancestors = '';
-		if (isset($_GET['templateid'])) {
-		    $templateid = (int) trim($_GET['templateid']);
-			//DB $query = "SELECT ancestors FROM imas_questionset WHERE id='{$_GET['templateid']}'";
-			//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-			//DB $ancestors = mysql_result($result,0,0);
-			$stm = $DBH->prepare("SELECT ancestors FROM imas_questionset WHERE id=:id");
-			$stm->execute(array(':id'=> $templateid));
-			$ancestors = $stm->fetchColumn(0);
-			if ($ancestors!='') {
-				$ancestors =  $templateid . ','. $ancestors;
-			} else {
-				$ancestors =  $templateid;
-			}
-		}
-		//DB $query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qtext,ancestors) VALUES ";
-		//DB $query .= "($uqid,$now,$now,'{$_POST['description']}','$userid','{$_POST['author']}','{$_POST['userights']}','$qtype','$code','$qtext','$ancestors');";
-		//DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
-		//DB $id = mysql_insert_id();
-        $description = Sanitize::encodeStringForDisplay($_POST['description']);
-		$question_set_author = Sanitize::encodeStringForDisplay($_POST['author']);
-		$userrights = Sanitize::onlyInt($_POST['userights']);
-
-		$query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qtext,ancestors) VALUES ";
-		$query .= "(:uniqueid, :adddate, :lastmoddate, :description, :ownerid, :author, :userights, :qtype, :control, :qtext, :ancestors);";
-		$stm = $DBH->prepare($query);
-		$stm->execute(array(':uniqueid'=>$uqid, ':adddate'=>$now, ':lastmoddate'=>$now, ':description'=>$description, ':ownerid'=>$userid,
-			':author'=>$question_set_author, ':userights'=>$userrights, ':qtype'=>$qtype, ':control'=>$code, ':qtext'=>$qtext, ':ancestors'=>$ancestors));
-		$id = $DBH->lastInsertId();
+  if (!isset($_GET['id'])) {
+    $id = 'new';
+  } else {
+    $id = Sanitize::onlyInt($_GET['id']);
+  }
+  //DB $_POST = stripslashes_deep($_POST);
+  $qtext = stripsmartquotes($_POST['text']);
+  $nparts = intval($_POST['nparts']);
+  $qtypes = array();
+  $qparts = array();
+  $questions = array();
+  $feedback = array();
+  $feedbacktxtdef = array();
+  $feedbacktxtessay = array();
+  $answerboxsize = array();
+  $variables = array();
+  $scoremethod = array();
+  $useeditor = array();
+  $answer = array();
+  $partial = array();
+  $qtol = array();
+  for ($n=0;$n<$nparts;$n++) {
+    $qtypes[$n] = $_POST['qtype'.$n];
+    $feedback[$n] = array();
+    if ($qtypes[$n] == 'choices') {
+      $questions[$n] = array();
+      $answer[$n] = $_POST['ans'.$n];
+    } else if ($qtypes[$n] == 'number') {
+      $partialans[$n] = array();
+      $qtol[$n] = (($_POST['qtol'.$n]=='abs')?'|':'') . $_POST['tol'.$n];
+      $feedbacktxtdef[$n] = $_POST['fb'.$n.'-def'];
+      $answer[$n] = $_POST['txt'.$n.'-'.$_POST['ans'.$n]];
+      $_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
+      $answerboxsize[$n] = intval($_POST['numboxsize'.$n]);
+    } else if ($qtypes[$n] == 'calculated') {
+      $partialans[$n] = array();
+      $qtol[$n] = (($_POST['qtol'.$n]=='abs')?'|':'') . $_POST['tol'.$n];
+      $feedbacktxtdef[$n] = $_POST['fb'.$n.'-def'];
+      $answer[$n] = '"'.$_POST['txt'.$n.'-'.$_POST['ans'.$n]].'"';
+      $_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
+      $answerboxsize[$n] = intval($_POST['numboxsize'.$n]);
+      $answerformat[$n] = $_POST['answerformat'.$n].(trim($_POST['answerformat'.$n])!=''?",":"")."noval";
+    } else if ($qtypes[$n] == 'numfunc') {
+      $partialans[$n] = array();
+      $qtol[$n] = (($_POST['funcqtol'.$n]=='abs')?'|':'') . $_POST['functol'.$n];
+      $feedbacktxtdef[$n] = $_POST['fb'.$n.'-def'];
+      $answer[$n] = '"'.$_POST['txt'.$n.'-'.$_POST['ans'.$n]].'"';
+      $_POST['pc'.$n.'-'.$_POST['ans'.$n]] = 1;
+      $answerboxsize[$n] = intval($_POST['funcboxsize'.$n]);
+      $variables[$n] = $_POST['variables'.$n];
+    } else if ($qtypes[$n] == 'essay') {
+      $answer[$n] = '"'.str_replace('"','\\"',$_POST['essay'.$n.'-fb']).'"';
+      if (isset($_POST['useeditor'.$n])) {
+        $useeditor[$n] = true;
+      }
+      if (isset($_POST['takeanything'.$n])) {
+        $scoremethod[$n] = 'takeanything';
+      }
+      $answerboxsize[$n] = intval($_POST['essayrows'.$n]);
+    }
+    if ($qtypes[$n] == 'choices' || $qtypes[$n] == 'number' || $qtypes[$n] == 'calculated' || $qtypes[$n] == 'numfunc') {
+      $qparts[$n] = intval($_POST['qparts'.$n]);
+      $questions[$n] = array();
+      $partialans[$n] = array();
+      $feedbacktxt[$n] = array();
+      $partial[$n] = array();
+      for ($i=0;$i<$qparts[$n];$i++) {
+        if (trim($_POST['txt'.$n.'-'.$i])=='') {continue;}
+        if ($qtypes[$n] == 'choices') {
+          $questions[$n][] = $_POST['txt'.$n.'-'.$i];
+        } else if ($qtypes[$n] == 'number' || $qtypes[$n] == 'calculated' || $qtypes[$n] == 'numfunc') {
+          $partialans[$n][] = $_POST['txt'.$n.'-'.$i];
+        }
+        $feedbacktxt[$n][] = $_POST['fb'.$n.'-'.$i];
+        $partial[$n][] = floatval($_POST['pc'.$n.'-'.$i]);
+      }
+      $qparts[$n] = count($feedbacktxt[$n]);
+    } else if ($qtypes[$n] == 'essay') {
+      $qparts[$n] = 0;
+      $feedbacktxtessay[$n] = $_POST['essay'.$n.'-fb'];
+    }
+  }
+  $nhints = intval($_POST['nhints']);
+  $hinttext = array();
+  for ($n=0;$n<$nhints;$n++) {
+    if (!empty($_POST['hint'.$n])) {
+      $hinttext[] = $_POST['hint'.$n];
+    }
+  }
+  $nhints = count($hinttext);
+  //generate question code
+  //this part stores the values in the question code, in form that makes
+  //them easy to recover later.
+  $code = "//start randomization code - Tutorial Style question\n\n";
+  $code .= $_POST['randvars'];
+  $code .= "\n\n//end randomization code - Tutorial Style question\n\n";
+  if ($nparts==1) {
+    $qtype = $qtypes[0];
+    $partialout = array();
+    for ($i=0;$i<$qparts[0];$i++) {
+      if ($qtypes[0]=='choices') {
+        $code .= '$questions['.$i.'] = "'.str_replace('"','\\"',$questions[0][$i]).'"'."\n";
+      }
+      $code .= '$feedbacktxt['.$i.'] = "'.str_replace('"','\\"',$feedbacktxt[0][$i]).'"'."\n";
+      if ($partial[0][$i]!=0 || $qtypes[0]=='number' || $qtypes[0] == 'numfunc' || $qtypes[0] == 'calculated') {
+        if ($qtypes[0]=='choices') {
+          $partialout[] = $i;
+        } else if ($qtypes[0]=='number') {
+          $partialout[] = $partialans[0][$i];
+        } else if ($qtypes[0] == 'numfunc' || $qtypes[0] == 'calculated') {
+          $partialout[] = '"'.$partialans[0][$i].'"';
+        }
+        $partialout[] = $partial[0][$i];
+      }
+    }
+    if (count($partialout)>0) {
+      $code .= '$partialcredit = array('.implode(',',$partialout).')'."\n";
+    }
+    if ($qtypes[0]=='choices') {
+      $code .= '$displayformat = "'.$_POST['qdisp0'].'"'."\n";
+      $code .= '$noshuffle = "'.$_POST['qshuffle0'].'"'."\n";
+    } else if ($qtypes[0]=='number' || $qtypes[0]=='calculated' || $qtypes[0] == 'numfunc') {
+      $code .= '$feedbacktxtdef = "'.str_replace('"','\\"',$feedbacktxtdef[0]).'"'."\n";
+      $code .= '$answerboxsize = '.$answerboxsize[0]."\n";
+      $code .= (($_POST['qtol0']=='abs')?'$abstolerance':'$reltolerance').' = '.$_POST['tol0']."\n";
+      if ($qtypes[0] == 'numfunc') {
+        $code .= '$variables = "'.$variables[0].'"'."\n";
+        $code .= '$requiretimes = ""'."\n";
+        if (strpos($answer[0],'=')!==false) {//is an equation answer
+          $code .= '$answerformat = "equation"'."\n";
+        }
+      } else if ($qtypes[0] == 'calculated') {
+        $code .= '$requiretimes = ""'."\n";
+        $code .= '$answerformat = "'.$answerformat[0].'"'."\n";
+      }
+    } else if ($qtypes[0]=='essay') {
+      $code .= '$feedbacktxtessay = "'.str_replace('"','\\"',$feedbacktxtessay[0]).'"'."\n";
+      $code .= '$answerboxsize = '.$answerboxsize[0]."\n";
+      if (isset($useeditor[0])) {
+        $code .= '$displayformat = "editor"'."\n";
+      }
+      if (isset($scoremethod[0])) {
+        $code .= '$scoremethod = "'.$scoremethod[0].'"'."\n";
+      }
+    }
+    $code .= '$answer = '.$answer[0]."\n\n";
+  } else {
+    $qtype = 'multipart';
+    $code .= '$anstypes = "'.implode(',',$qtypes).'"'."\n\n";
+    for ($n=0;$n<$nparts;$n++) {
+      $partialout = array();
+      for ($i=0;$i<$qparts[$n];$i++) {
+        if ($qtypes[$n]=='choices') {
+          $code .= '$questions['.$n.']['.$i.'] = "'.str_replace('"','\\"',$questions[$n][$i]).'"'."\n";
+        }
+        $code .= '$feedbacktxt['.$n.']['.$i.'] = "'.str_replace('"','\\"',$feedbacktxt[$n][$i]).'"'."\n";
+        if ($partial[$n][$i]!=0 || $qtypes[$n]=='number' || $qtypes[$n] == 'numfunc' || $qtypes[$n] == 'calculated') {
+          if ($qtypes[$n]=='choices') {
+            $partialout[] = $i;
+          } else if ($qtypes[$n]=='number') {
+            $partialout[] = $partialans[$n][$i];
+          } else if ($qtypes[$n] == 'numfunc' || $qtypes[$n] == 'calculated') {
+            $partialout[] = '"'.$partialans[$n][$i].'"';
+          }
+          $partialout[] = $partial[$n][$i];
+        }
+      }
+      if (count($partialout)>0) {
+        $code .= '$partialcredit['.$n.'] = array('.implode(',',$partialout).')'."\n";
+      }
+      if ($qtypes[$n]=='choices') {
+        $code .= '$displayformat['.$n.'] = "'.$_POST['qdisp'.$n].'"'."\n";
+        $code .= '$noshuffle['.$n.'] = "'.$_POST['qshuffle'.$n].'"'."\n";
+      } else if ($qtypes[$n]=='number' || $qtypes[$n] == 'numfunc' || $qtypes[$n] == 'calculated') {
+        $code .= '$feedbacktxtdef['.$n.'] = "'.str_replace('"','\\"',$feedbacktxtdef[$n]).'"'."\n";
+        $code .= '$answerboxsize['.$n.'] = '.$answerboxsize[$n]."\n";
+        $code .= (($_POST['qtol'.$n]=='abs')?'$abstolerance[':'$reltolerance[').$n.'] = '.$_POST['tol'.$n]."\n";
+        if ($qtypes[$n] == 'numfunc') {
+          $code .= '$variables['.$n.'] = "'.$variables[$n].'"'."\n";
+          $code .= '$requiretimes['.$n.'] = ""'."\n";
+          if (strpos($answer[$n],'=')!==false) {//is an equation answer
+            $code .= '$answerformat['.$n.'] = "equation"'."\n";
+          }
+        } else if ($qtypes[$n] == 'calculated') {
+          $code .= '$requiretimes['.$n.'] = ""'."\n";
+          $code .= '$answerformat['.$n.'] = "'.$answerformat[$n].'"'."\n";
+        }
+      } else if ($qtypes[$n]=='essay') {
+        $code .= '$feedbacktxtessay['.$n.'] = "'.str_replace('"','\\"',$feedbacktxtessay[$n]).'"'."\n";
+        $code .= '$answerboxsize['.$n.'] = '.$answerboxsize[$n]."\n";
+        if (isset($useeditor[$n])) {
+          $code .= '$displayformat['.$n.'] = "editor"'."\n";
+        }
+        if (isset($scoremethod[$n])) {
+          $code .= '$scoremethod['.$n.'] = "'.$scoremethod[$n].'"'."\n";
+        }
+      }
+      $code .= '$answer['.$n.'] = '.$answer[$n]."\n\n";
+    }
+  }
+  for ($i=0;$i<$nhints;$i++) {
+    $code .= '$hinttext['.$i.'] = "'.str_replace('"','\\"',$hinttext[$i]).'"'."\n";
+  }
+  $code .= "\n//end stored values - Tutorial Style question\n\n";
+  $code .= $_POST['keepcode']."\n";
+  $code .= "\n//end retained code - Tutorial Style question\n\n";
+  //$code .= '$noshuffle = "all"'."\n";
+  //now we convert as needed
+  $qtextpre = '';
+  //form hoverovers for hints
+  if ($nhints>0) {
+    $qtextpre .= '<p style="text-align: right">';
+    for ($i=0;$i<$nhints;$i++) {
+      $code .= '$hintlink['.$i.'] = formhoverover("Hint '.($i+1).'",$hinttext['.$i.'])'."\n";
+      $qtextpre .= '$hintlink['.$i.'] ';
+    }
+    $qtextpre .= '</p>';
+  }
+  $code .= "\n";
+  //form feedback text
+  if ($nparts==1) {
+    if ($qtypes[0]=='choices') {
+      $code .= '$feedback = getfeedbacktxt($stuanswers[$thisq], $feedbacktxt, $answer)'."\n";
+    } else if ($qtypes[0]=='number') {
+      $code .= '$feedback = getfeedbacktxtnumber($stuanswers[$thisq], $partialcredit, $feedbacktxt, $feedbacktxtdef, "'.$qtol[0].'")'."\n";
+    } else if ($qtypes[0]=='calculated') {
+      $code .= '$feedback = getfeedbacktxtcalculated($stuanswers[$thisq], $stuanswersval[$thisq], $partialcredit, $feedbacktxt, $feedbacktxtdef, $answerformat, $requiretimes, "'.$qtol[0].'")'."\n";
+    } else if ($qtypes[0]=='numfunc') {
+      $code .= '$feedback = getfeedbacktxtnumfunc($stuanswers[$thisq], $partialcredit, $feedbacktxt, $feedbacktxtdef, $variables, $requiretimes, "'.$qtol[0].'")'."\n";
+    } else if ($qtypes[0]=='essay') {
+      $code .= '$feedback = getfeedbacktxtessay($stuanswers[$thisq], $feedbacktxtessay)'."\n";
+    }
+  } else {
+    for ($n=0;$n<$nparts;$n++) {
+      if ($qtypes[$n]=='choices') {
+        $code .= '$feedback['.$n.'] = getfeedbacktxt($stuanswers[$thisq]['.$n.'], $feedbacktxt['.$n.'], $answer['.$n.'])'."\n";
+      } else if ($qtypes[$n]=='number') {
+        $code .= '$feedback['.$n.'] = getfeedbacktxtnumber($stuanswers[$thisq]['.$n.'], $partialcredit['.$n.'], $feedbacktxt['.$n.'], $feedbacktxtdef['.$n.'], "'.$qtol[$n].'")'."\n";
+      } else if ($qtypes[$n]=='calculated') {
+        $code .= '$feedback['.$n.'] = getfeedbacktxtcalculated($stuanswers[$thisq]['.$n.'], $stuanswersval[$thisq]['.$n.'], $partialcredit['.$n.'], $feedbacktxt['.$n.'], $feedbacktxtdef['.$n.'] , $answerformat['.$n.'] , $requiretimes['.$n.'], "'.$qtol[$n].'")'."\n";
+      } else if ($qtypes[$n]=='numfunc') {
+        $code .= '$feedback['.$n.'] = getfeedbacktxtnumfunc($stuanswers[$thisq]['.$n.'], $partialcredit['.$n.'], $feedbacktxt['.$n.'], $feedbacktxtdef['.$n.'], $variables['.$n.'], $requiretimes['.$n.'],"'.$qtol[$n].'")'."\n";
+      } else if ($qtypes[$n]=='essay') {
+        $code .= '$feedback['.$n.'] = getfeedbacktxtessay($stuanswers[$thisq]['.$n.'], $feedbacktxtessay['.$n.'])'."\n";
+      }
+    }
+  }
+  $qtext = $qtextpre . $qtext;
+  //DB $code = addslashes($code);
+  //DB $qtext = addslashes($qtext);
+  if ($id=='new') {
+    $mt = microtime();
+    $uqid = substr($mt,11).substr($mt,2,6);
+    $ancestors = '';
+    if (isset($_GET['templateid'])) {
+      //DB $query = "SELECT ancestors FROM imas_questionset WHERE id='{$_GET['templateid']}'";
+      //DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+      //DB $ancestors = mysql_result($result,0,0);
+      $stm = $DBH->prepare("SELECT ancestors FROM imas_questionset WHERE id=:id");
+      $stm->execute(array(':id'=>$_GET['templateid']));
+      $ancestors = $stm->fetchColumn(0);
+      if ($ancestors!='') {
+        $ancestors = $_GET['templateid'] . ','. $ancestors;
+      } else {
+        $ancestors = $_GET['templateid'];
+      }
+    }
+    //DB $query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qtext,ancestors) VALUES ";
+    //DB $query .= "($uqid,$now,$now,'{$_POST['description']}','$userid','{$_POST['author']}','{$_POST['userights']}','$qtype','$code','$qtext','$ancestors');";
+    //DB $result = mysql_query($query) or die("Query failed :$query " . mysql_error());
+    //DB $id = mysql_insert_id();
+    $query = "INSERT INTO imas_questionset (uniqueid,adddate,lastmoddate,description,ownerid,author,userights,qtype,control,qtext,ancestors) VALUES ";
+    $query .= "(:uniqueid, :adddate, :lastmoddate, :description, :ownerid, :author, :userights, :qtype, :control, :qtext, :ancestors);";
+    $stm = $DBH->prepare($query);
+    $stm->execute(array(':uniqueid'=>$uqid, ':adddate'=>$now, ':lastmoddate'=>$now, ':description'=>$_POST['description'], ':ownerid'=>$userid,
+      ':author'=>$_POST['author'], ':userights'=>$_POST['userights'], ':qtype'=>$qtype, ':control'=>$code, ':qtext'=>$qtext, ':ancestors'=>$ancestors));
+    $id = $DBH->lastInsertId();
 		$_GET['id'] = $id;
 		if (isset($_GET['makelocal'])) {
 			//DB $query = "UPDATE imas_questions SET questionsetid='$qsetid' WHERE id='{$_GET['makelocal']}'";

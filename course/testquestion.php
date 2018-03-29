@@ -305,8 +305,8 @@ if ($overwriteBody==1) {
 		echo 'It is recommended you discontinue use of this question when possible</p>';
 	}
 	if ($line['replaceby']>0) {
-	  echo '<p class=noticetext>This message has been marked as deprecated, and it is recommended you use question ID '.Sanitize::encodeStringForDisplay($line['replaceby']).' instead.  You can find this question ';
-		echo 'by searching all libraries with the ID number as the search term</p>';
+	  echo '<p class=noticetext>This message has been marked as deprecated, and it is recommended you use question ID '.$line['replaceby'].' instead.  You can find this question ';
+	  echo 'by searching all libraries with the ID number as the search term</p>';
 	}
 
 	echo '<p id="brokenmsgbad" class=noticetext style="display:'.(($line['broken']==1)?"block":"none").'">This message has been marked as broken.  This indicates ';
