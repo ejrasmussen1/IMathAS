@@ -99,5 +99,5 @@ if ($like==1) {
 	$likemsg = 'Click to like this post. '.$likemsg;;
 }
 header('Content-type: application/json');
-echo '{"aff":'.$aff.', "classn":"'.$likeclass.'", "msg":"'.$likemsg.'", "cnt":'.Sanitize::onlyInt($likecnt).'}';
+echo '{"aff":'.$aff.', "classn":"'.$likeclass.'", "msg":"'.$likemsg.'", "cnt":'.$likecnt.'}';
 ?>

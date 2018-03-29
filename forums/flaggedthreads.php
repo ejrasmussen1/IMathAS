@@ -16,7 +16,7 @@ if (!isset($teacherid)) {
 }
 $query .= "LEFT JOIN imas_forum_views AS mfv ";
 $query .= "ON mfv.threadid=imas_forum_threads.id AND mfv.userid=:userid WHERE imas_forums.courseid=:courseid ";
-$array[':userid'] = $userid;
+$array[':userid']=  $userid;
 $array[':courseid']=$cid;
 if (!isset($teacherid)) {
   $query .= "AND (imas_forum_threads.stugroupid=0 OR imas_forum_threads.stugroupid IN (SELECT stugroupid FROM imas_stugroupmembers WHERE userid=:userid2)) ";
@@ -39,16 +39,16 @@ foreach ($result  as $line) {
 $lastforum = '';
 
 if (isset($_GET['unflagall'])) {
-	if (count($forumids)>0) {
-		$threadids = implode(',', array_map('intval', array_keys($lastpost)));
-		$DBH->query("UPDATE imas_forum_views SET tagged=0 WHERE threadid IN ($threadids)");
-	}
+  if (count($forumids)>0) {
+    $threadids = implode(',', array_map('intval', array_keys($lastpost)));
+    $DBH->query("UPDATE imas_forum_views SET tagged=0 WHERE threadid IN ($threadids)");
+  }
   if ($from=='home') {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php?r=" . Sanitize::randomQueryStringParam());
-	} else {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
-	}
-	exit;
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../index.php?r=" . Sanitize::randomQueryStringParam());
+  } else {
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/../course/course.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
+  }
+  exit;
 }
 
 
@@ -72,7 +72,7 @@ if (count($lastpost)>0) {
   //DB while ($line = mysql_fetch_array($result, MYSQL_ASSOC)) {
   $query = "SELECT imas_forum_posts.*,imas_users.LastName,imas_users.FirstName,imas_forum_threads.lastposttime FROM imas_forum_posts,imas_users,imas_forum_threads ";
   $query .= "WHERE imas_forum_posts.userid=imas_users.id AND imas_forum_posts.threadid=imas_forum_threads.id AND ";
-  $query .= "imas_forum_posts.threadid IN ($threadids) AND imas_forum_threads.lastposttime<$now AND imas_forum_posts.parent=0 ORDER BY imas_forum_threads.lastposttime DESC";
+  $query .= "imas_forum_posts.threadid IN ($threadids) imas_forum_threads.lastposttime<$now AND imas_forum_posts.parent=0 ORDER BY imas_forum_threads.lastposttime DESC";
   $stm = $DBH->query($query);
   $alt = 0;
   while ($line = $stm->fetch(PDO::FETCH_ASSOC)) {
