@@ -4,7 +4,7 @@
 //(c) 2009 David Lippman
 	$init_skip_csrfp = true;
    	require("init_without_validate.php");
-   	$keyString = (string) trim($_GET['key']);
+   	$keyString = $_GET['key'];
 	if (!empty($_COOKIE['remoteaccess']) && strlen($_COOKIE['remoteaccess'])==10) {
         $keyString = $_COOKIE['remoteaccess'];
 	} else if (empty($keyString) || strlen(trim($keyString))!=10) {

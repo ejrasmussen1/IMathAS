@@ -118,6 +118,7 @@ if ($stm->rowCount() > 0) {
         $stm = $DBH->prepare("INSERT INTO imas_log (time,log) VALUES (:now,:log)");
         $stm->execute(array(':now' => $now, ':log' => "$userid login from IP:{$_SERVER['REMOTE_ADDR']}"));
 
+        // checks if the array $querys is empty
         if (!empty($querys)){
             $rqp = "&r=" .Sanitize::randomQueryStringParam();
         } else {
@@ -299,6 +300,8 @@ if ($haslogin && !$hasusername) {
         //$now = time();
         //DB //$query = "INSERT INTO imas_log (time,log) VALUES ($now,'$userid from IP: {$_SERVER['REMOTE_ADDR']}')";
         //DB //mysql_query($query) or die("Query failed : " . mysql_error());
+
+        //checks if the array $querys is empty
         if (!empty($querys)){
             $rqp = "&r=" .Sanitize::randomQueryStringParam();
         } else {

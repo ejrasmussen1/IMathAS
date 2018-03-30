@@ -92,7 +92,7 @@ if ($sessiondata['ltiitemtype']==0) {
 }
 
 //handle form postbacks
-$createcourse = (int) trim($_POST['createcourse']);
+$createcourse = Sanitize::onlyInt($_POST['createcourse']);
 if (!empty($createcourse)) {
 	//DB $query = "SELECT courseid FROM imas_teachers WHERE courseid='{$_POST['createcourse']}' AND userid='$userid'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
