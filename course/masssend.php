@@ -267,7 +267,7 @@
 		exit;
 	} else {
 		$stm = $DBH->prepare("SELECT count(id) FROM imas_tutors WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>$_GET['cid']));
+		$stm->execute(array(':courseid'=>Sanitize::courseId($_GET['cid'])));
 		$hastutors = ($stm->fetchColumn(0)>0);
 
 		$sendtype = Sanitize::encodeStringForDisplay((isset($_POST['posted']))?$_POST['posted']:$_POST['submit']); //E-mail or Message

@@ -12,7 +12,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Question Settings";
 
-$question_id = (int) trim($_GET['id']);
+$question_id = Sanitize::onlyInt($_GET['id']);
 	//CHECK PERMISSIONS AND SET FLAGS
 if (!(isset($teacherid))) {
  	$overwriteBody = 1;
@@ -53,7 +53,7 @@ if (!(isset($teacherid))) {
 // 			if (trim($_POST['penalty'])=="") {$penalty=9999;} else {$penalty = intval($_POST['penalty']);}
 // 			if (trim($_POST['fixedseeds'])=="") {$fixedseeds=null;} else {$fixedseeds = trim($_POST['fixedseeds']);}
 			if ($penalty!=9999) {
-			    $post_skippenalty = (int) trim($_POST['skippenalty']);
+			    $post_skippenalty = Sanitize::onlyInt($_POST['skippenalty']);
 				if ($post_skippenalty==10) {
 					$penalty = 'L'.$penalty;
 				} else if ($post_skippenalty>0) {

@@ -28,9 +28,9 @@
 
 		if (!isset($_POST['addexc'])) { $_POST['addexc'] = array();}
 		if (!isset($_POST['addfexc'])) { $_POST['addfexc'] = array();}
-		$toarr = array_map('Sanitize::onlyInt', explode(',', $_POST['tolist']));
-		$addexcarr = array_map('Sanitize::onlyInt', $_POST['addexc']);
-		$addfexcarr = array_map('Sanitize::onlyInt', $_POST['addfexc']);
+		$toarr = array_map('intval', explode(',', $_POST['tolist']));
+		$addexcarr = array_map('intval', $_POST['addexc']);
+		$addfexcarr = array_map('intval', $_POST['addfexc']);
 		$existingExceptions = array();
 		if (count($addexcarr)>0 && count($toarr)>0) {
 			//prepull users with exceptions
