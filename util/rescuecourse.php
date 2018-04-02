@@ -3,7 +3,7 @@ require("../init.php");
 if ($myrights<100) {
 	exit;
 }
-$cid = (int) trim($_REQUEST['cid']);
+$cid = Sanitize::onlyInt($_REQUEST['cid']);
 if (!empty($cid)) {
 	//DB $query = "SELECT itemorder,blockcnt FROM imas_courses WHERE id='{$_GET['cid']}'";
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());

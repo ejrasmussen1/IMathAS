@@ -32,7 +32,8 @@ $now = time();
 
 if (isset($_GET['modify'])) { //adding or modifying post
   if ($caller=='thread') {
-    $threadid = $_GET['modify'];
+    $threadid = Sanitize::stripHtmlTags($_GET['modify']);
+
   }
   if ($_GET['modify']!='new' && $threadid==0) {
     echo "I don't know what thread you're replying to.  Please go back and try again.";
@@ -43,8 +44,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
     } else {
       $isanon = 0;
     }
+
     if ($isteacher) {
-      $type = $_POST['type'];
+      $type = Sanitize::stripHtmlTags($_POST['type']);
       if (!isset($_POST['replyby']) || $_POST['replyby']=="null") {
         $replyby = null;
       } else if ($_POST['replyby']=="Always") {
@@ -60,7 +62,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
       $replyby = null;
     }
     if (isset($_POST['tag'])) {
-      $tag = $_POST['tag'];
+      $tag = Sanitize::stripHtmlTags($_POST['tag']);
     } else {
       $tag = '';
     }
@@ -354,7 +356,7 @@ if (isset($_GET['modify'])) { //adding or modifying post
     $stm = $DBH->prepare("UPDATE imas_forum_posts SET files=:files WHERE id=:id");
     $stm->execute(array(':files'=>$files, ':id'=>$_GET['modify']));
     
-    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl?r=" . Sanitize::randomQueryStringParam());
+    header('Location: ' . $GLOBALS['basesiteurl'] . "/forums/$returnurl&r=" . Sanitize::randomQueryStringParam());
     exit;
   } else { //display mod
     if ($caller=='thread') {
