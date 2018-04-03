@@ -37,7 +37,7 @@ function getTeachers($cid) {
 		if ($row['name']==null) {
 			$row['name'] = _('Default');
 		}
-		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')');
+		$out[] = array("id"=>Sanitize::onlyInt($row['id']), "name"=>Sanitize::stripHtmlTags($row['LastName']).', '.Sanitize::stripHtmlTags($row['FirstName']).' ('.Sanitize::stripHtmlTags($row['name']).')');
 	}
 	return $out;
 }
