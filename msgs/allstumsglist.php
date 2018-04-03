@@ -46,11 +46,13 @@
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 	}
+
 	if (isset($_GET['removeid'])) {
+        $removeId = Sanitize::onlyInt($_GET['removeid']);
 		//DB $query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}'";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id");
-		$stm->execute(array(':id'=>$_GET['removeid']));
+		$stm->execute(array(':id'=>$removeId));
 	}
 
 	$pagetitle = "Student Messages";

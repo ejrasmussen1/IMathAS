@@ -583,6 +583,7 @@ function sendtoall(w,type) {
 	}
 	for (var e = 0; e<form.elements.length; e++) {
 		 var el = form.elements[e];
+		 console.log(w,type);
 		 if (w==1) {
 			if (el.name.match(/feedback/) && el.name!="toallfeedback") {
 				pastfb = $(el).val();
@@ -596,7 +597,6 @@ function sendtoall(w,type) {
 					else if (type==0) { el.value = el.value+toall;}
 					else if (type==2) { el.value = toall;}
 				}
-				
 			}
 		 } else if (w==0) {
 			if (document.getElementById("toallgrade").value.match(/\d/)) {

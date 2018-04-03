@@ -20,12 +20,12 @@ echo '<h2>Remove Questions Marked with Wrong Library</h2>';
 
 if (isset($_POST['record'])) {
 	$now = time();
-	$todel = array_map('Sanitize::onlyInt', $_POST['todel']);
+	$todel = array_map('intval', $_POST['todel']);
 	$ph = Sanitize::generateQueryPlaceholders($todel);
 	$stm = $DBH->prepare("UPDATE imas_library_items SET deleted=1 WHERE id IN ($ph)");
 	$stm->execute($todel);
 	
-	$unwrong = array_map('Sanitize::onlyInt', $_POST['unwrong']);
+	$unwrong = array_map('intval', $_POST['unwrong']);
 	$ph = Sanitize::generateQueryPlaceholders($unwrong);
 	$stm = $DBH->prepare("UPDATE imas_library_items SET junkflag=0 WHERE id IN ($ph)");
 	$stm->execute($unwrong);

@@ -1,181 +1,181 @@
 <?php
-	//Listing of all forums for a course - not being used
-	//(c) 2006 David Lippman
+//Listing of all forums for a course - not being used
+//(c) 2006 David Lippman
 
-	require("../init.php");
-	if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
-	   require("../header.php");
-	   echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
-	   require("../footer.php");
-	   exit;
-	}
-	if (isset($teacherid)) {
-		$isteacher = true;
-	} else {
-		$isteacher = false;
-	}
+require("../init.php");
+if (!isset($teacherid) && !isset($tutorid) && !isset($studentid)) {
+  require("../header.php");
+  echo "You are not enrolled in this course.  Please return to the <a href=\"../index.php\">Home Page</a> and enroll\n";
+  require("../footer.php");
+  exit;
+}
+if (isset($teacherid)) {
+  $isteacher = true;
+} else {
+  $isteacher = false;
+}
 
-	if (!isset($_GET['cid'])) {
-		exit;
-	}
+if (!isset($_GET['cid'])) {
+  exit;
+}
 
-	$cid = Sanitize::courseId($_GET['cid']);
+$cid = Sanitize::courseId($_GET['cid']);
 
-	if (isset($_POST['searchsubmit'])) {
-		if (trim($_POST['search'])=='' && $_POST['tagfiltersel'] == '') {
-			$_GET['clearsearch'] = true;
-		}
-	}
+if (isset($_POST['searchsubmit'])) {
+  if (trim($_POST['search'])=='' && $_POST['tagfiltersel'] == '') {
+    $_GET['clearsearch'] = true;
+  }
+}
 
-	if (isset($_GET['clearsearch'])) {
-		unset($sessiondata['forumsearchstr'.$cid]);
-		unset($sessiondata['forumsearchtype'.$cid]);
-		unset($sessiondata['forumsearchtag'.$cid]);
-		writesessiondata();
-		$searchtype = "none";
-	} else if(isset($_POST['searchsubmit'])) {
-		$searchstr = trim($_POST['search']);
-		$searchtype = $_POST['searchtype'];
-		$searchtag = $_POST['tagfiltersel'];
-		$sessiondata['forumsearchstr'.$cid] = $searchstr;
-		$sessiondata['forumsearchtype'.$cid] = $searchtype;
-		$sessiondata['forumsearchtag'.$cid] = $searchtag;
-		writesessiondata();
-	} else if (isset($sessiondata['forumsearchstr'.$cid])) {
-		$searchstr = $sessiondata['forumsearchstr'.$cid];
-		$searchtype = $sessiondata['forumsearchtype'.$cid];
-		$searchtag = $sessiondata['forumsearchtag'.$cid];
-	} else {
-		$searchtype = "none";
-	}
-
-
-	$pagetitle = "Forums";
-	$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
-	$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js"></script>';
-	$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';</script>";
-
-	require("../header.php");
-	echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
-	if ($searchtype != 'none') {
-		echo "<a href=\"forums.php?cid=$cid&amp;clearsearch=true\">Forum List</a> &gt; ";
-	}
-	echo "Forums</div>\n";
-
-	//get general forum info and page order
-	$now = time();
-	//DB $query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
-	$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid=:courseid";
-	if (!$teacherid) {
-		//DB $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
-		$query .= " AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now))";
-	}
-	$stm = $DBH->prepare($query);
-	$stm->execute(array(':courseid'=>$cid));
-	$line = $stm->fetchALL(PDO::FETCH_ASSOC);
-	$anyforumsgroup = false;
-	$forumdata = array();
-	$anyforumsgroup = false;
-	foreach ($line as  $line) {
-		$forumdata[$line['id']] = $line;
-		if ($line['groupsetid']>0) {
-			$anyforumsgroup = true;
-		}
-	}
-
-	//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
-	$result = $stm->execute(array(':id'=>$cid));
-	$itemorder =  unserialize($stm->fetchColumn(0));
-	$itemsimporder = array();
-	function flattenitems($items,&$addto) {
-		global $itemsimporder;
-		foreach ($items as $item) {
-			if (is_array($item)) {
-				flattenitems($item['items'],$addto);
-			} else {
-				$addto[] = $item;
-			}
-		}
-	}
-	flattenitems($itemorder,$itemsimporder);
-
-	$itemsassoc = array();
-	//DB $query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
-	//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
-	$stm = $DBH->prepare("SELECT id,typeid FROM imas_items WHERE courseid=:courseid AND itemtype='Forum'");
-	$stm->execute(array(':courseid'=>$cid));
-	while ($row = $stm->fetch(PDO::FETCH_NUM)) {
-		$itemsassoc[$row[0]] = $row[1];
-		if (!in_array($row[0],$itemsimporder)) {
-			//capture any forums that are in imas_items but not imas_courses.itemorder
-			$itemsimporder[] = $row[0];
-		}
-	}
-
-	$maxitemnum = max($itemsimporder) + 1;
-	//capture any forums that are not in imas_items
-	foreach ($forumdata as $fid=>$line) {
-		if (in_array($fid,$itemsassoc)) { continue; }
-		$itemsassoc[$maxitemnum] = $fid;
-		$itemsimporder[] = $maxitemnum;
-		$maxitemnum++;
-	}
+if (isset($_GET['clearsearch'])) {
+  unset($sessiondata['forumsearchstr'.$cid]);
+  unset($sessiondata['forumsearchtype'.$cid]);
+  unset($sessiondata['forumsearchtag'.$cid]);
+  writesessiondata();
+  $searchtype = "none";
+} else if(isset($_POST['searchsubmit'])) {
+  $searchstr = trim($_POST['search']);
+  $searchtype = $_POST['searchtype'];
+  $searchtag = $_POST['tagfiltersel'];
+  $sessiondata['forumsearchstr'.$cid] = $searchstr;
+  $sessiondata['forumsearchtype'.$cid] = $searchtype;
+  $sessiondata['forumsearchtag'.$cid] = $searchtag;
+  writesessiondata();
+} else if (isset($sessiondata['forumsearchstr'.$cid])) {
+  $searchstr = $sessiondata['forumsearchstr'.$cid];
+  $searchtype = $sessiondata['forumsearchtype'.$cid];
+  $searchtag = $sessiondata['forumsearchtag'.$cid];
+} else {
+  $searchtype = "none";
+}
 
 
-	//construct tag list selector
-	$taginfo = array();
-	foreach ($itemsimporder as $item) {
-		if (!isset($itemsassoc[$item])) { continue; }
-		$taglist = $forumdata[$itemsassoc[$item]]['taglist'];
-		if ($taglist=='') { continue;}
-		$p = strpos($taglist,':');
-		$catname = substr($taglist,0,$p);
-		if (!isset($taginfo[$catname])) {
-			$taginfo[$catname] = explode(',',substr($taglist,$p+1));
-		} else {
-			$newtags = array_diff(explode(',',substr($taglist,$p+1)), $taginfo[$catname]);
-			foreach ($newtags as $tag) {
-				$taginfo[$catname][] = $tag;
-			}
-		}
-	}
-	if (count($taginfo)==0) {
-		$tagfilterselect = '';
-	} else {
-		if (count($taginfo)>1) {
-			$tagfilterselect = 'Category: ';
-		} else {
-			$tagfilterselect = $catname .': ';
-		}
-		$tagfilterselect .= '<select name="tagfiltersel">';
-		$tagfilterselect .= '<option value="">All</option>';
-		foreach ($taginfo as $catname=>$tagarr) {
-			if (count($taginfo)>1) {
-				$tagfilterselect .= '<optgroup label="'.$catname.'">';
-			}
-			foreach ($tagarr as $tag) {
-				$tagfilterselect .= '<option value="'.$tag.'"';
-				if ($tag==$searchtag) { $tagfilterselect .= ' selected="selected"';}
-				$tagfilterselect .= '>'.$tag.'</option>';
-			}
-			if (count($taginfo)>1) {
-				$tagfilterselect .= '</optgroup>';
-			}
-		}
-		$tagfilterselect .= '</select>';
-	}
-	echo '<div class="cpmid">';
-	echo '<a href="newthreads.php?cid='.$cid.'">'._('New Forum Posts').'</a> | ';
-	echo '<a href="flaggedthreads.php?cid='.$cid.'">'._('Flagged Forum Posts').'</a>';
-	echo '</div>';
+$pagetitle = "Forums";
+$placeinhead = "<style type=\"text/css\">\n@import url(\"$imasroot/forums/forums.css\");\n</style>\n";
+$placeinhead .= '<script type="text/javascript" src="'.$imasroot.'/javascript/thread.js"></script>';
+$placeinhead .= "<script type=\"text/javascript\">var AHAHsaveurl = '" . $GLOBALS['basesiteurl'] . "/forums/savetagged.php?cid=$cid';</script>";
 
-	if ($searchtype=='none') {
-		echo '<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>';
-	} else {
-		echo '<div id="headerforums" class="pagetitle"><h2>Forum Search Results</h2></div>';
-	}
+require("../header.php");
+echo "<div class=breadcrumb>$breadcrumbbase <a href=\"../course/course.php?cid=$cid\">".Sanitize::encodeStringForDisplay($coursename)."</a> &gt; ";
+if ($searchtype != 'none') {
+  echo "<a href=\"forums.php?cid=$cid&amp;clearsearch=true\">Forum List</a> &gt; ";
+}
+echo "Forums</div>\n";
+
+//get general forum info and page order
+$now = time();
+//DB $query = "SELECT * FROM imas_forums WHERE imas_forums.courseid='$cid'";
+$query = "SELECT * FROM imas_forums WHERE imas_forums.courseid=:courseid";
+if (!$teacherid) {
+  //DB $query .= "AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now)) ";
+  $query .= " AND (imas_forums.avail=2 OR (imas_forums.avail=1 AND imas_forums.startdate<$now AND imas_forums.enddate>$now))";
+}
+$stm = $DBH->prepare($query);
+$stm->execute(array(':courseid'=>$cid));
+$line = $stm->fetchALL(PDO::FETCH_ASSOC);
+$anyforumsgroup = false;
+$forumdata = array();
+$anyforumsgroup = false;
+foreach ($line as  $line) {
+  $forumdata[$line['id']] = $line;
+  if ($line['groupsetid']>0) {
+    $anyforumsgroup = true;
+  }
+}
+
+//DB $query = "SELECT itemorder FROM imas_courses WHERE id='$cid'";
+//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
+$result = $stm->execute(array(':id'=>$cid));
+$itemorder =  unserialize($stm->fetchColumn(0));
+$itemsimporder = array();
+function flattenitems($items,&$addto) {
+  global $itemsimporder;
+  foreach ($items as $item) {
+    if (is_array($item)) {
+      flattenitems($item['items'],$addto);
+    } else {
+      $addto[] = $item;
+    }
+  }
+}
+flattenitems($itemorder,$itemsimporder);
+
+$itemsassoc = array();
+//DB $query = "SELECT id,typeid FROM imas_items WHERE courseid='$cid' AND itemtype='Forum'";
+//DB $result = mysql_query($query) or die("Query failed : $query" . mysql_error());
+$stm = $DBH->prepare("SELECT id,typeid FROM imas_items WHERE courseid=:courseid AND itemtype='Forum'");
+$stm->execute(array(':courseid'=>$cid));
+while ($row = $stm->fetch(PDO::FETCH_NUM)) {
+  $itemsassoc[$row[0]] = $row[1];
+  if (!in_array($row[0],$itemsimporder)) {
+    //capture any forums that are in imas_items but not imas_courses.itemorder
+    $itemsimporder[] = $row[0];
+  }
+}
+
+$maxitemnum = max($itemsimporder) + 1;
+//capture any forums that are not in imas_items
+foreach ($forumdata as $fid=>$line) {
+  if (in_array($fid,$itemsassoc)) { continue; }
+  $itemsassoc[$maxitemnum] = $fid;
+  $itemsimporder[] = $maxitemnum;
+  $maxitemnum++;
+}
+
+
+//construct tag list selector
+$taginfo = array();
+foreach ($itemsimporder as $item) {
+  if (!isset($itemsassoc[$item])) { continue; }
+  $taglist = $forumdata[$itemsassoc[$item]]['taglist'];
+  if ($taglist=='') { continue;}
+  $p = strpos($taglist,':');
+  $catname = substr($taglist,0,$p);
+  if (!isset($taginfo[$catname])) {
+    $taginfo[$catname] = explode(',',substr($taglist,$p+1));
+  } else {
+    $newtags = array_diff(explode(',',substr($taglist,$p+1)), $taginfo[$catname]);
+    foreach ($newtags as $tag) {
+      $taginfo[$catname][] = $tag;
+    }
+  }
+}
+if (count($taginfo)==0) {
+  $tagfilterselect = '';
+} else {
+  if (count($taginfo)>1) {
+    $tagfilterselect = 'Category: ';
+  } else {
+    $tagfilterselect = $catname .': ';
+  }
+  $tagfilterselect .= '<select name="tagfiltersel">';
+  $tagfilterselect .= '<option value="">All</option>';
+  foreach ($taginfo as $catname=>$tagarr) {
+    if (count($taginfo)>1) {
+      $tagfilterselect .= '<optgroup label="'.$catname.'">';
+    }
+    foreach ($tagarr as $tag) {
+      $tagfilterselect .= '<option value="'.$tag.'"';
+      if ($tag==$searchtag) { $tagfilterselect .= ' selected="selected"';}
+      $tagfilterselect .= '>'.$tag.'</option>';
+    }
+    if (count($taginfo)>1) {
+      $tagfilterselect .= '</optgroup>';
+    }
+  }
+  $tagfilterselect .= '</select>';
+}
+echo '<div class="cpmid">';
+echo '<a href="newthreads.php?cid='.$cid.'">'._('New Forum Posts').'</a> | ';
+echo '<a href="flaggedthreads.php?cid='.$cid.'">'._('Flagged Forum Posts').'</a>';
+echo '</div>';
+
+if ($searchtype=='none') {
+  echo '<div id="headerforums" class="pagetitle"><h2>Forums</h2></div>';
+} else {
+  echo '<div id="headerforums" class="pagetitle"><h2>Forum Search Results</h2></div>';
+}
 ?>
 
 
@@ -413,7 +413,7 @@ if ($searchtype == 'thread') {
 			//if (count($fl)>2) {echo '</ul>';}
 			echo '</p>';
 		}
-		echo filter($line['message']);
+		echo Sanitize::outgoingHtml(filter($line['message']));
 		echo "<p><a href=\"posts.php?cid=" . Sanitize::courseId($cid) . "&forum=" . Sanitize::onlyInt($line['forumid']) . "&thread=" . Sanitize::onlyInt($line['threadid']) . "&page=-4\">Show full thread</a></p>";
 		echo "</div>\n";
 	}

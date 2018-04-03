@@ -1,0 +1,524 @@
+EXPORT DESCRIPTION
+Select * from users
+EXPORT OWNERID
+1
+INSTALLNAME
+IMathAS - Local
+ITEM LIST
+a:1:{i:0;i:0;}
+BEGIN ITEM
+ID
+0
+TYPE
+Assessment
+NAME
+Assessment 1
+SUMMARY
+
+INTRO
+
+AVAIL
+1
+STARTDATE
+1517500800
+ENDDATE
+1518119640
+REVIEWDATE
+0
+SETTINGS
+timelimit=0
+displaymethod=OneByOne
+defpoints=10
+defattempts=1
+deffeedback=AsGo-I
+defpenalty=10
+shuffle=1
+password=
+cntingb=1
+minscore=10050
+showcat=0
+showhints=1
+isgroup=0
+allowlate=0
+exceptionpenalty=0
+noprint=0
+groupmax=6
+endmsg=
+eqnhelper=4
+caltag=?
+calrtag=R
+showtips=2
+deffeedbacktext=
+msgtoinstr=0
+istutorial=0
+viddata=
+QUESTIONS
+0,1,2,3,4
+END ITEM
+BEGIN QUESTION
+QID
+0
+UQID
+11435814263782
+POINTS
+9999
+PENALTY
+9999
+ATTEMPTS
+9999
+CATEGORY
+0
+REGEN
+0
+SHOWANS
+0
+END QUESTION
+BEGIN QUESTION
+QID
+1
+UQID
+114358142637105
+POINTS
+9999
+PENALTY
+9999
+ATTEMPTS
+9999
+CATEGORY
+0
+REGEN
+0
+SHOWANS
+0
+END QUESTION
+BEGIN QUESTION
+QID
+2
+UQID
+114358142637108
+POINTS
+9999
+PENALTY
+9999
+ATTEMPTS
+9999
+CATEGORY
+0
+REGEN
+0
+SHOWANS
+0
+END QUESTION
+BEGIN QUESTION
+QID
+3
+UQID
+114358142637109
+POINTS
+9999
+PENALTY
+9999
+ATTEMPTS
+9999
+CATEGORY
+0
+REGEN
+0
+SHOWANS
+0
+END QUESTION
+BEGIN QUESTION
+QID
+4
+UQID
+1141954525122484
+POINTS
+9999
+PENALTY
+9999
+ATTEMPTS
+9999
+CATEGORY
+0
+REGEN
+0
+SHOWANS
+0
+END QUESTION
+BEGIN QSET
+
+UNIQUEID
+11435814263782
+
+LASTMOD
+1227157541
+
+DESCRIPTION
+Example of calculated matrix type
+
+AUTHOR
+Lippman, David
+
+OWNERID
+1
+
+USERIGHTS
+2
+
+CONTROL
+//if $answersize is specified, the user will be provided
+//an array of boxes in which to enter their answer.  If
+//not, they will be required to use ASCIIMath format for
+//their answer, like ((1,2,3),(4,5,6))
+$answersize="2,3"
+
+//load in matrix functions
+loadlibrary("matrix")
+//form the matrices
+$a = rands(1,9,6)
+$ma = matrix($a,2,3)
+$b = rands(1,9,6)
+$mb = matrix($b,2,3)
+
+//display forms
+$mad = matrixformat($ma)
+$mbd = matrixformat($mb)
+
+//calculate the answer
+$mans = matrixsum($ma,$mb)
+$answer = matrixformat($mans)
+
+QCONTROL
+
+
+QTYPE
+calcmatrix
+
+QTEXT
+Add: `$mad + $mbd`
+
+ANSWER
+
+
+SOLUTION
+
+
+SOLUTIONOPTS
+0
+
+EXTREF
+
+
+LICENSE
+1
+
+ANCESTORAUTHORS
+
+
+OTHERATTRIBUTION
+
+END QSET
+BEGIN QSET
+
+UNIQUEID
+114358142637105
+
+LASTMOD
+1227157541
+
+DESCRIPTION
+Example of multipart
+
+AUTHOR
+Lippman, David
+
+OWNERID
+1
+
+USERIGHTS
+2
+
+CONTROL
+//this defines that there will be two parts, both of
+//type calculated.  Refer the help for valid anstypes.
+$anstypes = array("calculated","calculated")
+$a,$b = nonzerodiffrands(-8,8,2)
+$c = nonzerorand(-30,30)
+
+$question = makeprettydisp("$a x + $b y=$c")
+
+//in some multipart questions, it might be useful to hide
+//the preview button usually provided with calculated and
+//function answer types.  You can set $hidepreview to
+//hide the preview button.  Note that it is suffixed with
+//a [1].  This specifies to apply the option to the
+//second calculated type.  All options must be suffixed
+//like this in a multipart problem.
+$hidepreview[1] = true
+
+//Note the use of the $answerbox in the question text.  This places the
+//answerboxes in the problem text.  Make sure you put the
+//boxes in numerical order; entry tips are given assuming
+//this.
+
+//like with other options, the $answer also needs to be
+//suffixed with the question part.
+$answer[0] = $c/$a
+$answer[1] = $c/$b
+
+QCONTROL
+
+
+QTYPE
+multipart
+
+QTEXT
+Find the x and y intercepts of $question
+
+x-int: `x=`$answerbox[0]
+
+y-int: `y=`$answerbox[1]
+
+ANSWER
+
+
+SOLUTION
+
+
+SOLUTIONOPTS
+0
+
+EXTREF
+
+
+LICENSE
+1
+
+ANCESTORAUTHORS
+
+
+OTHERATTRIBUTION
+
+END QSET
+BEGIN QSET
+
+UNIQUEID
+114358142637108
+
+LASTMOD
+1227157541
+
+DESCRIPTION
+Example of calculated type.
+
+AUTHOR
+Lippman, David
+
+OWNERID
+1
+
+USERIGHTS
+2
+
+CONTROL
+//choose two numbers from a list.  Can also choose from
+//an array
+$a,$b = randsfrom("2,3,5,7,11",2)
+
+//the "where" statement is used with randomizers. It allows
+//you to avoid a specific case.  In this case, we requiring
+//that $a not divide evenly into $c.
+$c = rand(1,10) where ($c % $a != 0)
+$d = rand(1,10) where ($d % $b != 0)
+
+//note that the student could enter 2/5*6/7 and get the
+//correct answer.  We can prevent this by adding this line
+$answerformat = "reducedfraction"
+
+//like with the Number type, we supply a number as the
+//answer.  The only difference is that the student can
+//enter a calculation instead of a number
+$answer = $c/$a * $d/$b
+
+//to get the answer to display as a fraction rather than a
+//decimal, we need to define $showanswer
+$showanswer = dispreducedfraction($c*$d,$a*$b)
+
+QCONTROL
+
+
+QTYPE
+calculated
+
+QTEXT
+Multiply: `$c/$a * $d/$b`
+
+Enter your answer as a single, reduced fraction
+
+ANSWER
+
+
+SOLUTION
+
+
+SOLUTIONOPTS
+0
+
+EXTREF
+
+
+LICENSE
+1
+
+ANCESTORAUTHORS
+
+
+OTHERATTRIBUTION
+
+END QSET
+BEGIN QSET
+
+UNIQUEID
+114358142637109
+
+LASTMOD
+1227157541
+
+DESCRIPTION
+Example of multiple-choice
+
+AUTHOR
+Lippman, David
+
+OWNERID
+1
+
+USERIGHTS
+2
+
+CONTROL
+//pick two different nonzero numbers that don't add to 0
+//the numbers are important here to ensure that all the
+//choices will be different.
+$a,$b = nonzerodiffrands(-5,5,2)
+
+//we can either define the entire $questions array
+//at once, or define each piece separately.  The former
+//would look like:  $questions = array($a+$b,$a-$,...
+$questions[0] = $a+$b
+$questions[1] = $a-$b
+$questions[2] = $a*$b
+
+//this will lay out the choices horizontally.  To do
+//a standard vertical layout, just omit this line
+$displayformat = "horiz"
+
+$text = makeprettydisp("$a+$b")
+
+//Here the answer is the INDEX into the questions array
+//that holds the correct answer.  Arrays are zero-indexed,
+//so the first entry is at index 0.
+$answer = 0
+
+QCONTROL
+
+
+QTYPE
+choices
+
+QTEXT
+Find $text
+
+ANSWER
+
+
+SOLUTION
+
+
+SOLUTIONOPTS
+0
+
+EXTREF
+
+
+LICENSE
+1
+
+ANCESTORAUTHORS
+
+
+OTHERATTRIBUTION
+
+END QSET
+BEGIN QSET
+
+UNIQUEID
+1141954525122484
+
+LASTMOD
+1227157541
+
+DESCRIPTION
+Solve matrix equation
+
+AUTHOR
+Lippman, David
+
+OWNERID
+1
+
+USERIGHTS
+2
+
+CONTROL
+loadlibrary("matrix")
+$mat = matrixidentity(3)
+//silly approach to guarantee a nonsingular matrix
+$a,$b,$c = nonzerorands(-3,3,3)
+$mat = matrixrowcombine3($mat,0,$a,1,$b,2,$c,0)
+$a,$b,$c = nonzerorands(-3,3,3)
+$mat = matrixrowcombine3($mat,0,$a,1,$b,2,$c,1)
+$a,$b,$c = nonzerorands(-3,3,3)
+$mat = matrixrowcombine3($mat,0,$a,1,$b,2,$c,2)
+
+$x = matrix(rands(-3,7,3),3,1)
+$rs = matrixprod($mat,$x)
+
+$md = matrixformat($mat)
+$rsd = matrixformat($rs)
+
+$answer = matrixformat($x)
+$answersize = "3,1"
+
+QCONTROL
+
+
+QTYPE
+matrix
+
+QTEXT
+Solve: `$md \ vec x = $rsd`
+
+`vec x` = $answerbox
+
+ANSWER
+
+
+SOLUTION
+
+
+SOLUTIONOPTS
+0
+
+EXTREF
+
+
+LICENSE
+1
+
+ANCESTORAUTHORS
+
+
+OTHERATTRIBUTION
+
+END QSET

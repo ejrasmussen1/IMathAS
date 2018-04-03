@@ -210,6 +210,7 @@
      try {
       $DBH = new PDO("mysql:host=$dbserver;dbname=$dbname", $dbusername, $dbpassword);
       $DBH->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING );
+      $DBH->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
       // global $DBH;
       $GLOBALS["DBH"] = $DBH;
      } catch(PDOException $e) {

@@ -723,6 +723,7 @@ function checkvarvarisallowed($inside) {
 	
 //loads a macro library
 function loadlibrary($str) {
+	$root = $GLOBALS['basesiteurl'];
 	$str = str_replace(array("/",".",'"'),"",$str);
 	$libs = explode(",",$str);
 	$libdir = rtrim(dirname(__FILE__), '/\\') .'/libs/';

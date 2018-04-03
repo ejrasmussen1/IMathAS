@@ -1,0 +1,9 @@
+config.php
+infoheader.php
+newinstructor.php
+loginpage.php
+admin/import
+admin/import/*
+course/files
+course/files/*
+

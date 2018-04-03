@@ -119,38 +119,37 @@
 			}
 
 			foreach(explode(',',$_POST['qids']) as $qid) {
-				$points = trim($_POST['points'.$qid]);
-				$attempts = trim($_POST['attempts'.$qid]);
-				$showhints = intval($_POST['showhints'.$qid]);
-				if ($points=='') { $points = 9999;}
-				if ($attempts=='') {$attempts = 9999;}
-				//DB $query = "UPDATE imas_questions SET points='$points',attempts='$attempts',showhints=$showhints WHERE id='$qid'";
-				//DB mysql_query($query) or die("Query failed : " . mysql_error());
-				$stm = $DBH->prepare("UPDATE imas_questions SET points=:points,attempts=:attempts,showhints=:showhints WHERE id=:id");
-				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':showhints'=>$showhints, ':id'=>$qid));
-				if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
-					for ($i=0;$i<intval($_POST['copies'.$qid]);$i++) {
-						$qsetid = $qidtoqsetid[$qid];
-						//DB $query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
-						//DB $query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
-						//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-						//DB $newqid = mysql_insert_id();
-						$query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
-						$query .= "VALUES (:assessmentid, :points, :attempts, :showhints, :penalty, :regen, :showans, :questionsetid)";
-						$stm = $DBH->prepare($query);
-						$stm->execute(array(':assessmentid'=>$aid, ':points'=>$points, ':attempts'=>$attempts, ':showhints'=>$showhints, ':penalty'=>9999, ':regen'=>0, ':showans'=>0, ':questionsetid'=>$qsetid));
-						$newqid = $DBH->lastInsertId();
-
-						$itemarr = explode(',',$itemorder);
-						$key = array_search($qid,$itemarr);
-						if ($key===false) {
-							$itemarr[] = $newqid;
-						} else {
-							array_splice($itemarr,$key+1,0,$newqid);
-						}
-						$itemorder = implode(',',$itemarr);
-					}
-				}
+			  $points = Sanitize::onlyInt(trim($_POST['points'.$qid]));
+			  $attempts = Sanitize::onlyInt(trim($_POST['attempts'.$qid]));
+			  $showhints = intval($_POST['showhints'.$qid]);
+			  if ($points==false) { $points = 9999;}
+			  if ($attempts==false) {$attempts = 9999;}
+			  //DB $query = "UPDATE imas_questions SET points='$points',attempts='$attempts',showhints=$showhints WHERE id='$qid'";
+			  //DB mysql_query($query) or die("Query failed : " . mysql_error());
+			  $stm = $DBH->prepare("UPDATE imas_questions SET points=:points,attempts=:attempts,showhints=:showhints WHERE id=:id");
+			  $stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':showhints'=>$showhints, ':id'=>$qid));
+			  if (intval($_POST['copies'.$qid])>0 && intval($qid)>0) {
+			    for ($i=0;$i<intval($_POST['copies'.$qid]);$i++) {
+			      $qsetid = $qidtoqsetid[$qid];
+			      //DB $query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
+			      //DB $query .= "VALUES ('$aid','$points','$attempts',$showhints,9999,0,0,'$qsetid')";
+			      //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+			      //DB $newqid = mysql_insert_id();
+			      $query = "INSERT INTO imas_questions (assessmentid,points,attempts,showhints,penalty,regen,showans,questionsetid) ";
+			      $query .= "VALUES (:assessmentid, :points, :attempts, :showhints, :penalty, :regen, :showans, :questionsetid)";
+			      $stm = $DBH->prepare($query);
+			      $stm->execute(array(':assessmentid'=>$aid, ':points'=>$points, ':attempts'=>$attempts, ':showhints'=>$showhints, ':penalty'=>9999, ':regen'=>0, ':showans'=>0, ':questionsetid'=>$qsetid));
+			      $newqid = $DBH->lastInsertId();
+			      $itemarr = explode(',',$itemorder);
+			      $key = array_search($qid,$itemarr);
+			      if ($key===false) {
+			        $itemarr[] = $newqid;
+			      } else {
+			        array_splice($itemarr,$key+1,0,$newqid);
+			      }
+			      $itemorder = implode(',',$itemarr);
+			    }
+			  }
 			}
 			//DB $query = "UPDATE imas_assessments SET itemorder='$itemorder' WHERE id='$aid'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -229,7 +228,7 @@ if (isset($_POST['checked'])) { //modifying existing
 					$row['attempts'] = '';
 				}
 
-				$qrows[$row['id']] = '<tr><td>'.$qns[$row['id']].'</td><td>'.Sanitize::encodeStringForDisplay($row['description']).'</td>';
+				$qrows[$row['id']] = '<tr><td>'.Sanitize::onlyInt($qns[$row['id']]).'</td><td>'.Sanitize::encodeStringForDisplay($row['description']).'</td>';
 				$qrows[$row['id']] .= '<td>';
 				if ($row['extref']!='') {
 					$extref = explode('~~',$row['extref']);

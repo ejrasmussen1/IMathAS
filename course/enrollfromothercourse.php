@@ -60,12 +60,13 @@ if (!isset($teacherid)) { // loaded by a NON-teacher
 				$stm->execute($qarr);
 			}
 		}
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid");
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 
 	} else if (isset($_POST['sourcecourse'])) {
 		//know source course
-		$source = intval($_POST['sourcecourse']);
+		//$source = intval($_POST['sourcecourse']);
+        $source = Sanitize::onlyInt($_POST['sourcecourse']);
 		//DB $query = "SELECT iu.FirstName,iu.LastName,iu.id FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid='$source' ORDER BY iu.LastName,iu.FirstName";
 		//DB $resultStudentList = mysql_query($query) or die("Query failed : " . mysql_error());
 		$resultStudentList = $DBH->prepare("SELECT iu.FirstName,iu.LastName,iu.id FROM imas_users AS iu JOIN imas_students ON iu.id=imas_students.userid WHERE imas_students.courseid=:courseid ORDER BY iu.LastName,iu.FirstName");

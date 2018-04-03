@@ -168,13 +168,13 @@
 			}
 		}
 		if ($from=='ltitimelimit') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/bltilaunch.php?accessibility=ask");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/bltilaunch.php?accessibility=ask" . "&r=" . Sanitize::randomQueryStringParam());
 		} else if ($from=='gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		} else if ((!isset($sessiondata['ltiitemtype']) || $sessiondata['ltiitemtype']!=0)) {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/assessment/showtest.php?cid=$cid&id={$sessiondata['ltiitemid']}" . "&r=" . Sanitize::randomQueryStringParam());
 		}
 	} else {
 		require("../header.php");

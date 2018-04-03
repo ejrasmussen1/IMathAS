@@ -28,11 +28,13 @@
 	if (isset($_POST['read']) && count($_POST['checked'])>0) {
 		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
+
 		$query = "UPDATE imas_msgs SET isread=(isread|1) WHERE id IN ($checklist) AND (isread&1)=0";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$DBH->query($query);
 	}
 	if (isset($_POST['remove']) && count($_POST['checked'])>0) {
+
 		//DB $checklist = "'".implode("','",$_POST['checked'])."'";
 		$checklist = implode(',', array_map('intval', $_POST['checked']));
 		$query = "DELETE FROM imas_msgs WHERE id IN ($checklist) AND (isread&4)=4";
@@ -43,6 +45,7 @@
 		$DBH->query($query);
 	}
 	if (isset($_GET['removeid'])) {
+
 		//DB $query = "DELETE FROM imas_msgs WHERE id='{$_GET['removeid']}' AND (isread&4)=4";
 		//DB mysql_query($query) or die("Query failed : $query " . mysql_error());
 		$stm = $DBH->prepare("DELETE FROM imas_msgs WHERE id=:id AND (isread&4)=4");

@@ -246,6 +246,8 @@ class Sanitize
 		return $safeUrl;
 	}
 
+
+
 	/**
 	 * Generate a safe query string from a map of query arguments.
 	 * It is not necessary to "pre-sanitize" data passed to this method. It will all be URL-encoded.

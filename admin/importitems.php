@@ -271,6 +271,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			//look up any refs to UIDs
 			//DB $query = "SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')";
 			//DB $result = mysql_query($query) or die("error on: $query: " . mysql_error());
+
 			$stm = $DBH->query("SELECT id,control,qtext FROM imas_questionset WHERE id IN ($qidstocheck) AND (control LIKE '%includecodefrom(UID%' OR qtext LIKE '%includeqtextfrom(UID%')");
 			$includedqs = array();
 			//DB while ($row = mysql_fetch_row($result)) {
@@ -288,7 +289,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 			//lookup backrefs
 			$includedbackref = array();
 			if (count($includedqs)>0) {
-				$includedlist = implode(',', $includedqs);  //known decimal values from above
+				$includedlist = implode(',', array_map('intval',$includedqs));  //known decimal values from above
 				//DB $query = "SELECT id,uniqueid FROM imas_questionset WHERE uniqueid IN ($includedlist)";
 				//DB $result = mysql_query($query) or die("Query failed : $query"  . mysql_error());
 				//DB while ($row = mysql_fetch_row($result)) {
@@ -681,7 +682,7 @@ if (!(isset($teacherid))) {
 		list ($desc,$itemlist,$item,$questions,$qset,$sourceinstall,$ownerid) = parsefile($filename);
 
 		$userights = $_POST['userights'];
-		$newlibs = explode(",",$_POST['libs']);
+		$newlibs = explode(",",array_map('intval',$_POST['libs']));
 		//DB $item = array_map('addslashes_deep', $item);
 		//DB $questions = array_map('addslashes_deep', $questions);
 		//DB $qset = array_map('addslashes_deep', $qset);
@@ -695,8 +696,8 @@ if (!(isset($teacherid))) {
 		$stm->execute(array(':id'=>$cid));
 
 		list($blockcnt,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
-		$ciditemorder = unserialize($itemorder);
-		$items = unserialize($itemlist);
+		$ciditemorder = json_decode($itemorder);
+		$items = json_decode($itemlist);
 		$newitems = array();
 		$missingfiles = array();
 
@@ -715,18 +716,20 @@ if (!(isset($teacherid))) {
 
 		//DB mysql_query("COMMIT") or die("Query failed :$query " . mysql_error());
 		$DBH->commit();
-
+        $rqp = Sanitize::randomQueryStringParam();
 		if (count($missingfiles)>0) {
 			echo "These files pointed to by inline text items were not found and will need to be reuploaded:<br/>";
 			foreach ($missingfiles as $file) {
 				echo "$file <br/>";
 			}
-			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
+
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid&r=$rqp\" >Done</a></p>";
 		} else if ($myrights==100) {
 			echo "<p>$updateqcnt questions updated, $newqcnt questions added.</p>";
-			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid\">Done</a></p>";
+
+			echo "<p><a href=\"$imasroot/course/course.php?cid=$cid&r=$rqp\" >Done</a></p>";
 		} else {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid");
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/course.php?cid=$cid&r=$rqp");
 		}
 		exit;
 	} elseif ($_FILES['userfile']['name']!='') { //STEP 2 DATA MANIPULATION
@@ -746,7 +749,7 @@ if (!(isset($teacherid))) {
 			$page_fileErrorMsg .=  "a question or library export.\n";
 		}
 
-		$items = unserialize($itemlist);
+		$items = json_decode($itemlist);
 		$ids = array();
 		$types = array();
 		$names = array();
@@ -867,7 +870,7 @@ function chkgrp(frm, arr, mark) {
 				echo "onClick=\"chkgrp(this.form, '".Sanitize::encodeStringForJavascript($ids[$i])."', this.checked);\" ";
 				echo '/>';
 			} else {
-				echo "<input type=checkbox name='checked[]' value='".Sanitize::encodeStringForDisplay($ids[$i])."' id='{$parents[$i]}.{$ids[$i]}' checked=checked ";
+				echo "<input type=checkbox name='checked[]' value='".Sanitize::encodeStringForDisplay($ids[$i])."' id='{$parents[$i]}.{'" . Sanitize::encodeStringForDisplay($ids[$i]). "'}' checked=checked ";
 				echo '/>';
 			}
 ?>
