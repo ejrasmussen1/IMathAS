@@ -63,7 +63,7 @@ if ($canviewall) {
 		$stm = $DBH->prepare("SELECT colorize FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$colorize = $stm->fetchColumn(0);
-		setcookie("colorize-$cid",$colorize, 0, null, null, false, true);
+		setcookie("colorize-$cid",$colorize);
 	}
 	if (isset($_GET['catfilter'])) {
 		$catfilter = $_GET['catfilter'];
@@ -132,7 +132,7 @@ if ($canviewall) {
 }
 
 if ($canviewall && !empty($_GET['stu'])) {
-  $stu = Sanitize::onlyInt($_GET['stu']);
+	$stu = $_GET['stu'];
 } else {
 	$stu = 0;
 }
@@ -199,10 +199,10 @@ if ($isteacher) {
 			$value = $_POST['checked'];
 			$last = count($value)-1;
 			for($i = 0; $i < $last; $i++){
-				gbstudisp(Sanitize::onlyInt($value[$i]));
+				gbstudisp($value[$i]);
 				echo "<div style=\"page-break-after:always\"></div>";
 			}
-			gbstudisp(Sanitize::onlyInt($value[$last]));//no page break after last report
+			gbstudisp($value[$last]);//no page break after last report
 
 			echo "</div></div></div>";
 		}
@@ -250,7 +250,7 @@ if ($isteacher) {
 		}
 	}
 	if (isset($_POST['usrcomments']) || isset($_POST['score']) || isset($_POST['newscore'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?".Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . "&r=" . Sanitize::randomQueryStringParam());
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?".Sanitize::fullQueryString($_SERVER['QUERY_STRING']));
 		exit;
 	}
 }
@@ -274,7 +274,7 @@ var gbmod = {
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=120617"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=040218"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
@@ -661,7 +661,7 @@ function gbstudisp($stu) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
 					if ($lastsec=='') {echo '</optgroup>';}
-					echo '<optgroup label="Section '.Sanitize::encodeStringForDisplay($row[3]).'">';
+					echo '<optgroup label="Section '.htmlentities($row[3]).'">';
 					$lastsec = $row[3];
 				}
 				echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';
@@ -1039,11 +1039,11 @@ function gbstudisp($stu) {
 				} else if ($gbt[0][1][$i][6]==0) { //online
 					echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][4]).',\'A\')">', _('View Feedback'), '</a></td>';
 				} else if ($gbt[0][1][$i][6]==1) { //offline
-					echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][2]).',\'O\')">', _('View Feedback'), '</a></td>';
+					echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][2]).',\'O\')">', _('View Feedback'), '</a></td>';					
 				} else if ($gbt[0][1][$i][6]==3) { //exttool
-					echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][2]).',\'E\')">', _('View Feedback'), '</a></td>';
+					echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[1][1][$i][2]).',\'E\')">', _('View Feedback'), '</a></td>';										
 				} else if ($gbt[0][1][$i][6]==2) { //forum
-					echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[0][1][$i][7]).',\'F\','.Sanitize::onlyInt($gbt[1][4][0]).')">', _('View Feedback'), '</a></td>';
+					echo '<td><a href="#" onclick="return showfb('.Sanitize::onlyInt($gbt[0][1][$i][7]).',\'F\','.Sanitize::onlyInt($gbt[1][4][0]).')">', _('View Feedback'), '</a></td>';										
 				} 
 			}
 			echo '</tr>';
