@@ -259,8 +259,7 @@ if ($myrights<20) {
 		}
 
 	} else if (isset($_POST['transfer'])) {
-	    $newOwner = Sanitize::onlyInt($_POST['newowner']);
-		if (!empty($newOwner)) {
+		if (isset($_POST['newowner'])) {
 			if ($_POST['transfer']!='') {
 				//DB $translist = "'".implode("','",explode(',',$_POST['transfer']))."'";
 				$translist = implode(',', array_map('intval', explode(',',$_POST['transfer'])));
@@ -270,11 +269,11 @@ if ($myrights<20) {
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB $newgpid = mysql_result($result,0,0);
 				$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=:id");
-				$stm->execute(array(':id'=>$newOwner));
+				$stm->execute(array(':id'=>$_POST['newowner']));
 				$newgpid = $stm->fetchColumn(0);
 				//DB $query = "UPDATE imas_libraries SET ownerid='{$_POST['newowner']}',groupid='$newgpid' WHERE imas_libraries.id IN ($translist)";
 				$query = "UPDATE imas_libraries SET ownerid=:ownerid,groupid=:groupid WHERE imas_libraries.id IN ($translist)";
-				$qarr = array(':ownerid'=>$newOwner , ':groupid'=>$newgpid);
+				$qarr = array(':ownerid'=>$_POST['newowner'], ':groupid'=>$newgpid);
 
 				if (!$isadmin) {
 				  //DB $query .= " AND groupid='$groupid'";
@@ -360,14 +359,14 @@ if ($myrights<20) {
 			}
 		}
 	} else if (isset($_GET['transfer'])) {
-		if (!empty($newOwner)) {
+		if (isset($_POST['newowner'])) {
 
 			//added for mysql 3.23 compatibility
 			//DB $query = "SELECT groupid FROM imas_users WHERE id='{$_POST['newowner']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $newgpid = mysql_result($result,0,0);
 			$stm = $DBH->prepare("SELECT groupid FROM imas_users WHERE id=:id");
-			$stm->execute(array(':id'=>$newOwner));
+			$stm->execute(array(':id'=>$_POST['newowner']));
 			$newgpid = $stm->fetchColumn(0);
 
 			//$query = "UPDATE imas_libraries,imas_users SET imas_libraries.ownerid='{$_POST['newowner']}'";
@@ -408,9 +407,8 @@ if ($myrights<20) {
 		}
 
 	} else if (isset($_GET['modify'])) {
-		$libModify = Sanitize::stripHtmlTags($_GET['modify']);
 		if (isset($_POST['name']) && trim($_POST['name'])!='') {
-			if ($libModify=="new") {
+			if ($_GET['modify']=="new") {
 				$_POST['name'] = str_replace(array(',','\\"','\\\'','~'),"",$_POST['name']);
 				//DB $query = "SELECT * FROM imas_libraries WHERE name='{$_POST['name']}' AND parent='{$_POST['libs']}'";
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -444,8 +442,8 @@ if ($myrights<20) {
 				//DB }
 				//DB $query .= " WHERE id='{$_GET['modify']}'";
 				$query = "UPDATE imas_libraries SET name=:name,userights=:userights,sortorder=:sortorder,lastmoddate=:lastmoddate";
-				$qarr = array(':name'=>$_POST['name'], ':userights'=>$_POST['rights'], ':sortorder'=>$_POST['sortorder'], ':lastmoddate'=>$now, ':id'=>$libModify);
-				if ($libModify != $_POST['libs']) {
+				$qarr = array(':name'=>$_POST['name'], ':userights'=>$_POST['rights'], ':sortorder'=>$_POST['sortorder'], ':lastmoddate'=>$now, ':id'=>$_GET['modify']);
+				if ($_GET['modify'] != $_POST['libs']) {
 					$query .= ",parent=:parent";
 					$qarr[':parent']=$_POST['libs'];
 				}
@@ -475,19 +473,19 @@ if ($myrights<20) {
 			$pagetitle = "Library Settings";
 			$curBreadcrumb .= " &gt; <a href=\"managelibs.php?cid=$cid\">Manage Libraries</a> &gt; $pagetitle ";
 
-			if ($libModify!="new") {
+			if ($_GET['modify']!="new") {
 				$pagetitle = "Modify Library\n";
 				if ($isgrpadmin) {
 					$stm = $DBH->prepare("SELECT il.name,il.userights,il.parent,il.sortorder,iu.firstName,iu.lastName FROM imas_libraries AS il JOIN imas_users AS iu ON il.ownerid=iu.id WHERE il.id=:id AND il.groupid=:groupid");
-					$stm->execute(array(':id'=>$libModify, ':groupid'=>$groupid));
+					$stm->execute(array(':id'=>$_GET['modify'], ':groupid'=>$groupid));
 				} else if ($isadmin) {
 					//DB $query = "SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id='{$_GET['modify']}'";
 					$stm = $DBH->prepare("SELECT il.name,il.userights,il.parent,il.sortorder,iu.firstName,iu.lastName,il.federationlevel FROM imas_libraries AS il JOIN imas_users AS iu ON il.ownerid=iu.id WHERE il.id=:id");
-					$stm->execute(array(':id'=>$libModify));
+					$stm->execute(array(':id'=>$_GET['modify']));
 				} else {
 					//DB $query = "SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id='{$_GET['modify']}' AND ownerid='$userid'";
 					$stm = $DBH->prepare("SELECT name,userights,parent,sortorder FROM imas_libraries WHERE id=:id AND ownerid=:ownerid");
-					$stm->execute(array(':id'=>$libModify, ':ownerid'=>$userid));
+					$stm->execute(array(':id'=>$_GET['modify'], ':ownerid'=>$userid));
 				}
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB if ($row = mysql_fetch_row($result)) {
@@ -724,9 +722,9 @@ if ($overwriteBody==1) {
 		</p>
 	</form>
 <?php
-	} else if (isset($libModify)) {
+	} else if (isset($_GET['modify'])) {
 ?>
-	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&modify=<?php echo Sanitize::encodeUrlParam($libModify); ?>">
+	<form method=post action="managelibs.php?cid=<?php echo $cid ?>&modify=<?php echo Sanitize::encodeUrlParam($_GET['modify']); ?>">
 		<span class=form>Library Name:</span>
 		<span class=formright><input type=text name="name" value="<?php echo Sanitize::encodeStringForDisplay($name); ?>" size=20></span><br class=form>
 		<?php

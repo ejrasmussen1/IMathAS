@@ -63,7 +63,7 @@ if ($canviewall) {
 		$stm = $DBH->prepare("SELECT colorize FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$colorize = $stm->fetchColumn(0);
-		setcookie("colorize-$cid",$colorize);
+		setcookie("colorize-$cid",$colorize, 0, null, null, false, true);
 	}
 	if (isset($_GET['catfilter'])) {
 		$catfilter = $_GET['catfilter'];
@@ -250,7 +250,7 @@ if ($isteacher) {
 		}
 	}
 	if (isset($_POST['usrcomments']) || isset($_POST['score']) || isset($_POST['newscore'])) {
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?".Sanitize::fullQueryString($_SERVER['QUERY_STRING']));
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?".Sanitize::fullQueryString($_SERVER['QUERY_STRING']) . "&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	}
 }
@@ -661,7 +661,7 @@ function gbstudisp($stu) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
 					if ($lastsec=='') {echo '</optgroup>';}
-					echo '<optgroup label="Section '.htmlentities($row[3]).'">';
+					echo '<optgroup label="Section '.Sanitize::encodeStringForDisplay($row[3]).'">';
 					$lastsec = $row[3];
 				}
 				echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';
