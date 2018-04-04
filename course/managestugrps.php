@@ -312,7 +312,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 				$stm->execute($stulist);
 				while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 					echo Sanitize::encodeStringForDisplay($row[1]).', '.Sanitize::encodeStringForDisplay($row[0]).'<br/>';
-					$loginfo .= Sanitize::encodeStringForDisplay($row[1]).', '.Sanitize::encodeStringForDisplay($row[0]).' already in group.';
+					$loginfo .= Sanitize::stripHtmlTags($row[1]).', '.Sanitize::stripHtmlTags($row[0]).' already in group.';
 				}
 				echo "<p><a href=\"managestugrps.php?cid=$cid&grpsetid=" . Sanitize::encodeUrlParam($_GET['grpsetid']) . "\">Continue</a></p>";
 				require("../footer.php");
