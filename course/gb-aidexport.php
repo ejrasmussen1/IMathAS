@@ -383,7 +383,7 @@ if (isset($_POST['options'])) {
 		# strip the last deliminator
 		$line = substr($line, 0, -1);
 		$line .= "\n";
-		echo $line;
+		echo Sanitize::outgoingHtml($line);
 	}
 	exit;
 } else {

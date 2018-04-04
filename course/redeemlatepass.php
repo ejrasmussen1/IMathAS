@@ -86,7 +86,7 @@
 							$n = $row[1];
 						}
 					}
-					printf("<p>Returning %d LatePass", $n);
+					printf("<p>Returning %d LatePass", Sanitize::onlyInt($n));
 					echo ($n>1?"es":"")."</p>";
 					//DB $query = "UPDATE imas_students SET latepass=latepass+$n WHERE userid='$userid' AND courseid='$cid'";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -236,7 +236,7 @@
 			echo '<div id="headerredeemlatepass" class="pagetitle"><h2>Redeem LatePass</h2></div>';
 			echo "<form method=post action=\"redeemlatepass.php?cid=$cid&aid=$aid\">";
 			if ($allowlate%10>1) {
-				echo '<p>You may use up to '.($allowlate%10-1-$usedlatepasses).' more LatePass(es) on this assessment.</p>';
+			    echo '<p>You may use up to '.Sanitize::onlyInt($allowlate%10-1-$usedlatepasses).' more LatePass(es) on this assessment.</p>';
 			}
 			echo "<p>You have ".Sanitize::encodeStringForDisplay($latepasses)." LatePass(es) remaining.  ";
 			if ($limitedByCourseEnd) {
