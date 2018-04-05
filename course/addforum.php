@@ -171,7 +171,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		$forumtype = Sanitize::onlyInt($_POST['forumtype']);
 		$forumid = Sanitize::onlyInt($_GET['id']);
 
-		if (!empty($forumid)) {  //already have id; update
+		if ($forumid) {  //already have id; update
 			//DB $query = "SELECT groupsetid FROM imas_forums WHERE id='{$_GET['id']}';";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $oldgroupsetid = mysql_result($result,0,0);

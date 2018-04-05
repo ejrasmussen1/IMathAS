@@ -96,7 +96,7 @@ function showitemtree($items,$parent) {
 					   $showgreyedout = true;
 				   }
 				   $stm = $DBH->prepare("SELECT bestscores FROM imas_assessment_sessions WHERE assessmentid=:assessmentid AND userid=:userid");
-				   $stm->execute(array(':assessmentid'=>$line['reqscoreaid'], ':userid'=>$userid));
+				   $stm->execute(array(':assessmentid'=>Sanitize::onlyInt($line['reqscoreaid']), ':userid'=>$userid));
 				   if ($stm->rowCount()==0) {
 					   $nothidden = false;
 				   } else {

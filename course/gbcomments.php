@@ -53,7 +53,7 @@
 				$scorecol = $_POST['gradecol']-1;
 
 				// $_FILES[]['tmp_name'] is not user provided. This is safe.
-				$handle = fopen_utf8($_FILES['userfile']['tmp_name'],'r');
+				$handle = fopen_utf8(realpath($_FILES['userfile']['tmp_name']),'r');
 				if ($_POST['hashdr']==1) {
 					$data = fgetcsv($handle,4096,',');
 				} else if ($_POST['hashdr']==2) {
