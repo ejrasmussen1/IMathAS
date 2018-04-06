@@ -537,6 +537,9 @@ function linkgenerator() {
  <title>Quick Drill Link Generator</title>
  <script type="text/javascript">
  var baseaddr = "<?php echo $addr;?>";
+ function isNumeric(n) {
+   return !isNaN(parseFloat(n)) && isFinite(n);
+ }
  function makelink() {
 	 var id = document.getElementById("qid").value;
 	 if (id=='') {alert("Question ID is required"); return false;}
@@ -546,10 +549,13 @@ function linkgenerator() {
 	 var val = document.getElementById("val").value;
 	 if (mode!='none' && val=='') { alert("need to specify N"); return false;}
 	 var url = baseaddr + '?id=' + id + '&sa='+sa;
+	 if (!isNumeric(id) || (!isNumeric(cid) && cid != 'admin') || !isNumeric(val)) {
+		 return false;
+	 }
 	 if (cid != '') {
 		url += '&cid='+cid;
 	 }
-	 if (mode != 'none') {
+	 if (mode == 'n' || mode == 'nc' ||  mode == 't') {
 		 url += '&'+mode+'='+val;
 	 }
 	 document.getElementById("output").innerHTML = "<p>URL to use: "+url+"</p><p><a href=\""+url+"\" target=\"_blank\">Try it</a></p>";

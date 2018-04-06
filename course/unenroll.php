@@ -93,7 +93,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		} else if ($_GET['uid']=="selected") {
 			if (count($_POST['checked'])>0) {
 				//DB $ulist = "'".implode("','",$_POST['checked'])."'";
-				$ulist = implode(',', array_map('intval', Sanitize::encodeStringForDisplay($_POST['checked'])));
+				$ulist = implode(',', array_map('intval', $_POST['checked']));
 				//DB $query = "SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)";
 				//DB $resultUserList = mysql_query($query) or die("Query failed : " . mysql_error());
 				$resultUserList = $DBH->query("SELECT LastName,FirstName,SID FROM imas_users WHERE id IN ($ulist)");
