@@ -78,8 +78,8 @@ if (!(isset($teacherid))) {
 					$last = trim($last);
 					//DB $query .= "imas_users.FirstName='$first' AND imas_users.LastName='$last'";
 					$query .= "imas_users.FirstName=:firstname AND imas_users.LastName=:lastname";
-					$qarr[':firstname'] = $first;
-					$qarr[':lastname'] = $last;
+					$qarr[':firstname'] = Sanitize::stripHtmlTags($first);
+					$qarr[':lastname'] = Sanitize::stripHtmlTags($last);
 					//echo $query;
 				} else {
 					$query .= "0";

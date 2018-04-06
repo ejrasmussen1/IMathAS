@@ -58,7 +58,7 @@
 	//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 	//DB $itemid = mysql_result($result,0,0);
 	$stm = $DBH->prepare("SELECT id FROM imas_items WHERE itemtype='LinkedText' AND typeid=:typeid");
-	$stm->execute(array(':typeid'=>$_GET['id']));
+	$stm->execute(array(':typeid'=>intval($_GET['id'])));
 	$itemid = $stm->fetchColumn(0);
 
 	//DB $query = "SELECT itemorder,name,theme FROM imas_courses WHERE id='$cid'";
