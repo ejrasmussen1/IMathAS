@@ -12,7 +12,7 @@ $overwriteBody = 0;
 $body = "";
 $pagetitle = "Question Settings";
 
-$question_id = Sanitize::onlyInt($_GET['id']);
+
 	//CHECK PERMISSIONS AND SET FLAGS
 if (!(isset($teacherid))) {
  	$overwriteBody = 1;
@@ -36,38 +36,24 @@ if (!(isset($teacherid))) {
 			$showhints = 0;
 			$fixedseeds = null;
 			$_POST['copies'] = 1;
-					
 		} else {
-            //sanitized vairables and updated the conditional statements 3/5/2018
-			$points = Sanitize::onlyInt($_POST['points']);
-			$attempts = Sanitize::onlyInt($_POST['attempts']);
-			$penalty = Sanitize::onlyInt($_POST['penalty']);
-			$fixedseeds = Sanitize::encodeStringForDisplay($_POST['fixedseeds']);
-			
-			empty($points)?$points = 9999 : $points;
-			empty($attempts)?$attempts = 9999 : $attempts;
-			empty($penalty)?$penalty = 9999 : $penalty;
-			empty($fixedseeds)?$fixedseeds = NULL : $fixedseeds;
-// 			if (trim($points)=="") {$points=9999;} else {$points = intval($points);}
-// 			if (trim($_POST['attempts'])=="") {$attempts=9999;} else {$attempts = intval($_POST['attempts']);}
-// 			if (trim($_POST['penalty'])=="") {$penalty=9999;} else {$penalty = intval($_POST['penalty']);}
-// 			if (trim($_POST['fixedseeds'])=="") {$fixedseeds=null;} else {$fixedseeds = trim($_POST['fixedseeds']);}
+			if (trim($_POST['points'])=="") {$points=9999;} else {$points = intval($_POST['points']);}
+			if (trim($_POST['attempts'])=="") {$attempts=9999;} else {$attempts = intval($_POST['attempts']);}
+			if (trim($_POST['penalty'])=="") {$penalty=9999;} else {$penalty = intval($_POST['penalty']);}
+			if (trim($_POST['fixedseeds'])=="") {$fixedseeds=null;} else {$fixedseeds = trim($_POST['fixedseeds']);}
 			if ($penalty!=9999) {
-			    $post_skippenalty = Sanitize::onlyInt($_POST['skippenalty']);
-				if ($post_skippenalty==10) {
+				if ($_POST['skippenalty']==10) {
 					$penalty = 'L'.$penalty;
-				} else if ($post_skippenalty>0) {
-					$penalty = 'S'.$post_skippenalty.$penalty;
+				} else if ($_POST['skippenalty']>0) {
+					$penalty = 'S'.$_POST['skippenalty'].$penalty;
 				}
 			}
-
-			$regen_post = Sanitize::onlyInt($_POST['regen']);
-			$regen = $regen_post + 3*$_POST['allowregen'];
-			$showans = Sanitize::encodeStringForDisplay($_POST['showans']);
-			$rubric = Sanitize::onlyInt($_POST['rubric']);
-			$showhints = Sanitize::onlyInt($_POST['showhints']);
+			$regen = $_POST['regen'] + 3*$_POST['allowregen'];
+			$showans = $_POST['showans'];
+			$rubric = intval($_POST['rubric']);
+			$showhints = intval($_POST['showhints']);
 		}
-		if (isset($question_id)) { //already have id - updating
+		if (isset($_GET['id'])) { //already have id - updating
 			if (isset($_POST['replacementid']) && $_POST['replacementid']!='' && intval($_POST['replacementid'])!=0) {
 				//DB $query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans',rubric=$rubric,showhints=$showhints";
 				//DB $query .= ',questionsetid='.intval($_POST['replacementid'])." WHERE id='{$_GET['id']}'";
@@ -75,7 +61,7 @@ if (!(isset($teacherid))) {
 				$query .= ',questionsetid=:questionsetid WHERE id=:id';
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans, ':rubric'=>$rubric,
-					':showhints'=>$showhints,  ':fixedseeds'=>$fixedseeds, ':questionsetid'=>$_POST['replacementid'], ':id'=>$question_id));
+					':showhints'=>$showhints,  ':fixedseeds'=>$fixedseeds, ':questionsetid'=>$_POST['replacementid'], ':id'=>$_GET['id']));
 			} else {
 				//DB $query = "UPDATE imas_questions SET points='$points',attempts='$attempts',penalty='$penalty',regen='$regen',showans='$showans',rubric=$rubric,showhints=$showhints";
 				//DB $query .= " WHERE id='{$_GET['id']}'";
@@ -83,7 +69,7 @@ if (!(isset($teacherid))) {
 				$query .= " WHERE id=:id";
 				$stm = $DBH->prepare($query);
 				$stm->execute(array(':points'=>$points, ':attempts'=>$attempts, ':penalty'=>$penalty, ':regen'=>$regen, ':showans'=>$showans,
-					':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds, ':id'=>$question_id));
+					':rubric'=>$rubric, ':showhints'=>$showhints, ':fixedseeds'=>$fixedseeds, ':id'=>$_GET['id']));
 			}
 
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
@@ -92,7 +78,7 @@ if (!(isset($teacherid))) {
 				//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB $_GET['qsetid'] = mysql_result($result,0,0);
 				$stm = $DBH->prepare("SELECT questionsetid FROM imas_questions WHERE id=:id");
-				$stm->execute(array(':id'=>$question_id));
+				$stm->execute(array(':id'=>$_GET['id']));
 				$_GET['qsetid'] = $stm->fetchColumn(0);
 			}
 		}
@@ -117,9 +103,9 @@ if (!(isset($teacherid))) {
 				$qid = $DBH->lastInsertId();
 
 				//add to itemorder
-				if (isset($question_id)) { //am adding copies of existing
+				if (isset($_GET['id'])) { //am adding copies of existing
 					$itemarr = explode(',',$itemorder);
-					$key = array_search($question_id,$itemarr);
+					$key = array_search($_GET['id'],$itemarr);
 					array_splice($itemarr,$key+1,0,$qid);
 					$itemorder = implode(',',$itemarr);
 				} else {
@@ -140,16 +126,16 @@ if (!(isset($teacherid))) {
 			updatePointsPossible($aid);
 		}
 
-		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid" . "&r=" . Sanitize::randomQueryStringParam());
+		header('Location: ' . $GLOBALS['basesiteurl'] . "/course/addquestions.php?cid=$cid&aid=$aid&r=" . Sanitize::randomQueryStringParam());
 		exit;
 	} else { //DEFAULT DATA MANIPULATION
 
-		if (isset($question_id)) {
+		if (isset($_GET['id'])) {
 			//DB $query = "SELECT points,attempts,penalty,regen,showans,rubric,showhints FROM imas_questions WHERE id='{$_GET['id']}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $line = mysql_fetch_array($result, MYSQL_ASSOC);
 			$stm = $DBH->prepare("SELECT points,attempts,penalty,regen,showans,rubric,showhints,questionsetid,fixedseeds FROM imas_questions WHERE id=:id");
-			$stm->execute(array(':id'=>$question_id));
+			$stm->execute(array(':id'=>$_GET['id']));
 			$line = $stm->fetch(PDO::FETCH_ASSOC);
 			if ($line['penalty']{0}==='L') {
 				$line['penalty'] = substr($line['penalty'],1);

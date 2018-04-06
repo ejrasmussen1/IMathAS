@@ -19,11 +19,10 @@
 		exit;
 	}
 
-	$posttolist = Sanitize::encodeStringForDisplay($_POST['tolist']);
 	if (isset($_POST['message'])) {
 		$toignore = array();
 		if (intval($_POST['aidselect'])!=0) {
-			$limitaid = Sanitize::encodeStringForDisplay($_POST['aidselect']);
+			$limitaid = $_POST['aidselect'];
 			$limittype = $_POST['limittype'];
 
 			if ($limittype=='comp') {
@@ -53,7 +52,7 @@
 		if ($_GET['masssend']=="Message") {
 			$now = time();
 			//DB $tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
-			$tolist = implode(',', array_map('intval', explode(",", $posttolist)));
+			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));
 			//DB $query = "SELECT FirstName,LastName,id,msgnotify,email FROM imas_users WHERE id IN ($tolist)";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->query("SELECT FirstName,LastName,id,msgnotify,email FROM imas_users WHERE id IN ($tolist)");
@@ -73,7 +72,7 @@
 				}
 			}
 
-			$tolist = explode(',', $posttolist);
+			$tolist = explode(',',$_POST['tolist']);
 
 			if (isset($_POST['savesent'])) {
 				$isread = 0;
@@ -103,9 +102,7 @@
 
 			foreach ($tolist as $msgto) {
 				if (!in_array($msgto,$toignore)) {
-					$postsubject = Sanitize::encodeStringForDisplay($_POST['subject']);
-					$postmessage = Sanitize::encodeStringForDisplay($_POST['message']);
-					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]), $postmessage);
+					$message = str_replace(array('LastName','FirstName'),array($lastnames[$msgto],$firstnames[$msgto]),$_POST['message']);
 					//DB $query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 					//DB $query .= "('{$_POST['subject']}','$message','$msgto','$userid',$now,$isread,'$cid')";
 					//DB mysql_query($query) or die("Query failed : " . mysql_error());
@@ -113,7 +110,7 @@
 					$query = "INSERT INTO imas_msgs (title,message,msgto,msgfrom,senddate,isread,courseid) VALUES ";
 					$query .= "(:title, :message, :msgto, :msgfrom, :senddate, :isread, :courseid)";
 					$stm = $DBH->prepare($query);
-					$stm->execute(array(':title'=>$postsubject, ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
+					$stm->execute(array(':title'=>$_POST['subject'], ':message'=>$message, ':msgto'=>$msgto, ':msgfrom'=>$userid,
 						':senddate'=>$now, ':isread'=>$isread, ':courseid'=>$cid));
 					$msgid = $DBH->lastInsertId();
 					if (isset($emailaddys[$msgto])) {
@@ -159,10 +156,11 @@
 			}
 
 		} else {
+
 			//$query = "SELECT imas_users.FirstName,imas_users.LastName,imas_users.email,imas_users.id ";
 			//$query .= "FROM imas_students,imas_users WHERE imas_students.courseid='$cid' AND imas_students.userid=imas_users.id";
 			//DB $tolist = "'".implode("','",explode(",",$_POST['tolist']))."'";
-			$tolist = implode(',', array_map('intval', explode(",", $posttolist)));
+			$tolist = implode(',', array_map('intval', explode(",",$_POST['tolist'])));
 			//DB $query = "SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			$stm = $DBH->query("SELECT FirstName,LastName,email,id FROM imas_users WHERE id IN ($tolist)");
@@ -253,11 +251,11 @@
 			}
 		}
 		if ($calledfrom=='lu') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		} else if ($calledfrom=='gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid" . "&r=" . Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 		} else if ($calledfrom=='itemsearch') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/admin2.php" . "?r=" . Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/admin2.php?r=" . Sanitize::randomQueryStringParam());
 		} else if ($calledfrom=='embed') {
 			require("../header.php");
 			echo '<p>'._('Messages Sent').'.';
@@ -267,10 +265,10 @@
 		exit;
 	} else {
 		$stm = $DBH->prepare("SELECT count(id) FROM imas_tutors WHERE courseid=:courseid");
-		$stm->execute(array(':courseid'=>Sanitize::courseId($_GET['cid'])));
+		$stm->execute(array(':courseid'=>$_GET['cid']));
 		$hastutors = ($stm->fetchColumn(0)>0);
 
-		$sendtype = Sanitize::encodeStringForDisplay((isset($_POST['posted']))?$_POST['posted']:$_POST['submit']); //E-mail or Message
+		$sendtype = (isset($_POST['posted']))?$_POST['posted']:$_POST['submit']; //E-mail or Message
 		$useeditor = "message";
 		$pagetitle = "Send Mass $sendtype";
 		require("../header.php");
