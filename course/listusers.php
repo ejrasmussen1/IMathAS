@@ -911,7 +911,7 @@ if ($overwriteBody==1) {
 				</td>
 				<?php
 				echo $hasSectionData;
-				echo $hasCodeData;
+				echo Sanitize::outgoingHtml($hasCodeData);
 				$nameline = '<a href="listusers.php?cid='.$cid.'&chgstuinfo=true&uid=' . Sanitize::onlyInt($line['userid']) . '" class="ui">';
 				$nameline .= Sanitize::encodeStringForDisplay($line['LastName']).', '.Sanitize::encodeStringForDisplay($line['FirstName']) . '</a>';
 				echo '<td><img data-uid="'. Sanitize::onlyInt($line['userid']) .'" src="../img/gears.png"/> ';
@@ -941,7 +941,7 @@ if ($overwriteBody==1) {
 				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo Sanitize::onlyInt($line['userid']); ?>&from=listusers" class="gl">Grades</a></td>
 				<?php
 				if ($haslatepasses) {
-					echo '<td>'.$line['latepass'].'</td>';
+					echo '<td>'.Sanitize::onlyInt($line['latepass']).'</td>';
 				}
 				?>
 			</tr>

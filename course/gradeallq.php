@@ -517,7 +517,7 @@
 				}
 
 			}
-			printf(" out of %d ", $points);
+			printf(" out of %d ", Sanitize::onlyInt($points));
 
 			if ($parts!='') {
 				$answeights = implode(', ',$answeights);

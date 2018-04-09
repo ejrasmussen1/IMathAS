@@ -74,8 +74,8 @@
 						$last = str_replace(' ','',$last);
 						//DB $query .= "imas_users.FirstName='$first' AND imas_users.LastName='$last'";
 						$query .= "imas_users.FirstName=:first AND imas_users.LastName=:last";
-						$qarr[':first'] = $first;
-						$qarr[':last'] = $last;
+						$qarr[':first'] = Sanitize::stripHtmlTags($first);
+						$qarr[':last'] = Sanitize::stripHtmlTags($last);
 						//echo $query;
 					} else {
 						$query .= "0";
