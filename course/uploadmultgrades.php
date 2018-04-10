@@ -189,10 +189,10 @@ if (!(isset($teacherid))) {
 							$p = explode(':',$hrow[$i]);
 							if (count($p)>1) {
 								$pts = intval(preg_replace('/[^\d\.]/','',$p[count($p)-1]));
-								$names[$i] = strip_tags($p[0]);
+								$names[$i] = Sanitize::stripHtmlTags($p[0]);
 							} else {
 								$pts = 0;
-								$names[$i] = strip_tags($hrow[$i]);
+								$names[$i] = Sanitize::stripHtmlTags($hrow[$i]);
 							}
 							//if ($pts==0) {$pts = '';}
 						}
