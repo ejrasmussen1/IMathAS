@@ -622,9 +622,9 @@ if (isset($_GET['modify'])) { //adding or modifying post
         $tags = explode(',',substr($taglist,$p+1));
         foreach ($tags as $tag) {
           $tag =  str_replace('"','&quot;',$tag);
-          echo '<option value="'.$tag.'" ';
+          echo '<option value="'.Sanitize::encodeStringForDisplay($tag).'" ';
           if ($tag==$line['tag']) {echo 'selected="selected"';}
-          echo '>'.$tag.'</option>';
+          echo '>'.Sanitize::encodeStringForDisplay($tag).'</option>';
         }
         echo '</select></span><br class="form" />';
       }

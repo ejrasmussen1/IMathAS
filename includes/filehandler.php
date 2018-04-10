@@ -151,7 +151,7 @@ function storeuploadedfile($id,$key,$sec="private") {
 			downsizeimage($_FILES[$id]);
 			$s3 = new S3($GLOBALS['AWSkey'],$GLOBALS['AWSsecret']);
 			// $_FILES[]['tmp_name'] is not user provided. This is safe.
-			if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],$key,$sec)) {
+			if ($s3->putObjectFile(realpath($_FILES[$id]['tmp_name']),$GLOBALS['AWSbucket'],$key,$sec)) {
 				return true;
 			} else {
 				return false;
@@ -242,7 +242,7 @@ function storeuploadedcoursefile($id,$key,$sec="public-read") {
 				$t++;
 			}
 			// $_FILES[]['tmp_name'] is not user provided. This is safe.
-			if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],'cfiles/'.$key,$sec)) {
+			if ($s3->putObjectFile(realpath($_FILES[$id]['tmp_name']),$GLOBALS['AWSbucket'],'cfiles/'.$key,$sec)) {
 				return $key;
 			} else {
 				return false;
@@ -291,7 +291,7 @@ function storeuploadedqimage($id,$key,$sec="public-read") {
 				$t++;
 			}
 			// $_FILES[]['tmp_name'] is not user provided. This is safe.
-			if ($s3->putObjectFile($_FILES[$id]['tmp_name'],$GLOBALS['AWSbucket'],'qimages/'.$key,$sec)) {
+			if ($s3->putObjectFile(realpath($_FILES[$id]['tmp_name']),$GLOBALS['AWSbucket'],'qimages/'.$key,$sec)) {
 				return $key;
 			} else {
 				return false;

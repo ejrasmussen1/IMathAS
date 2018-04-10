@@ -1356,6 +1356,7 @@ if ($linkparts[0]=='cid') {
 		$stm->execute(array(':enddate'=>$_SESSION['lti_duedate'], ':datebylti'=>$newdatebylti, ':id'=>$aid));
 		$line['enddate'] = $_SESSION['lti_duedate'];
 	}
+
 	if (!isset($_SESSION['lti_duedate']) && $line['date_by_lti']==1 && $_SESSION['ltirole']=='instructor') {
 		//assessment is set to use dates sent by LTI, but none was sent.  Give error for instructor.
 		$err = 'Your '.$installname.' course is set to use dates sent by the LMS, but the LMS did not send a date. ';
@@ -1366,7 +1367,7 @@ if ($linkparts[0]=='cid') {
 		$err .= 'enter this: canvas_assignment_due_at=$Canvas.assignment.dueAt.iso8601';
 		reporterror($err);
 	}
-	
+
 	if ($_SESSION['ltirole']!='instructor') {
 		//if ($line['avail']==0 || $now>$line['enddate'] || $now<$line['startdate']) {
 		//	reporterror("This assessment is closed");
