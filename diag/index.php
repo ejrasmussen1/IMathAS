@@ -173,7 +173,7 @@
 			$superpw[$k] = strtolower($v);
 		}
 		//DB $diagSID = $_POST['SID'].'~'.addslashes($diagqtr).'~'.$pcid;
-		$diagSID = $_POST['SID'].'~'.$diagqtr.'~'.$pcid;
+		$diagSID = Sanitize::stripHtmlTags($_POST['SID']).'~'.$diagqtr.'~'.$pcid;
 		if ($entrynotunique) {
 			$diagSID .= '~'.preg_replace('/\W/','',$sel1[$_POST['course']]);
 		}
@@ -270,19 +270,19 @@
 			}
 			//if ($allowreentry) {
 
-			$sessiondata['mathdisp'] = (int) $_POST['mathdisp'];//1;
-			$sessiondata['graphdisp'] = (int) $_POST['graphdisp'];//1;
+			$sessiondata['mathdisp'] = Sanitize::onlyInt($_POST['mathdisp']);//1;
+			$sessiondata['graphdisp'] = Sanitize::onlyInt($_POST['graphdisp']);//1;
 			//$sessiondata['mathdisp'] = 1;
 			//$sessiondata['graphdisp'] = 1;
 			$sessiondata['useed'] = 1;
 			$sessiondata['isdiag'] = $diagid;
 			$enc = base64_encode(serialize($sessiondata));
 			if (!empty($_POST['tzname'])) {
-				$tzname = $_POST['tzname'];
+				$tzname = Sanitize::stripHtmlTags($_POST['tzname']);
 			} else {
 				$tzname = '';
 			}
-			$tzoffset =  $_POST['tzoffset'];
+			$tzoffset =  Sanitize::onlyInt($_POST['tzoffset']);
 			//DB $query = "INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES ('$sessionid','$userid',$now,'{$_POST['tzoffset']}','$tzname','$enc')";
 			//DB $result = mysql_query($query) or die("Query failed : $query " . mysql_error());
 			$stm = $DBH->prepare("INSERT INTO imas_sessions (sessionid,userid,time,tzoffset,tzname,sessiondata) VALUES (:sessionid, :userid, :time, :tzoffset, :tzname, :sessiondata)");

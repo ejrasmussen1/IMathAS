@@ -1,14 +1,14 @@
 <?php
 require("../../init.php");
-$linkid = Sanitize::onlyInt($_GET['linkid']);
-if (empty($linkid)) {
+
+if (empty($_GET['linkid'])) {
 	echo "no link id provided";
 	exit;
 }
+$linkid = Sanitize::onlyInt($_GET['linkid']);
 //DB $query = "SELECT text,title,points FROM imas_linkedtext WHERE id='{$_GET['linkid']}'";
 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 //DB list($text,$title,$points) = mysql_fetch_row($result);
-
 $stm = $DBH->prepare("SELECT text,title,points FROM imas_linkedtext WHERE id=:id");
 $stm->execute(array(':id'=>$linkid));
 list($text,$title,$points) = $stm->fetch(PDO::FETCH_NUM);
@@ -133,7 +133,7 @@ if ($line['url']=='') {
 
 try {
 	$parms = signParameters($parms, $line['url'], "POST", $line['ltikey'], $line['secret'], null, $org_id, $org_desc);
-	$content = postLaunchHTML($parms, $line['url'],isset($parms['custom_debug']));
+	$content = postLaunchHTML($parms, Sanitize::rawurlencodePath($line['url']),isset($parms['custom_debug']));
 	print($content);
 } catch (Exception $e) {
 	echo $e->getMessage();
