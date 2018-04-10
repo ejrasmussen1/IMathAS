@@ -190,7 +190,7 @@
 			$page++;
 			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradeallq.php?"
 				. Sanitize::generateQueryStringFromMap(array('stu' => $stu, 'cid' => $cid, 'aid' => $aid,
-					'qid' => $qid, 'page' => $page,)));
+					'qid' => $qid, 'page' => $page, 'r' => Sanitize::randomQueryStringParam(),)));
 		}
 		exit;
 	}
@@ -517,7 +517,7 @@
 				}
 
 			}
-			printf(" out of %d ", $points);
+			printf(" out of %d ", Sanitize::onlyInt($points));
 
 			if ($parts!='') {
 				$answeights = implode(', ',$answeights);

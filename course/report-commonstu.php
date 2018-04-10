@@ -325,7 +325,7 @@ var app = new Vue({
 		editingRuleSet: -1,
 		allRules: [],
 		curRuleSetName: '',
-		ruleSets: <?php echo json_encode($rulesets); ?>,
+		ruleSets: <?php echo json_encode($rulesets, JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS); ?>,
 		currentRule: {
 			ruleType: 'none',
 			abovebelow: 0,

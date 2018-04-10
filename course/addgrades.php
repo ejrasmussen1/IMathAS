@@ -11,7 +11,7 @@
 	$isteacher = false;
 	if (isset($tutorid)) { $istutor = true;}
 	if (isset($teacherid)) { $isteacher = true;}
-    $gbItem = Sanitize::onlyInt($_GET['gbitem']);
+    $gbItem = $_GET['gbitem'] == 'new' ? 'new' : Sanitize::onlyInt($_GET['gbitem']);
 	if ($istutor) {
 		$isok = false;
 		if (is_numeric($gbItem)) {

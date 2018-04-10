@@ -132,7 +132,7 @@ if ($canviewall) {
 }
 
 if ($canviewall && !empty($_GET['stu'])) {
-	$stu = $_GET['stu'];
+	$stu = Sanitize::onlyInt($_GET['stu']);
 } else {
 	$stu = 0;
 }
@@ -199,10 +199,10 @@ if ($isteacher) {
 			$value = $_POST['checked'];
 			$last = count($value)-1;
 			for($i = 0; $i < $last; $i++){
-				gbstudisp($value[$i]);
+				gbstudisp(Sanitize::onlyInt($value[$i]));
 				echo "<div style=\"page-break-after:always\"></div>";
 			}
-			gbstudisp($value[$last]);//no page break after last report
+			gbstudisp(Sanitize::onlyInt($value[$last]));//no page break after last report
 
 			echo "</div></div></div>";
 		}
@@ -661,7 +661,7 @@ function gbstudisp($stu) {
 			while ($row = $stm->fetch(PDO::FETCH_NUM)) {
 				if ($row[3]!='' && $row[3]!=$lastsec && $usersort==0) {
 					if ($lastsec=='') {echo '</optgroup>';}
-					echo '<optgroup label="Section '.Sanitize::encodeStringForDisplay($row[3]).'">';
+					echo '<optgroup label="Section '.htmlentities($row[3]).'">';
 					$lastsec = $row[3];
 				}
 				echo '<option value="'.Sanitize::encodeStringForDisplay($row[0]).'"';
@@ -683,7 +683,8 @@ function gbstudisp($stu) {
 		if ($stusection!='') {
 			echo ' <span class="small">Section: '.Sanitize::encodeStringForDisplay($stusection).'.</span>';
 		}
-		echo ' <span class="small">'._('Last Login: ').tzdate('D n/j/y g:ia', $lastaccess).'.</span>';
+		$logindate = ($lastaccess>0)?tzdate('D n/j/y g:ia', $lastaccess):_('Never');
+		echo ' <span class="small">'._('Last Login: ').$logindate.'.</span>';
 		echo '</div>';
 		if ($isteacher) {
 			echo '<div style="clear:both;display:inline-block" class="cpmid secondary">';
