@@ -523,9 +523,9 @@ function deleteasidfilesbyquery2($tosearchby,$val,$aid=null,$lim=0) {
 		$base = rtrim(dirname(dirname(__FILE__)), '/\\').'/filestore';
 		foreach($todel as $file) {
 			if (in_array($file,$deled)) { continue;}
-			if (unlink($base.'/adata/'.$file)) {
+			if (unlink(realpath($base.'/adata/'.$file))) {
 				$deled[] = $file;
-				recursiveRmdir(dirname($base.'/adata/'.$file));
+				recursiveRmdir(realpath(dirname($base.'/adata/'.$file)));
 			}
 		}
 	}
