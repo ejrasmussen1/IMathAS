@@ -451,7 +451,7 @@ if ($haslogin && !$hasusername) {
 
 	 }
 
- }
+ 
  //has logged in already
  if ($hasusername) {
 	//check validity, if desired

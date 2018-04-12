@@ -82,7 +82,7 @@ if (isset($_POST['remove'])) {
 		if ($row['rights']==76 || $row['rights']==77) {continue;}
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName']);
 	}
-	echo json_encode($out);
+	echo json_encode($out, JSON_HEX_TAG);
 	exit;
 } else if (isset($_POST['search'])) {
 	$stm = $DBH->prepare("SELECT userid FROM imas_teachers WHERE courseid=?");
@@ -96,7 +96,7 @@ if (isset($_POST['remove'])) {
 		if (in_array($row['id'], $existing)) { continue; }
 		$out[] = array("id"=>$row['id'], "name"=>$row['LastName'].', '.$row['FirstName'].' ('.$row['name'].')');
 	}
-	echo json_encode($out);
+	echo json_encode($out, JSON_HEX_TAG);
 	exit;
 }
 
