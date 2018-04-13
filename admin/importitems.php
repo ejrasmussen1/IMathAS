@@ -89,7 +89,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				$tosets .= ','.$set;
 				//DB $valsets .= ',\''.$item[$itemtoadd][$set].'\'';
 				$valsets .= ',:'.$set;
-				$qarr[':'.$set] = $item[$itemtoadd][$set];
+				$qarr[':'.$set] = Sanitize::stripHtmlTags($item[$itemtoadd][$set]);
 			}
 		}
 		$query = "INSERT INTO imas_assessments ($tosets) VALUES ($valsets)";
@@ -141,7 +141,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					$qarr = array(':description'=>$qset['description'][$n], ':author'=>$qset['author'][$n], ':qtype'=>$qset['qtype'][$n],
 						':control'=>$qset['control'][$n], ':qcontrol'=>$qset['qcontrol'][$n], ':qtext'=>$qset['qtext'][$n], ':answer'=>$qset['answer'][$n],
 						':solution'=>$qset['solution'][$n], ':solutionopts'=>$qset['solutionopts'][$n], ':license'=>$qset['license'][$n],
-						':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':extref'=>$qset['extref'][$n],
+						':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':extref'=>Sanitize::stripHtmlTags($qset['extref'])[$n],
 						':lastmoddate'=>$now, ':adddate'=>$now, ':hasimg'=>$hasimg, ':id'=>$questions[$qid]['qsetid']);
 
 					$query = "UPDATE imas_questionset SET description=:description,";
@@ -184,7 +184,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 							}
 							$p[1] = filter_var($p[1], FILTER_SANITIZE_URL);
 							$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename,alttext) VALUES (:qsetid, :var, :filename, :alt)");
-							$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>$p[0], ':filename'=>$p[1], ':alt'=>$alttext));
+							$stm->execute(array(':qsetid'=>Sanitize::onlyInt($questions[$qid]['qsetid']), ':var'=>Sanitize::stripHtmlTags($p[0]), ':filename'=>Sanitize::stripHtmlTags($p[1]), ':alt'=>Sanitize::stripHtmlTags($alttext)));
 						}
 					}
 					if ($qdeleted==1) { //was deleted; need to add library items
@@ -230,7 +230,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 					':author'=>$qset['author'][$n], ':userights'=>$thisqrights, ':description'=>$qset['description'][$n], ':qtype'=>$qset['qtype'][$n],
 					':control'=>$qset['control'][$n], ':qcontrol'=>$qset['qcontrol'][$n], ':qtext'=>$qset['qtext'][$n], ':answer'=>$qset['answer'][$n],
 					':solution'=>$qset['solution'][$n], ':solutionopts'=>$qset['solutionopts'][$n], ':extref'=>$qset['extref'][$n], ':license'=>$qset['license'][$n],
-					':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>$qset['otherattribution'][$n], ':hasimg'=>$hasimg, ':importuid'=>$importuid));
+					':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>Sanitize::stripHtmlTags($qset['otherattribution'][$n]), ':hasimg'=>$hasimg, ':importuid'=>$importuid));
 				$questions[$qid]['qsetid'] = $DBH->lastInsertId();
 				if ($hasimg==1) {
 					$qimgs = explode("\n",$qset['qimgs'][$n]);
@@ -239,7 +239,7 @@ function additem($itemtoadd,$item,$questions,$qset) {
 						//DB $query = "INSERT INTO imas_qimages (qsetid,var,filename) VALUES ({$questions[$qid]['qsetid']},'{$p[0]}','{$p[1]}')";
 						//DB mysql_query($query) or die("Import failed on $query: " . mysql_error());
 						$stm = $DBH->prepare("INSERT INTO imas_qimages (qsetid,var,filename) VALUES (:qsetid, :var, :filename)");
-						$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>$p[0], ':filename'=>$p[1]));
+						$stm->execute(array(':qsetid'=>$questions[$qid]['qsetid'], ':var'=>Sanitize::stripHtmlTags($p[0]), ':filename'=>Sanitize::stripHtmlTags($p[1])));
 					}
 				}
 				foreach ($newlibs as $lib) {

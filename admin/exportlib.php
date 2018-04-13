@@ -96,15 +96,15 @@ if (!(isset($teacherid)) && $myrights<20) {
 				echo "ID\n";
 				echo rtrim($libcnt) . "\n";
 				echo "UID\n";
-				echo rtrim($row[3]) . "\n";
+				echo Sanitize::stripHtmlTags(rtrim($row[3])) . "\n";
 				echo "LASTMODDATE\n";
-				echo rtrim($row[4]) . "\n";
+				echo Sanitize::stripHtmlTags(rtrim($row[4])) . "\n";
 				echo "OWNERID\n";
-				echo rtrim($row[5]) . "\n";
+				echo Sanitize::stripHtmlTags(rtrim($row[5])) . "\n";
 				echo "USERIGHTS\n";
-				echo rtrim($row[6]) . "\n";
+				echo Sanitize::stripHtmlTags(rtrim($row[6])) . "\n";
 				echo "NAME\n";
-				echo rtrim($row[1]) . "\n";
+				echo Sanitize::stripHtmlTags(rtrim($row[1])) . "\n";
 				echo "PARENT\n";
 				echo "0\n";
 				$libcnt++;
@@ -295,7 +295,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 				$stm2 = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm2->execute(array(':qsetid'=>$line['id']));
 				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-					echo $row[0].','.getqimageurl($row[1],true).','.$row[2]. "\n";
+					echo Sanitize::stripHtmlTags($row[0]).','.getqimageurl($row[1],true).','.Sanitize::stripHtmlTags($row[2]). "\n";
 				}
 			}
 		}
