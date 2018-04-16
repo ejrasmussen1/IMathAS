@@ -1,5 +1,7 @@
 <?php
 //IMathAS:  Lock students students; called from List Users or Gradebook
+//  This file is always included from listusers.php or gradebook.php
+//  The isset($teacherid) check blocks access if accessed directly
 //(c) 2013 David Lippman
 @set_time_limit(0);
 ini_set("max_input_time", "600");
@@ -38,17 +40,16 @@ ini_set("max_execution_time", "600");
 		$stm->execute(array(':locked'=>$now, ':courseid'=>$cid));
 
 		if ($calledfrom=='lu') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" .Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/listusers.php?cid=$cid&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		} else if ($calledfrom == 'gb') {
-			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&r=" .Sanitize::randomQueryStringParam());
+			header('Location: ' . $GLOBALS['basesiteurl'] . "/course/gradebook.php?cid=$cid&gbmode=" . Sanitize::encodeUrlParam($_GET['gbmode']) . "&r=" . Sanitize::randomQueryStringParam());
 			exit;
 		}
 	} else { //get confirm
 		if ((isset($_POST['submit']) && $_POST['submit']=="Lock") || (isset($_POST['posted']) && $_POST['posted']=="Lock")) {
 			$get_uid = 'selected';
 		}
-		
 
 		if ($get_uid=="selected") {
 			if (count($_POST['checked'])>0) {
@@ -63,7 +64,7 @@ ini_set("max_execution_time", "600");
 				$stm->execute(array(':courseid'=>$cid));
 			}
 		} else {
-			//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";
+			//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$get_uid}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
@@ -76,9 +77,9 @@ ini_set("max_execution_time", "600");
 		require("../header.php");
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
-			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid=" . $get_uid . "&confirmed=true\">";
+			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($get_uid) . "&confirmed=true\">";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&action=lock&uid=" . $get_uid . "&confirmed=true\">";
+			echo "<form method=post action=\"gradebook.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($get_uid) . "&confirmed=true\">";
 		}
 
 
