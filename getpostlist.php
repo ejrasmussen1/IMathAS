@@ -4,9 +4,9 @@
 //(c) 2009 David Lippman
 	$init_skip_csrfp = true;
    	require("init_without_validate.php");
-   	$keyString = $_GET['key'];
+   	$keyString = Sanitize::simpleString($_GET['key']);
 	if (!empty($_COOKIE['remoteaccess']) && strlen($_COOKIE['remoteaccess'])==10) {
-        $keyString = $_COOKIE['remoteaccess'];
+        $keyString = Sanitize::simpleString($_COOKIE['remoteaccess']);
 	} else if (empty($keyString) || strlen(trim($keyString))!=10) {
 		echo "Key Error";
         setcookie('remoteaccess',$keyString, time()+60*60*24*30*365*10,'','',true,true);

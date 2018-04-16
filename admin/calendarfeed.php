@@ -91,7 +91,7 @@ echo 'X-WR-CALDESC:'.calencode($installname.': '.$coursename).$EOL;
 
 foreach ($calevents as $event) {
 	echo 'BEGIN:VEVENT'.$EOL;
-	echo 'UID:'.$event[0].'@'.$installname.'.imathas.com'.$EOL;
+	echo 'UID:'.calencode($event[0]).'@'.$installname.'.imathas.com'.$EOL;
 	echo 'DTSTAMP:'.date('Ymd\THis\Z', $now).$EOL;
 	echo 'DTSTART:'.date('Ymd\THis\Z', $event[1]).$EOL;
 	echo 'DTEND:'.date('Ymd\THis\Z', $event[1]).$EOL;
@@ -101,7 +101,7 @@ foreach ($calevents as $event) {
 	}
 	if ($event[4] != '') { //alarm
 		echo 'BEGIN:VALARM'.$EOL;
-		echo 'TRIGGER:'.$event[4].$EOL;
+		echo 'TRIGGER:'.calencode($event[4]).$EOL;
 		echo 'ACTION:DISPLAY'.$EOL;
 		echo 'DESCRIPTION:'.calencode(($event[3]!=''?$event[3]:$event[2])).$EOL;
 		echo 'END:VALARM'.$EOL;

@@ -105,7 +105,7 @@ function checkNewUserValidation($required = array('SID','firstname','lastname','
 	  if ($loginformat != '' && !checkFormatAgainstRegex($_POST['SID'], $loginformat)) {
 	    $errors[] = "$loginprompt has invalid format";
 	  }
-	  $sid_value = (string) trim($_POST['SID']);
+	  $sid_value = Sanitize::stripHtmlTags($_POST['SID']);
 	  $stm = $DBH->prepare('SELECT id FROM imas_users WHERE SID=:sid');
 	  $stm->execute(array(':sid'=>$sid_value));
 	  if ($stm->rowCount()>0) {

@@ -61,7 +61,7 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     echo "Importing ".Sanitize::encodeStringForDisplay($data[0])."<br/>";
     $query = 'INSERT INTO imas_users (SID,password,FirstName,LastName,rights,email,groupid,homelayout,forcepwreset) VALUES (:SID, :password, :FirstName, :LastName, :rights, :email, :groupid, :homelayout, 1)';
     $stm = $DBH->prepare($query);
-    $stm->execute(array(':SID'=>$data[0], ':password'=>$hashpw, ':FirstName'=>$data[2], ':LastName'=>$data[3],
+    $stm->execute(array(':SID'=>Sanitize::stripHtmlTags($data[0]), ':password'=>$hashpw, ':FirstName'=>Sanitize::stripHtmlTags($data[2]), ':LastName'=>Sanitize::stripHtmlTags($data[3]),
             ':rights'=>40, ':email'=>Sanitize::emailAddress($data[4]), ':groupid'=>$newusergroupid, ':homelayout'=>$homelayout));
 
     $newuserid = $DBH->lastInsertId();
@@ -107,14 +107,15 @@ if (isset($_POST['groupid']) && is_uploaded_file($_FILES['uploadedfile']['tmp_na
     }
     $i = 5;
     while (isset($data[$i]) && $data[$i]!='' && intval($data[$i])>0) {
+      $sourcecid = Sanitize::onlyInt($data[$i]);
       if (empty($isoktocopy[$data[$i]])) {
-        echo "Skipping copying course {$data[$i]} - you don't have rights to copy this course without the enrollment key which is not supported by this batch process<br/>";
+        echo "Skipping copying course {$sourcecid} - you don't have rights to copy this course without the enrollment key which is not supported by this batch process<br/>";
         $i++;
         continue;
       }
-      echo "Copying course {$data[$i]}<br/>";
+      echo "Copying course {$sourcecid}<br/>";
       $uid = $newuserid;
-      $sourcecid = Sanitize::onlyInt($data[$i]);
+      
       $blockcnt = 1;
       $itemorder = serialize(array());
       $DBH->beginTransaction();

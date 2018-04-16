@@ -26,7 +26,6 @@ require("i18n/i18n.php");
 require("includes/JWT.php");
 header('P3P: CP="ALL CUR ADM OUR"');
 $sessiondata = array();
-
 /*
 if (isset($_GET['graphdisp'])) {
 	$sessiondata['graphdisp'] = intval($_GET['graphdisp']);
@@ -54,16 +53,14 @@ foreach($prefdefaults as $key=>$def) {
 		$sessiondata['userprefs'][$key] = $def;
 	}
 }
-
 if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and drawentry
 	$sessiondata['userprefs']['graphdisp'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
 	$sessiondata['userprefs']['drawentry'] = filter_var($_GET['graphdisp'], FILTER_SANITIZE_NUMBER_INT);
 	setcookie("embedquserprefs", json_encode(array(
 		'graphdisp'=>$sessiondata['userprefs']['graphdisp'],
 		'drawentry'=>$sessiondata['userprefs']['drawentry']
-		)),	'','','',true,true);
+		)),0,'','',false,true);
 }
-
 foreach(array('graphdisp','mathdisp','useed') as $key) {
 	$sessiondata[$key] = $sessiondata['userprefs'][$key];
 }
@@ -188,7 +185,7 @@ if (isset($_GET['action']) && $_GET['action']=='scoreembed') {
 	displayq($qn,$qids[$qn],$seeds[$qn],($showanstype>0),$showhints,$attempts[$qn],false,false,false,$colors);
 	$quesout .= ob_get_clean();
 	$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="'. _('Submit'). '" onclick="assessbackgsubmit('.$qn.',\'submitnotice'.$qn.'\')" /><span id="submitnotice'.$qn.'"></span></div>';
-	echo '<input type="hidden" id="verattempts'.$qn.'" value="'.$attempts[$qn].'"/>';
+	echo '<input type="hidden" id="verattempts'.$qn.'" value="'.Sanitize::encodeStringForDisplay($attempts[$qn]).'"/>';
 	echo $quesout;
 
 	//"save" session
@@ -253,7 +250,7 @@ echo '<script type="text/javascript">var assesspostbackurl="' .$urlmode. Sanitiz
 echo '<input type="hidden" id="asidverify" value="'.$jwtstring.'"/>';
 echo '<input type="hidden" id="disptime" value="'.time().'"/>';
 echo '<input type="hidden" id="isreview" value="0"/>';
-echo '<p><a href="multiembedq.php?id='.Sanitize::encodeUrlParam($_GET['id']).'&amp;regen=1&amp;sameseed='.$sameseed.'&amp;theme='.$theme.'&amp;iframe_resize_id='.$targetid.'">';
+echo '<p><a href="multiembedq.php?id='.Sanitize::encodeUrlParam($_GET['id']).'&amp;regen=1&amp;sameseed='.Sanitize::encodeUrlParam($sameseed).'&amp;theme='.Sanitize::encodeUrlParam($theme).'&amp;iframe_resize_id='.Sanitize::encodeUrlParam($targetid).'">';
 if (count($qids)>1) {
 	echo _('Try Another Version of These Questions').'</a></p>';
 } else {
@@ -279,7 +276,7 @@ foreach ($qids as $i=>$qid) {
 	$quesout .= ob_get_clean();
 	$quesout = substr($quesout,0,-7).'<br/><input type="button" class="btn" value="'. _('Submit'). '" onclick="assessbackgsubmit('.$i.',\'submitnotice'.$i.'\')" /><span id="submitnotice'.$i.'"></span></div>';
 	echo $quesout;
-	echo '<input type="hidden" id="verattempts'.$i.'" value="'.$attempts[$i].'"/>';
+	echo '<input type="hidden" id="verattempts'.$i.'" value="'.Sanitize::encodeStringForDisplay($attempts[$i]).'"/>';
 	echo '</div>';
 }
 

@@ -36,7 +36,7 @@ if (isset($_POST['libs'])) {
 		$thisgroup = $groupid;
 	}
 	
-	$librights = $_POST['librights'];
+	$librights = Sanitize::onlyInt($_POST['librights']);
 	$_POST['baselibname'] = trim($_POST['baselibname']);
 	if ($_POST['baselibname']=='') {
 		$_POST['baselibname'] = $coursename;
@@ -155,7 +155,7 @@ if (isset($_POST['libs'])) {
 	$inslibitem = $DBH->prepare("INSERT INTO imas_library_items (libid, qsetid, ownerid, lastmoddate) VALUES (?,?,?,?)");
 	
         if($librights < 6 || $librights==8){
-            $inslib->execute(array(getuniqid(), $now, $now, $_POST['baselibname'], $thisowner, $librights, $_POST['libs'], $thisgroup));
+            $inslib->execute(array(getuniqid(), $now, $now, Sanitize::stripHtmlTags($_POST['baselibname']), $thisowner, $librights, Sanitize::onlyInt($_POST['libs']), $thisgroup));
             $libid = $DBH->lastInsertId();
             $nlibs = 1;
             $nlibitems = 0;
