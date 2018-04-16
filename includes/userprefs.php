@@ -149,7 +149,7 @@ function storeUserPrefs() {
 		}
 	}
 	//use timezone from form - either browser reported or set val
-    $tzname = $_POST['settimezone'];
+    $tzname = Sanitize::stripHtmlTags($_POST['settimezone']);
 	if (date_default_timezone_set($_POST['settimezone'])) {
 		//$tzname = $_POST['settimezone'];
 		$stm = $DBH->prepare("UPDATE imas_sessions SET tzname=:tzname WHERE sessionid=:sessionid");

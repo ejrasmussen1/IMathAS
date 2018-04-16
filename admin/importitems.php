@@ -226,11 +226,11 @@ function additem($itemtoadd,$item,$questions,$qset) {
 				$query = "INSERT INTO imas_questionset (adddate,lastmoddate,uniqueid,ownerid,author,userights,description,qtype,control,qcontrol,qtext,answer,solution,solutionopts,extref,license,ancestorauthors,otherattribution,hasimg,importuid) ";
 				$query .= "VALUES (:adddate, :lastmoddate, :uniqueid, :ownerid, :author, :userights, :description, :qtype, :control, :qcontrol, :qtext, :answer, :solution, :solutionopts, :extref, :license, :ancestorauthors, :otherattribution, :hasimg, :importuid)";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':adddate'=>$now, ':lastmoddate'=>$qset['lastmod'][$n], ':uniqueid'=>$qset['uniqueid'][$n], ':ownerid'=>$thisownerid,
-					':author'=>$qset['author'][$n], ':userights'=>$thisqrights, ':description'=>$qset['description'][$n], ':qtype'=>$qset['qtype'][$n],
-					':control'=>$qset['control'][$n], ':qcontrol'=>$qset['qcontrol'][$n], ':qtext'=>$qset['qtext'][$n], ':answer'=>$qset['answer'][$n],
-					':solution'=>$qset['solution'][$n], ':solutionopts'=>$qset['solutionopts'][$n], ':extref'=>$qset['extref'][$n], ':license'=>$qset['license'][$n],
-					':ancestorauthors'=>$qset['ancestorauthors'][$n], ':otherattribution'=>Sanitize::stripHtmlTags($qset['otherattribution'][$n]), ':hasimg'=>$hasimg, ':importuid'=>$importuid));
+				$stm->execute(array(':adddate'=>$now, ':lastmoddate'=>Sanitize::stripHtmlTags($qset['lastmod'][$n]), ':uniqueid'=>Sanitize::onlyInt($qset['uniqueid'][$n]), ':ownerid'=>Sanitize::onlyInt($thisownerid),
+					':author'=>Sanitize::stripHtmlTags($qset['author'][$n]), ':userights'=>Sanitize::onlyInt($thisqrights), ':description'=>Sanitize::stripHtmlTags($qset['description'][$n]), ':qtype'=>Sanitize::stripHtmlTags($qset['qtype'][$n]),
+					':control'=>Sanitize::stripHtmlTags($qset['control'][$n]), ':qcontrol'=>Sanitize::stripHtmlTags($qset['qcontrol'][$n]), ':qtext'=>Sanitize::stripHtmlTags($qset['qtext'][$n]), ':answer'=>Sanitize::stripHtmlTags($qset['answer'][$n]),
+					':solution'=>Sanitize::stripHtmlTags($qset['solution'][$n]), ':solutionopts'=>Sanitize::onlyInt($qset['solutionopts'][$n]), ':extref'=>Sanitize::stripHtmlTags($qset['extref'][$n]), ':license'=>Sanitize::onlyInt($qset['license'][$n]),
+					':ancestorauthors'=>Sanitize::stripHtmlTags($qset['ancestorauthors'][$n]), ':otherattribution'=>Sanitize::stripHtmlTags($qset['otherattribution'][$n]), ':hasimg'=>$hasimg, ':importuid'=>$importuid));
 				$questions[$qid]['qsetid'] = $DBH->lastInsertId();
 				if ($hasimg==1) {
 					$qimgs = explode("\n",$qset['qimgs'][$n]);

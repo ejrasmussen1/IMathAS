@@ -144,7 +144,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 					echo "INSTRFILES\n";
 					foreach (explode(',',$line['fileorder']) as $fid) {
 						if (!isset($filenames[$fid])) {continue;}
-						echo $filenames[$fid]. ':::'.Sanitize::stripHtmlTags($filedescr[$fid])."\n";
+						echo Sanitize::stripHtmlTags($filenames[$fid]). ':::'.Sanitize::stripHtmlTags($filedescr[$fid])."\n";
 					}
 				}
 				echo "END ITEM\n";

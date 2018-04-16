@@ -450,8 +450,8 @@ if ($myrights < 100) {
 				$query = "INSERT INTO imas_libraries (uniqueid,adddate,lastmoddate,name,ownerid,userights,parent,groupid) VALUES ";
 				$query .= "(:uniqueid, :adddate, :lastmoddate, :name, :ownerid, :userights, :parent, :groupid)";
 				$stm = $DBH->prepare($query);
-				$stm->execute(array(':uniqueid'=>$unique[$libid], ':adddate'=>$now, ':lastmoddate'=>$now, ':name'=>Sanitize::stripHtmlTags($names[$libid]), ':ownerid'=>$thisownerid,
-					':userights'=>$thislibrights, ':parent'=>$parent, ':groupid'=>$thisgroupid));
+				$stm->execute(array(':uniqueid'=>Sanitize::onlyInt($unique[$libid]), ':adddate'=>$now, ':lastmoddate'=>$now, ':name'=>Sanitize::stripHtmlTags($names[$libid]), ':ownerid'=>Sanitize::onlyInt($thisownerid),
+					':userights'=>Sanitize::onlyInt($thislibrights), ':parent'=>Sanitize::onlyInt($parent), ':groupid'=>Sanitize::onlyInt($thisgroupid)));
 				$libs[$libid] = $DBH->lastInsertId();
 				$newl++;
 			}

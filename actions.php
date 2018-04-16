@@ -256,7 +256,7 @@ require_once("includes/sanitize.php");
 
 			$query = "SELECT id,email,rights FROM imas_users WHERE SID=:sid";
 			$stm = $DBH->prepare($query);
-			$stm->execute(array(':sid'=>$username));
+			$stm->execute(array(':sid'=>Sanitize::stripHtmlTags($username)));
 			if ($stm->rowCount()>0) {
 				list($id,$email,$rights) = $stm->fetch(PDO::FETCH_NUM);
 				//DB mysql_fetch_row($result);
@@ -403,7 +403,7 @@ require_once("includes/sanitize.php");
 			exit;
 		}
 		$stm = $DBH->prepare("SELECT id FROM imas_users WHERE SID=:SID");
-		$stm->execute(array(':SID'=>$getUsername));
+		$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($getUsername)));
 		if ($stm->rowCount()>0) {
 			echo "false";
 		} else {

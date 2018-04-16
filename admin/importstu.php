@@ -176,7 +176,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 				//DB mysql_query($query) or die("Query failed : " . mysql_error());
 				//DB $id = mysql_insert_id();
 				$stm = $DBH->prepare("INSERT INTO imas_users (SID,FirstName,LastName,email,rights,password,forcepwreset) VALUES (:SID, :FirstName, :LastName, :email, :rights, :password, 1)");
-				$stm->execute(array(':SID'=>$arr[0], ':FirstName'=>$arr[1], ':LastName'=>$arr[2], ':email'=>Sanitize::emailAddress($arr[3]), ':rights'=>10, ':password'=>$pw));
+				$stm->execute(array(':SID'=>Sanitize::stripHtmlTags($arr[0]), ':FirstName'=>Sanitize::stripHtmlTags($arr[1]), ':LastName'=>Sanitize::stripHtmlTags($arr[2]), ':email'=>Sanitize::emailAddress($arr[3]), ':rights'=>10, ':password'=>$pw));
 				$id = $DBH->lastInsertId();
 			}
 			if ($_POST['enrollcid']!=0 || !$isadmin) {
@@ -205,7 +205,7 @@ if (!(isset($teacherid)) && $myrights<100) {
 
 				$stm = $DBH->prepare("INSERT INTO imas_students (userid,courseid,code,section,latepass) VALUES (:userid, :courseid, :code, :section, :latepass)");
 				$stm->execute(array(':userid'=>$id, ':courseid'=>$ncid,
-					':code'=>($_POST['codetype']==1)?$arr[4]:null,
+					':code'=>($_POST['codetype']==1)?Sanitize::stripHtmlTags($arr[4]):null,
 					':section'=>($_POST['sectype']>0)?Sanitize::stripHtmlTags($arr[5]):null,
 					':latepass'=>$deflatepass));
 			}

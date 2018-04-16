@@ -40,7 +40,7 @@ if (isset($_GET['graphdisp'])) { //currently same is used for graphdisp and draw
 	setcookie("OEAembeduserprefs", json_encode(array(
 		'graphdisp'=>$sessiondata['userprefs']['graphdisp'],
 		'drawentry'=>$sessiondata['userprefs']['drawentry']
-		)));
+		)),0,'','',false,true);
 }
 foreach(array('graphdisp','mathdisp','useed') as $key) {
 	$sessiondata[$key] = $sessiondata['userprefs'][$key];
