@@ -892,8 +892,8 @@ if ($overwriteBody==1) {
 
 			$lastaccess = ($line['lastaccess']>0) ? tzdate("n/j/y g:ia",$line['lastaccess']) : "never";
 
-			$hasSectionData = ($hassection) ? "<td>{$line['section']}</td>" : "";
-			$hasCodeData = ($hascode) ? "<td>{$line['code']}</td>" : "";
+			$hasSectionData = ($hassection) ? "<td>".Sanitize::encodeStringForDisplay($line['section'])."</td>" : "";
+			$hasCodeData = ($hascode) ? "<td>".Sanitize::encodeStringForDisplay($line['code'])."</td>" : "";
 			if ($alt==0) {echo "<tr class=even>"; $alt=1;} else {echo "<tr class=odd>"; $alt=0;}
 ?>
 				<td><input type=checkbox name="checked[]" value="<?php echo Sanitize::onlyInt($line['userid']); ?>" <?php if ($line['locked']>0) echo 'class="locked"'?>></td>
@@ -941,7 +941,7 @@ if ($overwriteBody==1) {
 				<td><a href="gradebook.php?cid=<?php echo $cid ?>&stu=<?php echo Sanitize::onlyInt($line['userid']); ?>&from=listusers" class="gl">Grades</a></td>
 				<?php
 				if ($haslatepasses) {
-					echo '<td>'.$line['latepass'].'</td>';
+					echo '<td>'.Sanitize::onlyInt($line['latepass']).'</td>';
 				}
 				?>
 			</tr>

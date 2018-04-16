@@ -1,5 +1,7 @@
 <?php
 //IMathAS:  Lock students students; called from List Users or Gradebook
+//  This file is always included from listusers.php or gradebook.php
+//  The isset($teacherid) check blocks access if accessed directly
 //(c) 2013 David Lippman
 @set_time_limit(0);
 ini_set("max_input_time", "600");
@@ -61,7 +63,7 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 				$stm->execute(array(':courseid'=>$_GET['cid']));
 			}
 		} else {
-			//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$_GET['uid']}'";
+			//DB $query = "SELECT FirstName,LastName,SID FROM imas_users WHERE id='{$get_uid}'";
 			//DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
 			//DB $row = mysql_fetch_row($result);
 			$stm = $DBH->prepare("SELECT FirstName,LastName,SID FROM imas_users WHERE id=:id");
@@ -74,9 +76,9 @@ require_once(__DIR__ . "/../includes/sanitize.php");
 		require("../header.php");
 		echo  "<div class=breadcrumb>$curBreadcrumb</div>";
 		if ($calledfrom=='lu') {
-			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($_GET['uid']) . "&confirmed=true\">";
+			echo "<form method=post action=\"listusers.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($get_uid) . "&confirmed=true\">";
 		} else if ($calledfrom=='gb') {
-			echo "<form method=post action=\"gradebook.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($_GET['uid']) . "&confirmed=true\">";
+			echo "<form method=post action=\"gradebook.php?cid=$cid&action=lock&uid=" . Sanitize::simpleString($get_uid) . "&confirmed=true\">";
 		}
 
 
