@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 //IMathAS:  Main gradebook views (instructor & student)
 //(c) 2007 David Lippman
@@ -274,7 +275,7 @@ var gbmod = {
 	"showpics": '.Sanitize::onlyInt($showpics).'};
 </script>';
 if ($canviewall) {
-	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=040218"></script>';
+	$placeinhead .= '<script type="text/javascript" src="../javascript/gradebook.js?v=041218"></script>';
 }
 
 if (isset($studentid) || $stu!=0) { //show student view
