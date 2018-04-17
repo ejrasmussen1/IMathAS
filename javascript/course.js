@@ -113,7 +113,7 @@ function showcalcontents(el) {
 		html += showcalcontentsid(el.id);
 		var mlink = document.getElementById("mcelink");
 		if (mlink!=null) {
-			var href = mlink.getAttribute("href");
+			var href = mlink.href;
 			href = href.replace(/^(.*?cid=\d+).*$/,"$1");
 			mlink.href = href+"&addto="+(Date.parse(caleventsarr[el.id].date)/1000);
 		}
