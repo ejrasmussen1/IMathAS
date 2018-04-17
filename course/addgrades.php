@@ -141,9 +141,6 @@
 
 		}
 	}
-    $assesssnap = Sanitize::encodeStringForDisplay($_POST['assesssnap']);
-	if (!empty($assesssnap)) {
-	    $assesssnapaid = Sanitize::onlyInt($_POST['assesssnapaid']);
 
 	if (isset($_POST['assesssnap'])) {
 		$assesssnapaid = Sanitize::onlyInt($_POST['assesssnapaid']);
