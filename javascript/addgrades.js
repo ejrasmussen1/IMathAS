@@ -583,7 +583,6 @@ function sendtoall(w,type) {
 	}
 	for (var e = 0; e<form.elements.length; e++) {
 		 var el = form.elements[e];
-		 console.log(w,type);
 		 if (w==1) {
 			if (el.name.match(/feedback/) && el.name!="toallfeedback") {
 				pastfb = $(el).val();
