@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 //IMathAS:  Main gradebook views (instructor & student)
 //(c) 2007 David Lippman
