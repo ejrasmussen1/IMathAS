@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 //IMathAS:  Main gradebook views (instructor & student)
 //(c) 2007 David Lippman
@@ -800,7 +801,7 @@ function gbstudisp($stu) {
 				echo '<a href="../assessment/showtest.php?cid='.$cid.'&id='.$gbt[0][1][$i][7].'"';
 				if (abs($gbt[1][1][$i][12])>0) {
 					$tlwrds = '';
-					$timelimit = abs($gbt[1][1][$i][12]);
+					$timelimit = abs($gbt[0][1][$i][13])*$gbt[1][4][4];
 					if ($timelimit>3600) {
 						$tlhrs = floor($timelimit/3600);
 						$tlrem = $timelimit % 3600;
