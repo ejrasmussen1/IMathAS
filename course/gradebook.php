@@ -63,7 +63,7 @@ if ($canviewall) {
 		$stm = $DBH->prepare("SELECT colorize FROM imas_gbscheme WHERE courseid=:courseid");
 		$stm->execute(array(':courseid'=>$cid));
 		$colorize = $stm->fetchColumn(0);
-		setcookie("colorize-$cid",$colorize,0,'','',false,true);
+		setcookie("colorize-$cid",$colorize);
 	}
 	if (isset($_GET['catfilter'])) {
 		$catfilter = $_GET['catfilter'];
@@ -800,7 +800,7 @@ function gbstudisp($stu) {
 				echo '<a href="../assessment/showtest.php?cid='.$cid.'&id='.$gbt[0][1][$i][7].'"';
 				if (abs($gbt[1][1][$i][12])>0) {
 					$tlwrds = '';
-					$timelimit = abs($gbt[0][1][$i][13])*$gbt[1][4][4];
+					$timelimit = abs($gbt[1][1][$i][12]);
 					if ($timelimit>3600) {
 						$tlhrs = floor($timelimit/3600);
 						$tlrem = $timelimit % 3600;
