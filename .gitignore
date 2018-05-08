@@ -6,4 +6,4 @@ admin/import
 admin/import/*
 course/files
 course/files/*
-
+nbproject/private/*
