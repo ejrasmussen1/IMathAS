@@ -104,7 +104,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 				echo "USERIGHTS\n";
 				echo rtrim($row[6]) . "\n";
 				echo "NAME\n";
-				echo rtrim($row[1]) . "\n";
+				echo Sanitize::stripHtmlTags(rtrim($row[1])) . "\n";
 				echo "PARENT\n";
 				echo "0\n";
 				$libcnt++;
@@ -258,9 +258,9 @@ if (!(isset($teacherid)) && $myrights<20) {
 			echo "\nLASTMOD\n";
 			echo rtrim($line['lastmoddate']) . "\n";
 			echo "\nDESCRIPTION\n";
-			echo rtrim($line['description']) . "\n";
+			echo Sanitize::outgoingHtml(rtrim($line['description'])) . "\n";
 			echo "\nAUTHOR\n";
-			echo rtrim($line['author']) . "\n";
+			echo Sanitize::stripHtmlTags(rtrim($line['author'])) . "\n";
 			echo "\nOWNERID\n";
 			echo rtrim($line['ownerid']) . "\n";
 			echo "\nUSERIGHTS\n";
@@ -268,25 +268,25 @@ if (!(isset($teacherid)) && $myrights<20) {
 			echo "\nCONTROL\n";
 			echo rtrim($line['control']) . "\n";
 			echo "\nQCONTROL\n";
-			echo rtrim($line['qcontrol']) . "\n";
+			echo Sanitize::outgoingHtml(rtrim($line['qcontrol'])) . "\n";
 			echo "\nQTYPE\n";
-			echo rtrim($line['qtype']) . "\n";
+			echo Sanitize::stripHtmlTags(rtrim($line['qtype'])) . "\n";
 			echo "\nQTEXT\n";
-			echo rtrim($line['qtext']) . "\n";
+			echo Sanitize::outgoingHtml(rtrim($line['qtext'])) . "\n";
 			echo "\nANSWER\n";
-			echo rtrim($line['answer']) . "\n";
+			echo Sanitize::outgoingHtml(rtrim($line['answer'])) . "\n";
 			echo "\nSOLUTION\n";
-			echo rtrim($line['solution']) . "\n";
+			echo Sanitize::outgoingHtml(rtrim($line['solution'])) . "\n";
 			echo "\nSOLUTIONOPTS\n";
 			echo rtrim($line['solutionopts']) . "\n";
 			echo "\nEXTREF\n";
-			echo rtrim($line['extref']) . "\n";
+			echo Sanitize::stripHtmlTags(rtrim($line['extref'])) . "\n";
 			echo "\nLICENSE\n";
 			echo rtrim($line['license']) . "\n";
 			echo "\nANCESTORAUTHORS\n";
-			echo rtrim($line['ancestorauthors']) . "\n";
+			echo Sanitize::stripHtmlTags(rtrim($line['ancestorauthors'])) . "\n";
 			echo "\nOTHERATTRIBUTION\n";
-			echo rtrim($line['otherattribution']) . "\n";
+			echo Sanitize::stripHtmlTags(rtrim($line['otherattribution'])) . "\n";
 			if ($line['hasimg']==1) {
 				echo "\nQIMGS\n";
 				//DB $query = "SELECT var,filename FROM imas_qimages WHERE qsetid='{$line['id']}'";
@@ -295,7 +295,7 @@ if (!(isset($teacherid)) && $myrights<20) {
 				$stm2 = $DBH->prepare("SELECT var,filename,alttext FROM imas_qimages WHERE qsetid=:qsetid");
 				$stm2->execute(array(':qsetid'=>$line['id']));
 				while ($row = $stm2->fetch(PDO::FETCH_NUM)) {
-					echo $row[0].','.getqimageurl($row[1],true).','.$row[2]. "\n";
+					echo Sanitize::stripHtmlTags($row[0]).','.getqimageurl($row[1],true).','.Sanitize::stripHtmlTags($row[2]). "\n";
 				}
 			}
 		}
