@@ -298,7 +298,7 @@
 					} else {
 						echo "  <b>$cnt:</b> " ;
 						if (preg_match('/@FILE:(.+?)@/',$laarr[$k],$match)) {
-							$url = getasidfileurl($match[1]);
+							$url = stri_replace('"', '%22', getasidfileurl($match[1]));
 							echo "<a href=\"$url\" target=\"_new\">".Sanitize::stripHtmlTags(basename($match[1]))."</a>";
 						} else {
 							if (strpos($laarr[$k],'$f$')) {
