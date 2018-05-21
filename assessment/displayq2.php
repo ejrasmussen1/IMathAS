@@ -154,6 +154,11 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	if (isset($GLOBALS['rawscores'])) {
 		$scoreiscorrect = getiscorrect();
 	}
+	$a11yqs = 'a11y_graph='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['graphdisp']);
+	$a11yqs .= '&amp;a11y_mouse='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['drawentry']);
+	$a11yqs .= '&amp;a11y_math='.Sanitize::onlyInt($GLOBALS['sessiondata']['userprefs']['mathdisp']);
+	
+	
 	$preevalerror = error_get_last();
 	$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
 	$res2 = eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
@@ -1072,7 +1077,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 				$shorttip = _('Enter an integer or decimal number');
 			}
 		}
-		$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
+		if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+			$tip .= _('Enter DNE for Does Not Exist, oo for Infinity');
+		}
 		if (isset($reqdecimals)) {
 			$tip .= "<br/>" . sprintf(_('Your answer should be accurate to %d decimal places.'), $reqdecimals);
 			$shorttip .= sprintf(_(", accurate to %d decimal places"), $reqdecimals);
@@ -2015,7 +2022,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$tip = _('Enter your answer as an n-tuple of numbers.  Example: (2,5.5172)') . "<br/>";
 			$shorttip = _('Enter an n-tuple');
 		}
-		$tip .= _('Enter DNE for Does Not Exist');
+		if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+			$tip .= _('Enter DNE for Does Not Exist');
+		}
 
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"".Sanitize::encodeStringForDisplay($la)."\" autocomplete=\"off\" ";
 		if ($showtips==2) { //eqntips: work in progress
@@ -2138,8 +2147,9 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 			$tip = _('Enter your answer as a complex number in a+bi form.  Example: 2+5.5172i') . "<br/>";
 			$shorttip = _('Enter a complex number');
 		}
-
-		$tip .= _('Enter DNE for Does Not Exist');
+		if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+			$tip .= _('Enter DNE for Does Not Exist');
+		}
 
 		$out .= "<input class=\"text $colorbox\" type=\"text\"  size=\"$sz\" name=qn$qn id=qn$qn value=\"".Sanitize::encodeStringForDisplay($la)."\" autocomplete=\"off\"  ";
 		if ($showtips==2) { //eqntips: work in progress
@@ -2470,7 +2480,11 @@ function makeanswerbox($anstype, $qn, $la, $options,$multi,$colorbox='') {
 
 			$tip = _('Enter your answer using interval notation.  Example: [2.1,5.6172)') . " <br/>";
 			$tip .= _('Use U for union to combine intervals.  Example: (-oo,2] U [4,oo)') . "<br/>";
-			$tip .= _('Enter DNE for an empty set, oo for Infinity');
+			if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats))  {
+				$tip .= _('Enter DNE for an empty set. Use oo to enter Infinity.');
+			} else {
+				$tip .= _('Use oo to enter Infinity.');
+			}
 			if (isset($reqdecimals)) {
 				$tip .= "<br/>" . sprintf(_('Your numbers should be accurate to %d decimal places.'), $reqdecimals);
 			}
@@ -7307,8 +7321,14 @@ function formathint($eword,$ansformats,$calledfrom, $islist=false,$doshort=false
 		$tip .= '<br/>'._('Do not enter mixed numbers');
 		$shorttip .= _(' (no mixed numbers)');
 	}
-	if ($calledfrom != 'calcmatrix') {
-		$tip .= "<br/>" . _('Enter DNE for Does Not Exist, oo for Infinity');
+	if (!in_array('nosoln',$ansformats) && !in_array('nosolninf',$ansformats)) {
+		if ($calledfrom == 'calcinterval') {
+			$tip .= "<br/>" . _('Enter DNE for an empty set. Use oo to enter Infinity.');
+		} else if ($calledfrom != 'calcmatrix') {
+			$tip .= "<br/>" . _('Enter DNE for Does Not Exist, oo for Infinity');
+		}
+	} else if ($calledfrom == 'calcinterval') {
+		$tip .= "<br/>" . _('Use oo to enter Infinity.');
 	}
 	if (in_array('nodecimal',$ansformats)) {
 		$tip .= "<br/>" . _('Decimal values are not allowed');
