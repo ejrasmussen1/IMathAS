@@ -160,8 +160,16 @@ function displayq($qnidx,$qidx,$seed,$doshowans,$showhints,$attemptn,$returnqtxt
 	
 	
 	$preevalerror = error_get_last();
-	$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
-	$res2 = eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+	try {
+		$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
+		$res2 = eval(interpret('qcontrol',$qdata['qtype'],$qdata['qcontrol']));
+	} catch (Throwable $t) {
+		$res1 = false;
+		$res2 = false;
+	} catch (Exception $e) {
+		$res1 = false;
+		$res2 = false;
+	}
 	if ($res1===false || $res2===false) {
 		if ($myrights>10) {
 			$error = error_get_last();
@@ -841,9 +849,17 @@ function scoreq($qnidx,$qidx,$seed,$givenans,$attemptn=0,$qnpointval=1) {
 		}
 	}
 	$preevalerror = error_get_last();
-	$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
-	$RND->srand($seed+1);
-	$res2 = eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+	try {
+		$res1 = eval(interpret('control',$qdata['qtype'],$qdata['control']));
+		$RND->srand($seed+1);
+		$res2 = eval(interpret('answer',$qdata['qtype'],$qdata['answer']));
+	} catch (Throwable $t) {
+		$res1 = false;
+		$res2 = false;
+	} catch (Exception $e) {
+		$res1 = false;
+		$res2 = false;
+	}
 	if ($res1===false || $res2===false) {
 		if ($myrights>10) {
 			$error = error_get_last();
@@ -5286,7 +5302,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 			$x2 = 1/2*$settings[1] + 1/2*$settings[0] + $epsilon;
 			$x3 = 3/4*$settings[1] + 1/4*$settings[0] + 3*$epsilon;
 			$x4 = $settings[1] + 5*$epsilon;
-			$x0p = $imgborder;
+			$x0p = $xtopix($x0);
 			$x1p = $xtopix($x1); //($x1 - $settings[0])*$pixelsperx + $imgborder;
 			$x2p = $xtopix($x2); //($x2 - $settings[0])*$pixelsperx + $imgborder;
 			$x3p = $xtopix($x3); //($x3 - $settings[0])*$pixelsperx + $imgborder;
@@ -6074,6 +6090,7 @@ function scorepart($anstype,$qn,$givenans,$options,$multi) {
 					break;
 				}
 			}
+
 			foreach ($ansabs as $key=>$aabs) {
 				$scores[$key] = 0;
 				for ($i=0; $i<count($abs); $i++) {
