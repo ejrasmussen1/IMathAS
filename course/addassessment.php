@@ -47,258 +47,258 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 } elseif (!(isset($_GET['cid']))) {
 	$overwriteBody=1;
 	$body = "You need to access this page from the course page menu";
-    } else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
-        $assessmentId = Sanitize::onlyInt($_GET['id']);
-        $cid = Sanitize::courseId($_GET['cid']);
-        $block = $_GET['block'];
-        $assessName = Sanitize::stripHtmlTags($_POST['name']);
-        $stm = $DBH->prepare("SELECT dates_by_lti FROM imas_courses WHERE id=?");
-        $stm->execute(array($cid));
-        $dates_by_lti = $stm->fetchColumn(0);
-        $displayMethod = Sanitize::stripHtmlTags($_POST['displaymethod']);
-        $defpoints = Sanitize::onlyInt($_POST['defpoints']);
-        $cntingb_int = Sanitize::onlyInt($_POST['cntingb']);
-        $assmpassword = Sanitize::stripHtmlTags($_POST['assmpassword']);
-        $grdebkcat = Sanitize::onlyInt($_POST['gbcat']);
-        $grpmax = Sanitize::onlyInt($_POST['groupmax']);
-        $shwqcat = Sanitize::onlyInt($_POST['showqcat']);
-        $eqnhelper = Sanitize::onlyInt($_POST['eqnhelper']);
-        $showtips = Sanitize::onlyInt($_POST['showtips']);
-        $grpsetid = Sanitize::onlyInt($_POST['groupsetid']);
-        $reqscore = Sanitize::onlyInt($_POST['reqscore']);
-        $allowlate = Sanitize::onlyInt($_POST['allowlate']);
-        $exceptpenalty = Sanitize::onlyInt($_POST['exceptionpenalty']);
-        $ltisecret = Sanitize::stripHtmlTags($_POST['ltisecret']);
-        $msgtoinstr = Sanitize::onlyInt($_POST['msgtoinstr']);
-        $posttoforum = Sanitize::onlyInt($_POST['posttoforum']);
-        $defoutcome = Sanitize::onlyInt($_POST['defoutcome']);
+} else { // PERMISSIONS ARE OK, PROCEED WITH PROCESSING
+    $assessmentId = Sanitize::onlyInt($_GET['id']);
+    $cid = Sanitize::courseId($_GET['cid']);
+    $block = $_GET['block'];
+    $assessName = Sanitize::stripHtmlTags($_POST['name']);
+    $stm = $DBH->prepare("SELECT dates_by_lti FROM imas_courses WHERE id=?");
+    $stm->execute(array($cid));
+    $dates_by_lti = $stm->fetchColumn(0);
+    $displayMethod = Sanitize::stripHtmlTags($_POST['displaymethod']);
+    $defpoints = Sanitize::onlyInt($_POST['defpoints']);
+    $cntingb_int = Sanitize::onlyInt($_POST['cntingb']);
+    $assmpassword = Sanitize::stripHtmlTags($_POST['assmpassword']);
+    $grdebkcat = Sanitize::onlyInt($_POST['gbcat']);
+    $grpmax = Sanitize::onlyInt($_POST['groupmax']);
+    $shwqcat = Sanitize::onlyInt($_POST['showqcat']);
+    $eqnhelper = Sanitize::onlyInt($_POST['eqnhelper']);
+    $showtips = Sanitize::onlyInt($_POST['showtips']);
+    $grpsetid = Sanitize::onlyInt($_POST['groupsetid']);
+    $reqscore = Sanitize::onlyInt($_POST['reqscore']);
+    $allowlate = Sanitize::onlyInt($_POST['allowlate']);
+    $exceptpenalty = Sanitize::onlyInt($_POST['exceptionpenalty']);
+    $ltisecret = Sanitize::stripHtmlTags($_POST['ltisecret']);
+    $msgtoinstr = Sanitize::onlyInt($_POST['msgtoinstr']);
+    $posttoforum = Sanitize::onlyInt($_POST['posttoforum']);
+    $defoutcome = Sanitize::onlyInt($_POST['defoutcome']);
 
-        if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
-            if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
-                require_once('../includes/filehandler.php');
-                deleteallaidfiles($assessmentId);
-                //DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
-                //DB mysql_query($query) or die("Query failed : " . mysql_error());
-                $stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
-                $stm->execute(array(':assessmentid'=>$assessmentId));
-                //DB $query = "DELETE FROM imas_livepoll_status WHERE assessmentid='{$_GET['id']}'";
-                //DB mysql_query($query) or die("Query failed : " . mysql_error());
-                $stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
-                $stm->execute(array(':assessmentid'=>$assessmentId));
-                //DB $query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='{$_GET['id']}'";
-                //DB mysql_query($query) or die("Query failed : " . mysql_error());
-                $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
-                $stm->execute(array(':assessmentid'=>$assessmentId));
-                header(sprintf('Location: %s/course/addassessment.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'],
-                        $cid, $assessmentId));
-                exit;
-            } else {
-                $overwriteBody = 1;
-                //DB $query = "SELECT name FROM imas_assessments WHERE id={$_GET['id']}";
-                //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                //DB $assessmentname = mysql_result($result,0,0);
-                $stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
-                $stm->execute(array(':id'=>$assessmentId));
-                $assessmentname = $stm->fetchColumn(0);
-                $body = sprintf("<div class=breadcrumb>%s <a href=\"course.php?cid=%s\">%s</a> ", $breadcrumbbase,
-                    $cid, Sanitize::encodeStringForDisplay($coursename));
-                $body .= sprintf("&gt; <a href=\"addassessment.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
-                    $cid, $assessmentId);
-                $body .= sprintf("<h3>%s</h3>", Sanitize::encodeStringForDisplay($assessmentname));
-                $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
-                $body .= '<form method="POST" action="'.sprintf('addassessment.php?cid=%s&id=%d',$cid, $assessmentId).'">"';
-                $body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
-                $body .= sprintf("<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid=%s&id=%d'\"></p>\n",
-                    $cid, $assessmentId);
-                $body .= '</form>';
-            }
-        } elseif (!empty($_POST['name'])) { //if the form has been submitted
+    if (isset($_REQUEST['clearattempts'])) { //FORM POSTED WITH CLEAR ATTEMPTS FLAG
+        if (isset($_POST['clearattempts']) && $_POST['clearattempts']=="confirmed") {
+            require_once('../includes/filehandler.php');
+            deleteallaidfiles($assessmentId);
+            //DB $query = "DELETE FROM imas_assessment_sessions WHERE assessmentid='{$_GET['id']}'";
+            //DB mysql_query($query) or die("Query failed : " . mysql_error());
+            $stm = $DBH->prepare("DELETE FROM imas_assessment_sessions WHERE assessmentid=:assessmentid");
+            $stm->execute(array(':assessmentid'=>$assessmentId));
+            //DB $query = "DELETE FROM imas_livepoll_status WHERE assessmentid='{$_GET['id']}'";
+            //DB mysql_query($query) or die("Query failed : " . mysql_error());
+            $stm = $DBH->prepare("DELETE FROM imas_livepoll_status WHERE assessmentid=:assessmentid");
+            $stm->execute(array(':assessmentid'=>$assessmentId));
+            //DB $query = "UPDATE imas_questions SET withdrawn=0 WHERE assessmentid='{$_GET['id']}'";
+            //DB mysql_query($query) or die("Query failed : " . mysql_error());
+            $stm = $DBH->prepare("UPDATE imas_questions SET withdrawn=0 WHERE assessmentid=:assessmentid");
+            $stm->execute(array(':assessmentid'=>$assessmentId));
+            header(sprintf('Location: %s/course/addassessment.php?cid=%s&id=%d&r=' .Sanitize::randomQueryStringParam() , $GLOBALS['basesiteurl'],
+                    $cid, $assessmentId));
+            exit;
+        } else {
+            $overwriteBody = 1;
+            //DB $query = "SELECT name FROM imas_assessments WHERE id={$_GET['id']}";
+            //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+            //DB $assessmentname = mysql_result($result,0,0);
+            $stm = $DBH->prepare("SELECT name FROM imas_assessments WHERE id=:id");
+            $stm->execute(array(':id'=>$assessmentId));
+            $assessmentname = $stm->fetchColumn(0);
+            $body = sprintf("<div class=breadcrumb>%s <a href=\"course.php?cid=%s\">%s</a> ", $breadcrumbbase,
+                $cid, Sanitize::encodeStringForDisplay($coursename));
+            $body .= sprintf("&gt; <a href=\"addassessment.php?cid=%s&id=%d\">Modify Assessment</a> &gt; Clear Attempts</div>\n",
+                $cid, $assessmentId);
+            $body .= sprintf("<h3>%s</h3>", Sanitize::encodeStringForDisplay($assessmentname));
+            $body .= "<p>Are you SURE you want to delete all attempts (grades) for this assessment?</p>";
+            $body .= '<form method="POST" action="'.sprintf('addassessment.php?cid=%s&id=%d',$cid, $assessmentId).'">"';
+            $body .= '<p><button type=submit name=clearattempts value=confirmed>'._('Yes, Clear').'</button>';
+            $body .= sprintf("<input type=button value=\"Nevermind\" class=\"secondarybtn\" onClick=\"window.location='addassessment.php?cid=%s&id=%d'\"></p>\n",
+                $cid, $assessmentId);
+            $body .= '</form>';
+        }
+    } elseif (!empty($_POST['name'])) { //if the form has been submitted
 
-            require_once("../includes/parsedatetime.php");
-            if ($_POST['avail']==1) {
-                if ($_POST['sdatetype']=='0') {
-                    $startdate = 0;
-                } else {
-                    $startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
-                }
-                if ($_POST['edatetype']=='2000000000') {
-                    $enddate = 2000000000;
-                } else {
-                    $enddate = parsedatetime($_POST['edate'],$_POST['etime']);
-                }
-
-                if ($_POST['doreview']=='0') {
-                    $reviewdate = 0;
-                } else if ($_POST['doreview']=='2000000000') {
-                    $reviewdate = 2000000000;
-                } else {
-                    $reviewdate = parsedatetime($_POST['rdate'],$_POST['rtime']);
-                }
-            }else {
+        require_once("../includes/parsedatetime.php");
+        if ($_POST['avail']==1) {
+            if ($_POST['sdatetype']=='0') {
                 $startdate = 0;
+            } else {
+                $startdate = parsedatetime($_POST['sdate'],$_POST['stime']);
+            }
+            if ($_POST['edatetype']=='2000000000') {
                 $enddate = 2000000000;
+            } else {
+                $enddate = parsedatetime($_POST['edate'],$_POST['etime']);
+            }
+
+            if ($_POST['doreview']=='0') {
                 $reviewdate = 0;
-            }
-
-            if (isset($_POST['shuffle'])) { $shuffle = 1;} else {$shuffle = 0;}
-            if (isset($_POST['sameseed'])) { $shuffle += 2;}
-            if (isset($_POST['samever'])) { $shuffle += 4;}
-            if (isset($_POST['reattemptsdiffver']) && $_POST['deffeedback']!="Practice" && $_POST['deffeedback']!="Homework") {
-                $shuffle += 8;
-            }
-
-            if ($_POST['minscoretype']==1 && trim($_POST['minscore'])!='' && $_POST['minscore']>0) {
-                $_POST['minscore'] = intval($_POST['minscore'])+10000;
-            }
-
-            $isgroup = Sanitize::onlyInt($_POST['isgroup']);
-
-            if (isset($_POST['showhints'])) {
-                $showhints = 1;
+            } else if ($_POST['doreview']=='2000000000') {
+                $reviewdate = 2000000000;
             } else {
-                $showhints = 0;
+                $reviewdate = parsedatetime($_POST['rdate'],$_POST['rtime']);
             }
+        }else {
+            $startdate = 0;
+            $enddate = 2000000000;
+            $reviewdate = 0;
+        }
 
-            if (isset($_POST['istutorial'])) {
-                $istutorial = 1;
-            } else {
-                $istutorial = 0;
-            }
+        $shuffle = Sanitize::onlyInt($_POST['shuffle']);
+        if (isset($_POST['sameseed'])) { $shuffle += 2;}
+        if (isset($_POST['samever'])) { $shuffle += 4;}
+        if (isset($_POST['reattemptsdiffver']) && $_POST['deffeedback']!="Practice" && $_POST['deffeedback']!="Homework") {
+            $shuffle += 8;
+        }
 
-            $tutoredit = Sanitize::onlyInt($_POST['tutoredit']);
+        if ($_POST['minscoretype']==1 && trim($_POST['minscore'])!='' && $_POST['minscore']>0) {
+            $_POST['minscore'] = intval($_POST['minscore'])+10000;
+        }
 
-            $allowlate = intval($allowlate);
-            if (isset($_POST['latepassafterdue']) && $allowlate>0) {
-                $allowlate += 10;
-            }
+        $isgroup = Sanitize::onlyInt($_POST['isgroup']);
 
-            $timelimit = Sanitize::onlyInt($_POST['timelimit'])*60;
-            if (isset($_POST['timelimitkickout'])) {
-                $timelimit = -1*$timelimit;
-            }
+        if (isset($_POST['showhints'])) {
+            $showhints = 1;
+        } else {
+            $showhints = 0;
+        }
 
-            if (isset($_POST['usedeffb'])) {
-                $deffb = Sanitize::incomingHtml($_POST['deffb']);
-            } else {
-                $deffb = '';
-            }
+        if (isset($_POST['istutorial'])) {
+            $istutorial = 1;
+        } else {
+            $istutorial = 0;
+        }
 
-            if ($_POST['deffeedback']=="Practice" || $_POST['deffeedback']=="Homework") {
-                $deffeedback = Sanitize::simpleString($_POST['deffeedback']).'-'.Sanitize::simpleString($_POST['showansprac']);
-            } else {
-                $deffeedback = Sanitize::simpleString($_POST['deffeedback']).'-'.Sanitize::simpleString($_POST['showans']);
+        $tutoredit = Sanitize::onlyInt($_POST['tutoredit']);
+
+        $allowlate = intval($allowlate);
+        if (isset($_POST['latepassafterdue']) && $allowlate>0) {
+            $allowlate += 10;
+        }
+
+        $timelimit = Sanitize::onlyInt($_POST['timelimit'])*60;
+        if (isset($_POST['timelimitkickout'])) {
+            $timelimit = -1*$timelimit;
+        }
+
+        if (isset($_POST['usedeffb'])) {
+            $deffb = Sanitize::incomingHtml($_POST['deffb']);
+        } else {
+            $deffb = '';
+        }
+
+        if ($_POST['deffeedback']=="Practice" || $_POST['deffeedback']=="Homework") {
+            $deffeedback = Sanitize::simpleString($_POST['deffeedback']).'-'.Sanitize::simpleString($_POST['showansprac']);
+        } else {
+            $deffeedback = Sanitize::simpleString($_POST['deffeedback']).'-'.Sanitize::simpleString($_POST['showans']);
+        }
+        if (!isset($_POST['doposttoforum'])) {
+            $posttoforum = 0;
+        }
+        if (isset($msgtoinstr)) {
+            $msgtoinstr = 1;
+        } else {
+            $msgtoinstr = 0;
+        }
+        $defpenalty = Sanitize::onlyFloat($_POST['defpenalty']);
+        $skippenalty_post = Sanitize::onlyInt($_POST['skippenalty']);
+        if ($skippenalty_post==10) {
+            $defpenalty = 'L'.$defpenalty;
+        } else if ($skippenalty_post>0) {
+            $defpenalty = 'S'.$skippenalty_post.$defpenalty;
+        }
+        $defattempts = Sanitize::onlyFloat($_POST['defattempts']);
+        $copyFromId = Sanitize::onlyInt($_POST['copyfrom']);
+        if (!empty($copyFromId)) {
+            //DB $query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
+            //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+            //DB list($timelimit,$_POST['minscore'],$displayMethod,$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$shwqcat,$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$grpsetid,$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$eqnhelper,$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = addslashes_deep(mysql_fetch_row($result));
+            $stm = $DBH->prepare("SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,reqscoretype,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id=:id");
+            $stm->execute(array(':id'=>$copyFromId));
+
+            list($timelimit,$_POST['minscore'],$displayMethod,$defpoints,$defattempts,$defpenalty,$deffeedback,$shuffle,$grdebkcat,$assmpassword,$cntingb_int,$tutoredit,$shwqcat,$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$grpmax,$grpsetid,$showhints,$reqscore,$_POST['reqscoreaid'],$reqscoretype,$_POST['noprint'],$allowlate,$eqnhelper,$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$showtips,$exceptpenalty,$ltisecret,$msgtoinstr,$posttoforum,$istutorial,$defoutcome) = $stm->fetch(PDO::FETCH_NUM);
+            if (isset($_POST['copyinstr'])) {
+                if (($introjson=json_decode($cpintro))!==null) { //is json intro
+                    $_POST['intro'] = $introjson[0];
+                } else {
+                    $_POST['intro'] = $cpintro;
+                }
             }
-            if (!isset($_POST['doposttoforum'])) {
-                $posttoforum = 0;
+            if (isset($_POST['copysummary'])) {
+                $_POST['summary'] = $cpsummary;
             }
-            if (isset($msgtoinstr)) {
-                $msgtoinstr = 1;
-            } else {
-                $msgtoinstr = 0;
+            if (isset($_POST['copydates'])) {
+                $startdate = $cpstartdate;
+                $enddate = $cpenddate;
+                $reviewdate = $cpreviewdate;
             }
-            $defpenalty = Sanitize::onlyFloat($_POST['defpenalty']);
-            $skippenalty_post = Sanitize::onlyInt($_POST['skippenalty']);
-            if ($skippenalty_post==10) {
-                $defpenalty = 'L'.$defpenalty;
-            } else if ($skippenalty_post>0) {
-                $defpenalty = 'S'.$skippenalty_post.$defpenalty;
+            if (isset($_POST['removeperq'])) {
+                //DB $query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid='{$_GET['id']}'";
+                //DB mysql_query($query) or die("Query failed : " . mysql_error());
+                $stm = $DBH->prepare("UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid=:assessmentid");
+                $stm->execute(array(':assessmentid'=>$assessmentId));
             }
-            $defattempts = Sanitize::onlyFloat($_POST['defattempts']);
-            $copyFromId = Sanitize::onlyInt($_POST['copyfrom']);
-            if (!empty($copyFromId)) {
-                //DB $query = "SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id='{$_POST['copyfrom']}'";
+        }
+        if ($deffeedback=="Practice") {
+            $cntingb_int = Sanitize::onlyInt($_POST['pcntingb']);
+        }
+        if (isset($ltisecret)) {
+            $ltisecret = trim($ltisecret);
+        } else {
+            $ltisecret = '';
+        }
+
+        $reqscoretype = 0;
+        if ($_POST['reqscoreshowtype']==1) {
+            $reqscoretype |= 1;
+        }
+        if ($_POST['reqscorecalctype']==1) {
+            $reqscoretype |= 2;
+        }
+
+        //is updating, switching from nongroup to group, and not creating new groupset, check if groups and asids already exist
+        //if so, cannot handle
+        $updategroupset='';
+        if (isset($_GET['id']) && $_POST['isgroup']>0 && $grpsetid>0) {
+            $isok = true;
+            //DB $query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
+            //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+            //DB if (mysql_result($result,0,0)==0) {
+            $stm = $DBH->prepare("SELECT isgroup FROM imas_assessments WHERE id=:id");
+            $stm->execute(array(':id'=>$assessmentId));
+            if ($stm->fetchColumn(0)==0) {
+                //check to see if students have already started assessment
+                //don't really care if groups exist - just whether asids exist
+                //$query = "SELECT id FROM imas_stugroups WHERE groupsetid='{$_POST['groupsetid']}'";
+                //DB $query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+                //DB $query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
                 //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                //DB list($timelimit,$_POST['minscore'],$displayMethod,$_POST['defpoints'],$_POST['defattempts'],$_POST['defpenalty'],$deffeedback,$shuffle,$_POST['gbcat'],$_POST['assmpassword'],$_POST['cntingb'],$tutoredit,$shwqcat,$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$_POST['groupmax'],$grpsetid,$showhints,$_POST['reqscore'],$_POST['reqscoreaid'],$_POST['noprint'],$_POST['allowlate'],$eqnhelper,$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$_POST['showtips'],$_POST['exceptionpenalty'],$_POST['ltisecret'],$_POST['msgtoinstr'],$_POST['posttoforum'],$istutorial,$_POST['defoutcome']) = addslashes_deep(mysql_fetch_row($result));
-                $stm = $DBH->prepare("SELECT timelimit,minscore,displaymethod,defpoints,defattempts,defpenalty,deffeedback,shuffle,gbcategory,password,cntingb,tutoredit,showcat,intro,summary,startdate,enddate,reviewdate,isgroup,groupmax,groupsetid,showhints,reqscore,reqscoreaid,reqscoretype,noprint,allowlate,eqnhelper,endmsg,caltag,calrtag,deffeedbacktext,showtips,exceptionpenalty,ltisecret,msgtoinstr,posttoforum,istutorial,defoutcome FROM imas_assessments WHERE id=:id");
-                $stm->execute(array(':id'=>$copyFromId));
-
-                list($timelimit,$_POST['minscore'],$displayMethod,$defpoints,$defattempts,$defpenalty,$deffeedback,$shuffle,$grdebkcat,$assmpassword,$cntingb_int,$tutoredit,$shwqcat,$cpintro,$cpsummary,$cpstartdate,$cpenddate,$cpreviewdate,$isgroup,$grpmax,$grpsetid,$showhints,$reqscore,$_POST['reqscoreaid'],$reqscoretype,$_POST['noprint'],$allowlate,$eqnhelper,$endmsg,$_POST['caltagact'],$_POST['caltagrev'],$deffb,$showtips,$exceptpenalty,$ltisecret,$msgtoinstr,$posttoforum,$istutorial,$defoutcome) = $stm->fetch(PDO::FETCH_NUM);
-                if (isset($_POST['copyinstr'])) {
-                    if (($introjson=json_decode($cpintro))!==null) { //is json intro
-                        $_POST['intro'] = $introjson[0];
-                    } else {
-                        $_POST['intro'] = $cpintro;
-                    }
-                }
-                if (isset($_POST['copysummary'])) {
-                    $_POST['summary'] = $cpsummary;
-                }
-                if (isset($_POST['copydates'])) {
-                    $startdate = $cpstartdate;
-                    $enddate = $cpenddate;
-                    $reviewdate = $cpreviewdate;
-                }
-                if (isset($_POST['removeperq'])) {
-                    //DB $query = "UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid='{$_GET['id']}'";
-                    //DB mysql_query($query) or die("Query failed : " . mysql_error());
-                    $stm = $DBH->prepare("UPDATE imas_questions SET points=9999,attempts=9999,penalty=9999,regen=0,showans=0 WHERE assessmentid=:assessmentid");
-                    $stm->execute(array(':assessmentid'=>$assessmentId));
+                //DB if (mysql_result($result,0,0)>0) {
+                $query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
+                $query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
+                $stm = $DBH->prepare($query);
+                $stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
+                if ($stm->fetchColumn(0)>0) {
+                    echo "Sorry, cannot switch to use pre-defined groups after students have already started the assessment";
+                    exit;
                 }
             }
-            if ($deffeedback=="Practice") {
-                $cntingb_int = Sanitize::onlyInt($_POST['pcntingb']);
-            }
-            if (isset($ltisecret)) {
-                $ltisecret = trim($ltisecret);
-            } else {
-                $ltisecret = '';
-            }
+            //DB $updategroupset = "groupsetid='{$_POST['groupsetid']}',";
+            $updategroupset = Sanitize::onlyInt($grpsetid);
 
-            $reqscoretype = 0;
-            if ($_POST['reqscoreshowtype']==1) {
-                $reqscoretype |= 1;
-            }
-            if ($_POST['reqscorecalctype']==1) {
-                $reqscoretype |= 2;
-            }
+        }
 
-            //is updating, switching from nongroup to group, and not creating new groupset, check if groups and asids already exist
-            //if so, cannot handle
-            $updategroupset='';
-            if (isset($_GET['id']) && $_POST['isgroup']>0 && $grpsetid>0) {
-                $isok = true;
-                //DB $query = "SELECT isgroup FROM imas_assessments WHERE id='{$_GET['id']}'";
-                //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                //DB if (mysql_result($result,0,0)==0) {
-                $stm = $DBH->prepare("SELECT isgroup FROM imas_assessments WHERE id=:id");
-                $stm->execute(array(':id'=>$assessmentId));
-                if ($stm->fetchColumn(0)==0) {
-                    //check to see if students have already started assessment
-                    //don't really care if groups exist - just whether asids exist
-                    //$query = "SELECT id FROM imas_stugroups WHERE groupsetid='{$_POST['groupsetid']}'";
-                    //DB $query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-                    //DB $query .= "ias.assessmentid='{$_GET['id']}' AND ias.userid=imas_students.userid AND imas_students.courseid='$cid'";
-                    //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                    //DB if (mysql_result($result,0,0)>0) {
-                    $query = "SELECT COUNT(ias.id) FROM imas_assessment_sessions AS ias,imas_students WHERE ";
-                    $query .= "ias.assessmentid=:assessmentid AND ias.userid=imas_students.userid AND imas_students.courseid=:courseid";
-                    $stm = $DBH->prepare($query);
-                    $stm->execute(array(':assessmentid'=>$assessmentId, ':courseid'=>$cid));
-                    if ($stm->fetchColumn(0)>0) {
-                        echo "Sorry, cannot switch to use pre-defined groups after students have already started the assessment";
-                        exit;
-                    }
-                }
-                //DB $updategroupset = "groupsetid='{$_POST['groupsetid']}',";
-                $updategroupset = Sanitize::onlyInt($grpsetid);
-
-            }
-
-            if ($_POST['isgroup']>0 && isset($grpsetid) && $grpsetid==0) {
-                //create new groupset
-                //DB $query = "INSERT INTO imas_stugroupset (courseid,name) VALUES ('$cid','Group set for {$_POST['name']}')";
-                //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
-                //DB $_POST['groupsetid'] = mysql_insert_id();
-                $stm = $DBH->prepare("INSERT INTO imas_stugroupset (courseid,name) VALUES (:courseid, :name)");
-                $stm->execute(array(':courseid'=>$cid, ':name'=>'Group set for '.$assessName));
-                $grpsetid = $DBH->lastInsertId();
-                //DB $updategroupset = "groupsetid='{$_POST['groupsetid']}',";
-                $updategroupset = $grpsetid;
-            }
+        if ($_POST['isgroup']>0 && isset($grpsetid) && $grpsetid==0) {
+            //create new groupset
+            //DB $query = "INSERT INTO imas_stugroupset (courseid,name) VALUES ('$cid','Group set for {$_POST['name']}')";
+            //DB $result = mysql_query($query) or die("Query failed : " . mysql_error());
+            //DB $_POST['groupsetid'] = mysql_insert_id();
+            $stm = $DBH->prepare("INSERT INTO imas_stugroupset (courseid,name) VALUES (:courseid, :name)");
+            $stm->execute(array(':courseid'=>$cid, ':name'=>'Group set for '.$assessName));
+            $grpsetid = $DBH->lastInsertId();
+            //DB $updategroupset = "groupsetid='{$_POST['groupsetid']}',";
+            $updategroupset = $grpsetid;
+        }
 
 
-            $caltag = Sanitize::stripHtmlTags($_POST['caltagact']);
-            $calrtag = Sanitize::stripHtmlTags($_POST['caltagrev']);
+        $caltag = Sanitize::stripHtmlTags($_POST['caltagact']);
+        $calrtag = Sanitize::stripHtmlTags($_POST['caltagrev']);
 		$_POST['allowlate'] = intval($_POST['allowlate']);
 		if (isset($_POST['latepassafterdue']) && $_POST['allowlate']>0) {
 			$_POST['allowlate'] += 10;
@@ -1318,7 +1318,12 @@ if ($overwriteBody==1) {
 
 
 			<span class=form>Shuffle item order: </span>
-			<span class=formright><input type="checkbox" name="shuffle" <?php writeHtmlChecked($line['shuffle']&1,1); ?>>
+			<span class=formright>
+				<select name="shuffle">
+					<option value="0" <?php writeHtmlSelected($line['shuffle']&(1+16),0) ?>>No</option>
+					<option value="1" <?php writeHtmlSelected($line['shuffle']&1,1) ?>>All</option>
+					<option value="16" <?php writeHtmlSelected($line['shuffle']&16,16) ?>>All but first</option>
+				</select>
 			</span><BR class=form>
 			<span class=form>Gradebook Category:</span>
 			<span class=formright>
