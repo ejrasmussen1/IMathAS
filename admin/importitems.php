@@ -64,13 +64,13 @@ function additem($itemtoadd,$item,$questions,$qset) {
 
 		// Sanitize endmsg content.
 		if (isset($item[$itemtoadd]['endmsg'])) {
-		    $data = unserialize($item[$itemtoadd]['endmsg']);
+		    $data = json_decode($item[$itemtoadd]['endmsg']);
 		    $data['commonmsg'] = Sanitize::incomingHtml($data['commonmsg']);
 		    $data['def'] = Sanitize::incomingHtml($data['def']);
 		    foreach (array_keys($data['msgs']) as $k) {
 			$data['msgs'][$k] = Sanitize::incomingHtml($data['msgs'][$k]);
 		    }
-		    $item[$itemtoadd]['endmsg'] = serialize($data);
+		    $item[$itemtoadd]['endmsg'] = json_encode($data);
 		}
 
 
@@ -700,8 +700,8 @@ if (!(isset($teacherid))) {
 		$stm->execute(array(':id'=>$cid));
 
 		list($blockcnt,$itemorder) = $stm->fetch(PDO::FETCH_NUM);
-		$ciditemorder = unserialize($itemorder);
-		$items = unserialize($itemlist);
+		$ciditemorder = json_decode($itemorder);
+		$items = json_decode($itemlist);
 		$newitems = array();
 		$missingfiles = array();
 
@@ -712,7 +712,7 @@ if (!(isset($teacherid))) {
 
 		array_splice($ciditemorder,count($ciditemorder),0,$newitems);
 		//DB $itemorder = addslashes(serialize($ciditemorder));
-		$itemorder = serialize($ciditemorder);
+		$itemorder = json_encode($ciditemorder);
 		//DB $query = "UPDATE imas_courses SET itemorder='$itemorder',blockcnt='$blockcnt' WHERE id='$cid'";
 		//DB mysql_query($query) or die("Query failed : $query" . mysql_error());
 		$stm = $DBH->prepare("UPDATE imas_courses SET itemorder=:itemorder,blockcnt=:blockcnt WHERE id=:id");
@@ -753,7 +753,7 @@ if (!(isset($teacherid))) {
 			$page_fileErrorMsg .=  "a question or library export.\n";
 		}
 
-		$items = unserialize($itemlist);
+		$items = json_decode($itemlist);
 		$ids = array();
 		$types = array();
 		$names = array();

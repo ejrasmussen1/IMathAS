@@ -75,7 +75,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	$qcnt = 0;
 	//DB $items = unserialize(mysql_result($result,0,0));
 	$line = $stm->fetch(PDO::FETCH_ASSOC);
-	$items = unserialize($line['itemorder']);
+	$items = json_decode($line['itemorder']);
 	$newitems = array();
 	$qtoexport = array();
 	$qsettoexport = array();
@@ -90,7 +90,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	echo "INSTALLNAME\n";
 	echo $installname."\n";
 	echo "ITEM LIST\n";
-	echo serialize($newitems)."\n";
+	echo json_encode($newitems)."\n";
 	$coursefiles = array();
 	foreach ($toexport as $exportid=>$itemid) {
 		echo "BEGIN ITEM\n";
@@ -437,7 +437,7 @@ if (!(isset($teacherid))) {   //NO PERMISSIONS
 	//DB $items = unserialize(mysql_result($result,0,0));
 	$stm = $DBH->prepare("SELECT itemorder FROM imas_courses WHERE id=:id");
 	$stm->execute(array(':id'=>$cid));
-	$items = unserialize($stm->fetchColumn(0));
+	$items = json_decode($stm->fetchColumn(0));
 	$ids = array();
 	$types = array();
 	$names = array();
