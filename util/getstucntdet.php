@@ -29,14 +29,16 @@ if (!empty($getStart)) {
     $start = $now - 60 * 60 * 24 * intval($getDays);
 }
 
+
 if (!empty($getEnd)) {
     $parts = explode('-', $getEnd);
     if (count($parts) == 3) {
         $end = mktime(0, 0, 0, $parts[0], $parts[1], $parts[2]);
     }
 }
-echo '<h2>Enrollments from ' . date('M j, Y', $start) . ' to ' . date('M j, Y', $end) . '</h2>';
-echo '<p>This will list all students who last accessed the course between those dates.</p>';
+	echo '<h1>Enrollments from '.date('M j, Y',$start).' to '.date('M j, Y',$end).'</h1>';
+	echo '<p>This will list all students who last accessed the course between those dates.</p>';
+
 
 echo '<p>Courses marked with <sup>*</sup> have more than one instructor, and the enrollments have already been counted earlier so will be omitted</p>';
 
