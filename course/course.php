@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php
 //IMathAS:  Main course page
 //(c) 2006 David Lippman
