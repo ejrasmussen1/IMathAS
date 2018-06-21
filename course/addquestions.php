@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 //IMathAS:  Add/modify blocks of items on course page
 //(c) 2006 David Lippman
@@ -394,7 +395,7 @@ if (!(isset($teacherid))) { // loaded by a NON-teacher
 		var addqaddr = '$address';
 		</script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addquestions.js?v=030818\"></script>";
-	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=011118\"></script>";
+	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/addqsort.js?v=061918\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\" src=\"$imasroot/javascript/junkflag.js\"></script>";
 	$placeinhead .= "<script type=\"text/javascript\">var JunkFlagsaveurl = '". $GLOBALS['basesiteurl'] . "/course/savelibassignflag.php';</script>";
 	$placeinhead .= "<link rel=\"stylesheet\" href=\"$imasroot/course/addquestions.css?v=100517\" type=\"text/css\" />";
@@ -1260,10 +1261,10 @@ if ($overwriteBody==1) {
 		initeditor("selector","div.textsegment",null,true /*inline*/,editorSetup);
 		tinymce.init({
 			selector: "h4.textsegment",
-			inline: 1,
+			inline: true,
 			menubar: false,
 			plugins: ["charmap"],
-			toolbar1: "charmap saveclose",
+			toolbar: "charmap saveclose",
 			setup: editorSetup
 		});
 	</script>
