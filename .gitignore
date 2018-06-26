@@ -7,3 +7,8 @@ admin/import/*
 course/files
 course/files/*
 
+/vendor
+/tests/_support/_generated
+/tests/_output/
+/c3.php
+
